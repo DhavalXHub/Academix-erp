@@ -1,42 +1,60 @@
 const mongoose = require('mongoose');
 
-// Note: Re-using the Quiz schema structure observed in view_file previously.
-// Enhancing it slightly if needed, but the previous one looked mostly correct for simple quizzes.
-// Re-writing it to ensure it matches exactly what we need.
+const questionSchema = new mongoose.Schema({
+    questionId: {
+        type: String,
+        required: true,
+        default: () => new mongoose.Types.ObjectId().toString(),
+    },
+    text: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    options: [{
+        type: String,
+        required: true,
+    }],
+    correctOptionIndex: {
+        type: Number,
+        required: true,
+        min: 0,
+    }
+});
 
 const quizSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true
-    },
-    description: String,
-    subject: {
+    course: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Subject',
-        required: true
+        ref: 'Course',
+        required: true,
     },
-    createdBy: {
+    faculty: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Faculty',
-        required: true
+        required: true,
+    },
+    title: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    description: {
+        type: String,
+        trim: true,
+        default: '',
     },
     timeLimitMinutes: {
         type: Number,
-        required: true
+        required: true,
+        min: 1,
     },
-    questions: [{
-        questionText: { type: String, required: true },
-        options: [{ type: String, required: true }], // Array of strings e.g., ["Option A", "Option B", "Option C", "Option D"]
-        correctOptionIndex: { type: Number, required: true } // 0-3
-    }],
     isActive: {
         type: Boolean,
-        default: false
+        default: false,
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
+    questions: [questionSchema],
+}, { timestamps: true });
+
+quizSchema.index({ course: 1, isActive: 1 });
 
 module.exports = mongoose.model('Quiz', quizSchema);

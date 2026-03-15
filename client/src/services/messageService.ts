@@ -1,0 +1,7 @@
+import api from './api';
+
+export const getConversation = (token: string, userId: string): Promise<{ messages: any[] }> => 
+    api.get(`/messages/${userId}`, token);
+
+export const sendMessage = (token: string, recipientId: string, content: string): Promise<{ message: any }> =>
+    api.post('/messages', { recipientId, content }, token);
