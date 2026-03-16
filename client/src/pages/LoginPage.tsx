@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useEffect, useState, FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
 
@@ -17,7 +17,7 @@ const ROLE_DASHBOARD: Record<UserRole, string> = {
 };
 
 const LoginPage: React.FC = () => {
-    const { login, isLoading } = useAuth();
+    const { login, isLoading, isAuthenticated, user } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -29,6 +29,12 @@ const LoginPage: React.FC = () => {
 
     // After login, redirect to where the user originally wanted to go
     const from = (location.state as { from?: { pathname: string } })?.from?.pathname || null;
+
+    useEffect(() => {
+        if (isAuthenticated && user) {
+            navigate(ROLE_DASHBOARD[user.role], { replace: true });
+        }
+    }, [isAuthenticated, user, navigate]);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();

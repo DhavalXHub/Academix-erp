@@ -4,7 +4,9 @@ import React, {
     useState,
     useCallback,
     ReactNode,
+    useEffect,
 } from 'react';
+import api, { ACCESS_TOKEN_KEY, client } from '@/services/api';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -47,17 +49,66 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
-const API_BASE = 'http://localhost:5000/api/v1';
-
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    // Access token lives strictly in React memory (NOT localStorage) to block XSS attacks
+    // NOTE: accessToken is persisted in localStorage to keep users logged in across refresh.
+    // Refresh token remains HTTP-only cookie (server-side).
     const [accessToken, setAccessTokenState] = useState<string | null>(null);
     const [user, setUser] = useState<AuthUser | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const setAccessToken = useCallback((token: string) => {
         setAccessTokenState(token);
+        window.localStorage.setItem(ACCESS_TOKEN_KEY, token);
     }, []);
+
+    const clearSession = useCallback(() => {
+        setAccessTokenState(null);
+        setUser(null);
+        window.localStorage.removeItem(ACCESS_TOKEN_KEY);
+    }, []);
+
+    const fetchMe = useCallback(async (token: string) => {
+        const me = await api.get<AuthUser>('/auth/me', token);
+        setUser(me);
+    }, []);
+
+    /**
+     * autoLogin() runs once on startup:
+     * - if localStorage has an accessToken: try /auth/me
+     * - else (or if token invalid/expired): try /auth/refresh (cookie) then /auth/me
+     */
+    const autoLogin = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const stored = window.localStorage.getItem(ACCESS_TOKEN_KEY);
+            if (stored) {
+                setAccessTokenState(stored);
+                try {
+                    await fetchMe(stored);
+                    return;
+                } catch {
+                    // fall through to refresh
+                }
+            }
+
+            // Refresh using HTTP-only cookie (no Authorization required)
+            const refreshRes = await client.post('/auth/refresh', {});
+            const newToken: string | undefined = refreshRes?.data?.data?.accessToken;
+            if (!newToken) throw new Error('Refresh did not return access token.');
+
+            window.localStorage.setItem(ACCESS_TOKEN_KEY, newToken);
+            setAccessTokenState(newToken);
+            await fetchMe(newToken);
+        } catch {
+            clearSession();
+        } finally {
+            setIsLoading(false);
+        }
+    }, [clearSession, fetchMe]);
+
+    useEffect(() => {
+        autoLogin();
+    }, [autoLogin]);
 
     /**
      * Authenticates the user and stores the access token in React state.
@@ -66,21 +117,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const login = useCallback(async (email: string, password: string, role: UserRole) => {
         setIsLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include', // Sends/receives cookies
-                body: JSON.stringify({ email, password, role }),
-            });
-
-            const json = await res.json();
-
-            if (!json.success) {
-                throw new Error(json.error?.message || 'Login failed.');
-            }
-
-            setAccessTokenState(json.data.accessToken);
-            setUser(json.data.user);
+            const res = await api.post<{ accessToken: string; user: AuthUser }>(
+                '/auth/login',
+                { email, password, role } as unknown as Record<string, unknown>
+            );
+            setAccessTokenState(res.accessToken);
+            window.localStorage.setItem(ACCESS_TOKEN_KEY, res.accessToken);
+            setUser(res.user);
         } finally {
             setIsLoading(false);
         }
@@ -93,19 +136,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const logout = useCallback(async () => {
         try {
             if (accessToken) {
-                await fetch(`${API_BASE}/auth/logout`, {
-                    method: 'POST',
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                    credentials: 'include',
-                });
+                await api.post('/auth/logout', {}, accessToken);
             }
         } catch {
             // Silent fail — still clear local state regardless
         } finally {
-            setAccessTokenState(null);
-            setUser(null);
+            clearSession();
         }
-    }, [accessToken]);
+    }, [accessToken, clearSession]);
 
     const value: AuthContextType = {
         user,

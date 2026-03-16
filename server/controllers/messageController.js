@@ -21,4 +21,25 @@ const getConversation = async (req, res) => {
     } catch (e) { return err(res, e); }
 };
 
-module.exports = { sendMessage, getConversation };
+const markMessageRead = async (req, res) => {
+    try {
+        const message = await messageService.markAsRead(req.user.id, req.params.id);
+        return ok(res, 200, { message }, 'Message marked as read.');
+    } catch (e) { return err(res, e); }
+};
+
+const markConversationRead = async (req, res) => {
+    try {
+        const result = await messageService.markConversationRead(req.user.id, req.params.userId);
+        return ok(res, 200, { updated: result.modifiedCount ?? result.nModified ?? 0 }, 'Conversation marked as read.');
+    } catch (e) { return err(res, e); }
+};
+
+const getUnreadCounts = async (req, res) => {
+    try {
+        const counts = await messageService.getUnreadCounts(req.user.id);
+        return ok(res, 200, { counts });
+    } catch (e) { return err(res, e); }
+};
+
+module.exports = { sendMessage, getConversation, markMessageRead, markConversationRead, getUnreadCounts };

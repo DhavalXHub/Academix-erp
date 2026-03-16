@@ -53,8 +53,27 @@ const markAsRead = async (userId, messageId) => {
     return message;
 };
 
+const markConversationRead = async (userId, otherUserId) => {
+    return Message.updateMany(
+        { sender: otherUserId, recipient: userId, readAt: null },
+        { $set: { readAt: new Date() } }
+    );
+};
+
+const getUnreadCounts = async (userId) => {
+    const rows = await Message.aggregate([
+        { $match: { recipient: require('mongoose').Types.ObjectId(userId), readAt: null } },
+        { $group: { _id: '$sender', count: { $sum: 1 } } },
+    ]);
+    const map = {};
+    rows.forEach(r => { map[String(r._id)] = r.count; });
+    return map;
+};
+
 module.exports = {
     getConversation,
     sendMessage,
     markAsRead,
+    markConversationRead,
+    getUnreadCounts,
 };

@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/services/api'; // generic api fetch
 import ChatWindow from '@/components/ChatWindow';
+import { useSocket } from '@/contexts/SocketContext';
 
 const MessagesPage: React.FC = () => {
     const { accessToken } = useAuth();
+    const { unreadMessagesByUser } = useSocket();
     const [users, setUsers] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -55,6 +57,9 @@ const MessagesPage: React.FC = () => {
                                         <div style={styles.contactName}>{u.name}</div>
                                         <div style={styles.contactRole}>{u.role}</div>
                                     </div>
+                                    {!!unreadMessagesByUser?.[u._id] && (
+                                        <div style={styles.badge}>{unreadMessagesByUser[u._id]}</div>
+                                    )}
                                 </div>
                             ))
                         )}
@@ -94,6 +99,7 @@ const styles: Record<string, React.CSSProperties> = {
     avatar: { width: 44, height: 44, borderRadius: '50%', background: '#cbd5e1', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, marginRight: 16, flexShrink: 0 },
     contactName: { fontSize: 15, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
     contactRole: { fontSize: 12, color: '#64748b', textTransform: 'capitalize', marginTop: 4 },
+    badge: { minWidth: 22, height: 22, padding: '0 6px', borderRadius: 999, background: '#ef4444', color: '#fff', fontWeight: 800, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' },
     
     mainArea: { flex: 1, display: 'flex', flexDirection: 'column', background: '#f1f5f9', padding: 16 },
     noSelection: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', background: '#fff', borderRadius: 12, border: '1px dashed #cbd5e1' }

@@ -36,8 +36,16 @@ import AdminUsersPage from '@/pages/admin/AdminUsersPage';
 import AdminCoursesPage from '@/pages/admin/AdminCoursesPage';
 import AdminFinancePage from '@/pages/admin/AdminFinancePage';
 import AdminAnalyticsPage from '@/pages/admin/AdminAnalyticsPage';
+import AdminAnnouncementsPage from '@/pages/admin/AdminAnnouncementsPage';
 
 import MessagesPage from '@/pages/common/MessagesPage';
+import { useAuth } from '@/contexts/AuthContext';
+
+const RoleHomeRedirect: React.FC = () => {
+    const { user } = useAuth();
+    if (!user) return <Navigate to="/login" replace />;
+    return <Navigate to={`/${user.role}/dashboard`} replace />;
+};
 
 const App: React.FC = () => {
     return (
@@ -50,7 +58,7 @@ const App: React.FC = () => {
 
                     {/* Root Redirect - Automatically bumps to dashboard based on role inside ProtectedRoute */}
                     <Route path="/" element={<ProtectedRoute />}>
-                        <Route index element={<Navigate to="/login" replace />} />
+                        <Route index element={<RoleHomeRedirect />} />
                     </Route>
 
                     {/* Student Routes */}
@@ -92,6 +100,7 @@ const App: React.FC = () => {
                             <Route path="courses" element={<AdminCoursesPage />} />
                             <Route path="finance" element={<AdminFinancePage />} />
                             <Route path="analytics" element={<AdminAnalyticsPage />} />
+                            <Route path="announcements" element={<AdminAnnouncementsPage />} />
                             <Route path="messages" element={<MessagesPage />} />
                             <Route path="profile" element={<ProfilePage />} />
                         </Route>

@@ -28,6 +28,17 @@ const initSocket = (server) => {
             console.log(`[Socket.IO] Client joined room course_${courseId}`);
         });
 
+        // Typing indicator for 1:1 chats
+        socket.on('typing', ({ toUserId, fromUserId }) => {
+            if (!toUserId || !fromUserId) return;
+            io.to(`user_${toUserId}`).emit('typing', { fromUserId });
+        });
+
+        socket.on('stopTyping', ({ toUserId, fromUserId }) => {
+            if (!toUserId || !fromUserId) return;
+            io.to(`user_${toUserId}`).emit('stopTyping', { fromUserId });
+        });
+
         socket.on('disconnect', () => {
              console.log(`[Socket.IO] Client disconnected: ${socket.id}`);
         });

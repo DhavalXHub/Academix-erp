@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Users, Book, DollarSign, BarChart2, MessageSquare, Settings, LogOut } from 'lucide-react';
+import { Users, Book, DollarSign, BarChart2, MessageSquare, Settings, LogOut, Megaphone } from 'lucide-react';
 
 const AdminLayout: React.FC = () => {
     const { user, logout } = useAuth();
@@ -20,6 +20,7 @@ const AdminLayout: React.FC = () => {
         { icon: Book, label: 'Course Catalog', path: '/admin/courses' },
         { icon: DollarSign, label: 'Finance Engine', path: '/admin/finance' },
         { icon: BarChart2, label: 'Deep Analytics', path: '/admin/analytics' },
+        { icon: Megaphone, label: 'Announcements', path: '/admin/announcements' },
         { icon: MessageSquare, label: 'Broadcasts', path: '/admin/messages' },
         { icon: Settings, label: 'System Settings', path: '/admin/profile' },
     ];

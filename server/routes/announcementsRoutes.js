@@ -3,6 +3,9 @@ const router = express.Router();
 const Notice = require('../models/Notice');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
+const ok = (res, code, data, msg = 'Success') => res.status(code).json({ success: true, message: msg, data, error: null });
+const fail = (res, code, message, errCode = 'ERROR') => res.status(code).json({ success: false, data: null, error: { code: errCode, message } });
+
 // @desc    Get all announcements
 // @route   GET /api/announcements
 router.get('/', protect, async (req, res) => {
@@ -25,10 +28,23 @@ router.get('/', protect, async (req, res) => {
             .sort({ createdAt: -1 })
             .populate('postedBy', 'name role');
 
-        res.json(notices);
+        return ok(res, 200, { notices });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server Error' });
+        return fail(res, 500, 'Server Error', 'SERVER_ERROR');
+    }
+});
+
+// @desc    Get one announcement
+// @route   GET /api/announcements/:id
+router.get('/:id', protect, async (req, res) => {
+    try {
+        const notice = await Notice.findById(req.params.id).populate('postedBy', 'name role');
+        if (!notice) return fail(res, 404, 'Notice not found', 'NOT_FOUND');
+        return ok(res, 200, { notice });
+    } catch (error) {
+        console.error(error);
+        return fail(res, 500, 'Server Error', 'SERVER_ERROR');
     }
 });
 
@@ -37,6 +53,7 @@ router.get('/', protect, async (req, res) => {
 router.post('/', protect, authorize('faculty', 'admin'), async (req, res) => {
     try {
         const { title, content, category, targetAudience } = req.body;
+        if (!title || !content) return fail(res, 400, 'title and content are required.', 'MISSING_FIELDS');
 
         const notice = await Notice.create({
             title,
@@ -46,10 +63,38 @@ router.post('/', protect, authorize('faculty', 'admin'), async (req, res) => {
             targetAudience: targetAudience || 'all'
         });
 
-        res.status(201).json(notice);
+        await notice.populate('postedBy', 'name role');
+        return ok(res, 201, { notice }, 'Announcement created.');
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server Error' });
+        return fail(res, 500, 'Server Error', 'SERVER_ERROR');
+    }
+});
+
+// @desc    Update announcement
+// @route   PUT /api/announcements/:id
+router.put('/:id', protect, authorize('faculty', 'admin'), async (req, res) => {
+    try {
+        const notice = await Notice.findById(req.params.id);
+        if (!notice) return fail(res, 404, 'Notice not found', 'NOT_FOUND');
+
+        // Faculty can only edit their own posts; admin can edit all.
+        if (req.user.role !== 'admin' && notice.postedBy?.toString() !== req.user.id) {
+            return fail(res, 403, 'Forbidden', 'FORBIDDEN');
+        }
+
+        const { title, content, category, targetAudience } = req.body;
+        if (title !== undefined) notice.title = title;
+        if (content !== undefined) notice.content = content;
+        if (category !== undefined) notice.category = category;
+        if (targetAudience !== undefined) notice.targetAudience = targetAudience;
+
+        await notice.save();
+        await notice.populate('postedBy', 'name role');
+        return ok(res, 200, { notice }, 'Announcement updated.');
+    } catch (error) {
+        console.error(error);
+        return fail(res, 500, 'Server Error', 'SERVER_ERROR');
     }
 });
 
@@ -59,12 +104,12 @@ router.delete('/:id', protect, authorize('admin'), async (req, res) => {
     try {
         const notice = await Notice.findByIdAndDelete(req.params.id);
         if (!notice) {
-            return res.status(404).json({ message: 'Notice not found' });
+            return fail(res, 404, 'Notice not found', 'NOT_FOUND');
         }
-        res.json({ message: 'Notice deleted' });
+        return ok(res, 200, { id: req.params.id }, 'Notice deleted.');
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server Error' });
+        return fail(res, 500, 'Server Error', 'SERVER_ERROR');
     }
 });
 

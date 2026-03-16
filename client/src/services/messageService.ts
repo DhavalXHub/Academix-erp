@@ -5,3 +5,12 @@ export const getConversation = (token: string, userId: string): Promise<{ messag
 
 export const sendMessage = (token: string, recipientId: string, content: string): Promise<{ message: any }> =>
     api.post('/messages', { recipientId, content }, token);
+
+export const getUnreadCounts = (token: string): Promise<{ counts: Record<string, number> }> =>
+    api.get('/messages/unread/counts', token);
+
+export const markConversationRead = (token: string, userId: string): Promise<{ updated: number }> =>
+    api.put(`/messages/conversation/${userId}/read`, {}, token);
+
+export const markMessageRead = (token: string, id: string): Promise<{ message: any }> =>
+    api.put(`/messages/${id}/read`, {}, token);

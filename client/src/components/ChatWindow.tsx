@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSocket, Message } from '@/contexts/SocketContext';
-import { getConversation, sendMessage } from '@/services/messageService';
+import { getConversation, sendMessage, markConversationRead } from '@/services/messageService';
 import MessageBubble from './MessageBubble';
 
 interface ChatWindowProps {
@@ -11,12 +11,13 @@ interface ChatWindowProps {
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName }) => {
     const { accessToken, user } = useAuth();
-    const { socket } = useSocket();
+    const { socket, typingByUser, setUnreadMessagesByUser } = useSocket();
     
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const bottomRef = useRef<HTMLDivElement>(null);
+    const typingTimer = useRef<number | null>(null);
 
     // Initial load history
     useEffect(() => {
@@ -27,6 +28,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName }) =
             .catch(console.error)
             .finally(() => setIsLoading(false));
     }, [accessToken, recipientId]);
+
+    // Mark conversation read when opened (clears unread badges)
+    useEffect(() => {
+        if (!accessToken || !recipientId) return;
+        markConversationRead(accessToken, recipientId)
+            .then(() => {
+                setUnreadMessagesByUser(prev => ({ ...prev, [recipientId]: 0 }));
+            })
+            .catch(() => {});
+    }, [accessToken, recipientId, setUnreadMessagesByUser]);
 
     // Live Socket listener
     useEffect(() => {
@@ -68,10 +79,25 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName }) =
             // Append optimistically or use what the server returns. Our server returns populated message.
             setMessages(prev => [...prev, res.message]);
             setNewMessage('');
+            socket?.emit('stopTyping', { toUserId: recipientId, fromUserId: user?.id });
         } catch (err: any) {
             alert(err.message || 'Failed to send message.');
         }
     };
+
+    const handleTypingChange = (val: string) => {
+        setNewMessage(val);
+        if (!socket || !user?.id) return;
+
+        socket.emit('typing', { toUserId: recipientId, fromUserId: user.id });
+
+        if (typingTimer.current) window.clearTimeout(typingTimer.current);
+        typingTimer.current = window.setTimeout(() => {
+            socket.emit('stopTyping', { toUserId: recipientId, fromUserId: user.id });
+        }, 700);
+    };
+
+    const isTyping = !!typingByUser?.[recipientId];
 
     return (
         <div style={styles.container}>
@@ -79,7 +105,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName }) =
                 <div style={styles.avatar}>{recipientName.charAt(0)}</div>
                 <div>
                     <h3 style={styles.name}>{recipientName}</h3>
-                    <p style={styles.status}>Online</p>
+                    <p style={styles.status}>{isTyping ? 'Typing…' : 'Online'}</p>
                 </div>
             </div>
 
@@ -100,7 +126,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName }) =
                     placeholder={`Message ${recipientName}...`} 
                     style={styles.input} 
                     value={newMessage}
-                    onChange={e => setNewMessage(e.target.value)}
+                    onChange={e => handleTypingChange(e.target.value)}
                 />
                 <button type="submit" disabled={!newMessage.trim()} style={styles.sendBtn}>
                     Send
