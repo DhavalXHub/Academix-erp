@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import api from '../../services/api'; // generic api fetch
-import ChatWindow from '../../components/ChatWindow';
+import { useAuth } from '@/contexts/AuthContext';
+import api from '@/services/api'; // generic api fetch
+import ChatWindow from '@/components/ChatWindow';
 
 const MessagesPage: React.FC = () => {
     const { accessToken } = useAuth();

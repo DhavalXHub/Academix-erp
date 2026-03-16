@@ -1,3 +1,5 @@
+process.on('uncaughtException', err => require('fs').writeFileSync(__dirname + '/fatal.log', err.stack));
+process.on('unhandledRejection', err => require('fs').writeFileSync(__dirname + '/fatal.log', err.stack));
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -40,6 +42,9 @@ app.use('/api/v1/assignments', require('./routes/assignmentRoutes'));
 app.use('/api/v1/submissions', require('./routes/submissionRoutes'));
 
 app.use('/api/v1/billing', require('./routes/billingRoutes'));
+app.use('/api/v1/invoices', require('./routes/invoiceRoutes'));
+app.use('/api/v1/payments', require('./routes/paymentRoutes'));
+app.use('/api/v1/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/v1/marks', require('./routes/marksRoutes'));
 app.use('/api/v1/quizzes', require('./routes/quizRoutes'));
 app.use('/api/v1/attempts', require('./routes/attemptRoutes'));

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { fetchNotifications, markAsRead } from '../../services/notificationService';
-import NotificationList from '../../components/NotificationList';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchNotifications, markAsRead } from '@/services/notificationService';
+import NotificationList from '@/components/NotificationList';
 
 const NotificationsPanel: React.FC = () => {
     const { accessToken } = useAuth();

@@ -1,74 +1,66 @@
 /**
  * Centralized API client for all Academix ERP requests.
  *
- * Usage:
- *   import api from './api';
- *   const data = await api.get('/courses', token);
- *   const result = await api.post('/auth/login', body);
+ * IMPORTANT: Uses axios + credentials to support cookie-based refresh flows,
+ * while still allowing bearer access tokens from `AuthContext`.
  */
 
-const API_BASE_URL = 'http://localhost:5000/api/v1';
+import axios, { AxiosInstance } from 'axios';
 
-interface RequestOptions {
-    body?: Record<string, unknown>;
-    token?: string | null;
-}
+const API_BASE_URL =
+    (import.meta as any).env?.VITE_API_BASE_URL ||
+    'http://localhost:5000/api/v1';
 
-const buildHeaders = (token?: string | null): HeadersInit => {
-    const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-    };
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
-    return headers;
-};
+type ApiEnvelope<T> =
+    | { success: true; data: T }
+    | { success: false; error?: { message?: string } };
 
-const handleResponse = async (res: Response) => {
-    const json = await res.json();
-    if (!json.success) {
-        throw new Error(json.error?.message || `Request failed with status ${res.status}`);
-    }
-    return json.data;
+const client: AxiosInstance = axios.create({
+    baseURL: API_BASE_URL,
+    withCredentials: true,
+    headers: { 'Content-Type': 'application/json' },
+});
+
+const unwrap = <T>(envelope: ApiEnvelope<T>): T => {
+    if ((envelope as any)?.success) return (envelope as any).data as T;
+    throw new Error((envelope as any)?.error?.message || 'Request failed.');
 };
 
 const api = {
-    get: async (endpoint: string, token?: string | null) => {
-        const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-            method: 'GET',
-            credentials: 'include',
-            headers: buildHeaders(token),
+    get: async <T = any>(endpoint: string, token?: string | null): Promise<T> => {
+        const res = await client.get<ApiEnvelope<T>>(endpoint, {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
-        return handleResponse(res);
+        return unwrap(res.data);
     },
 
-    post: async (endpoint: string, body: Record<string, unknown> = {}, token?: string | null) => {
-        const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: buildHeaders(token),
-            body: JSON.stringify(body),
+    post: async <T = any>(
+        endpoint: string,
+        body: Record<string, unknown> = {},
+        token?: string | null
+    ): Promise<T> => {
+        const res = await client.post<ApiEnvelope<T>>(endpoint, body, {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
-        return handleResponse(res);
+        return unwrap(res.data);
     },
 
-    put: async (endpoint: string, body: Record<string, unknown> = {}, token?: string | null) => {
-        const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: buildHeaders(token),
-            body: JSON.stringify(body),
+    put: async <T = any>(
+        endpoint: string,
+        body: Record<string, unknown> = {},
+        token?: string | null
+    ): Promise<T> => {
+        const res = await client.put<ApiEnvelope<T>>(endpoint, body, {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
-        return handleResponse(res);
+        return unwrap(res.data);
     },
 
-    delete: async (endpoint: string, token?: string | null) => {
-        const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-            method: 'DELETE',
-            credentials: 'include',
-            headers: buildHeaders(token),
+    delete: async <T = any>(endpoint: string, token?: string | null): Promise<T> => {
+        const res = await client.delete<ApiEnvelope<T>>(endpoint, {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
-        return handleResponse(res);
+        return unwrap(res.data);
     },
 };
 

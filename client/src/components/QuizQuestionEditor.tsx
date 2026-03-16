@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Question } from '../../services/quizService';
+import type { Question } from '@/services/quizService';
 
 interface QuizQuestionEditorProps {
     question: Question;

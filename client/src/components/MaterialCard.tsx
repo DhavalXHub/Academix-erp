@@ -1,5 +1,5 @@
 import React from 'react';
-import type { CourseMaterial } from '../../services/lmsService';
+import type { CourseMaterial } from '@/services/lmsService';
 
 interface MaterialCardProps {
     material: CourseMaterial;

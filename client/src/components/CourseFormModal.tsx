@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Course, CreateCoursePayload } from '../../services/courseService';
+import type { Course, CreateCoursePayload } from '@/services/courseService';
 
 interface CourseFormModalProps {
     isOpen: boolean;

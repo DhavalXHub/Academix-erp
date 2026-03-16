@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { startQuiz, submitQuiz, Quiz, QuizAttempt } from '../../services/quizService';
-import QuizRunner from '../../components/QuizRunner';
+import { useAuth } from '@/contexts/AuthContext';
+import { startQuiz, submitQuiz, Quiz, QuizAttempt } from '@/services/quizService';
+import QuizRunner from '@/components/QuizRunner';
 
 const QuizAttemptPage: React.FC = () => {
     const { id } = useParams<{ id: string }>(); // quizId

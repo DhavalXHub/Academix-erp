@@ -4,32 +4,39 @@ const invoiceSchema = new mongoose.Schema({
     student: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Student',
-        required: true
+        required: true,
     },
-    title: {
-        type: String,
-        required: true
-    },
-    amount: {
+    amountDue: {
         type: Number,
-        required: true
+        required: true,
+        min: 0,
+    },
+    amountPaid: {
+        type: Number,
+        default: 0,
+        min: 0,
     },
     dueDate: {
         type: Date,
-        required: true
+        required: true,
     },
     status: {
         type: String,
-        enum: ['Pending', 'Paid', 'Overdue'],
-        default: 'Pending'
+        enum: ['pending', 'paid_partial', 'paid_full'],
+        default: 'pending',
     },
-    paidAt: {
-        type: Date
+    type: {
+        type: String,
+        enum: ['tuition', 'library_fine', 'hostel', 'other'],
+        required: true,
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
+    description: {
+        type: String,
+        trim: true,
+    },
+}, { timestamps: true });
+
+// Index for getting student invoices fast and filtering by status
+invoiceSchema.index({ student: 1, status: 1 });
 
 module.exports = mongoose.model('Invoice', invoiceSchema);

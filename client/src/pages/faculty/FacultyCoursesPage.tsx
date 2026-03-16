@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import CourseCard from '../../components/CourseCard';
-import { fetchTeachingCourses, fetchCourseRoster } from '../../services/courseService';
-import type { Course, Enrollment } from '../../services/courseService';
+import { useAuth } from '@/contexts/AuthContext';
+import CourseCard from '@/components/CourseCard';
+import { fetchTeachingCourses, fetchCourseRoster } from '@/services/courseService';
+import type { Course, Enrollment } from '@/services/courseService';
 
 const FacultyCoursesPage: React.FC = () => {
     const { accessToken } = useAuth();
@@ -33,8 +33,8 @@ const FacultyCoursesPage: React.FC = () => {
         setIsLoadingRoster(true);
         try {
             const res = await fetchCourseRoster(accessToken, course._id);
-            // The API returns the raw enrollment docs with populated student/user
-            setRosterData(res.data.roster);
+            // API returns: { roster: Enrollment[] }
+            setRosterData((res as any).roster || []);
         } catch (e: any) {
             console.error(e);
         } finally {

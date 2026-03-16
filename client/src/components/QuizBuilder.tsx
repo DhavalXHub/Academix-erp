@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Quiz, Question } from '../../services/quizService';
+import type { Quiz, Question } from '@/services/quizService';
 import QuizQuestionEditor from './QuizQuestionEditor';
 
 interface QuizBuilderProps {

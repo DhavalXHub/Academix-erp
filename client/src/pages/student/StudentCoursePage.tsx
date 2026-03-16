@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { fetchMyEnrollments } from '../../services/courseService';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchMyEnrollments } from '@/services/courseService';
 import {
     fetchMaterials,
     fetchAssignments, fetchMySubmission, submitAssignment,
     CourseMaterial, Assignment, Submission
-} from '../../services/lmsService';
-import type { Course } from '../../services/courseService';
+} from '@/services/lmsService';
+import type { Course } from '@/services/courseService';
 
-import MaterialCard from '../../components/MaterialCard';
-import AssignmentCard from '../../components/AssignmentCard';
+import MaterialCard from '@/components/MaterialCard';
+import AssignmentCard from '@/components/AssignmentCard';
 
 type Tab = 'materials' | 'assignments';
 

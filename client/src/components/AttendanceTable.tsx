@@ -1,5 +1,5 @@
 import React from 'react';
-import type { StudentAttendanceSummary, StudentAttendanceHistory } from '../../services/attendanceService';
+import type { StudentAttendanceSummary, StudentAttendanceHistory } from '@/services/attendanceService';
 
 interface StudentAttendanceTableProps {
     summary: StudentAttendanceSummary[];

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import type { AttendanceStatus, MarkAttendanceRecord } from '../../services/attendanceService';
-import type { Enrollment } from '../../services/courseService';
+import type { AttendanceStatus, MarkAttendanceRecord } from '@/services/attendanceService';
+import type { Enrollment } from '@/services/courseService';
 
 interface AttendanceMarkingFormProps {
     courseId: string;

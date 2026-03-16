@@ -71,9 +71,9 @@ const importData = async () => {
         ]);
 
         await Invoice.insertMany([
-            { student: student._id, title: 'Semester 6 Tuition Fee', amount: 45000, dueDate: new Date(2026, 5, 30), status: 'Pending' },
-            { student: student._id, title: 'Library Fine', amount: 500, dueDate: new Date(2026, 1, 15), status: 'Overdue' },
-            { student: student._id, title: 'Semester 5 Tuition Fee', amount: 45000, dueDate: new Date(2025, 11, 31), status: 'Paid', paidAt: new Date(2025, 11, 20) }
+            { student: student._id, type: 'tuition', description: 'Semester 6 Tuition Fee', amountDue: 45000, amountPaid: 0, dueDate: new Date(2026, 5, 30), status: 'pending' },
+            { student: student._id, type: 'library_fine', description: 'Library Fine', amountDue: 500, amountPaid: 0, dueDate: new Date(2026, 1, 15), status: 'pending' },
+            { student: student._id, type: 'tuition', description: 'Semester 5 Tuition Fee', amountDue: 45000, amountPaid: 45000, dueDate: new Date(2025, 11, 31), status: 'paid_full' }
         ]);
 
         await Quiz.insertMany([

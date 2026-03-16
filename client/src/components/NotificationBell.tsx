@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSocket } from '../../contexts/SocketContext';
-import { useAuth } from '../../contexts/AuthContext';
-import { fetchNotifications, markAsRead } from '../../services/notificationService';
+import { useSocket } from '@/contexts/SocketContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchNotifications, markAsRead } from '@/services/notificationService';
 import NotificationList from './NotificationList';
 
 const NotificationBell: React.FC = () => {

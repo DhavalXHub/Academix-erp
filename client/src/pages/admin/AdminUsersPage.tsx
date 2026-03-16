@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from 'react';
-import UserTable from '../../components/UserTable';
-import UserFormModal from '../../components/UserFormModal';
-import { useAuth } from '../../contexts/AuthContext';
+import UserTable from '@/components/UserTable';
+import UserFormModal from '@/components/UserFormModal';
+import { useAuth } from '@/contexts/AuthContext';
 import {
     fetchUsers, createUser, updateUser, deleteUser, deactivateUser,
-} from '../../services/userService';
-import type { UserRecord, CreateUserPayload } from '../../services/userService';
+} from '@/services/userService';
+import type { UserRecord, CreateUserPayload } from '@/services/userService';
 
 type FilterRole = '' | 'student' | 'faculty' | 'admin';
 

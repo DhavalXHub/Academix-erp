@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { UserRecord, CreateUserPayload } from '../../services/userService';
+import type { UserRecord, CreateUserPayload } from '@/services/userService';
 
 interface UserFormModalProps {
     isOpen: boolean;

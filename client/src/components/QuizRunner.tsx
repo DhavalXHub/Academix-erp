@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Quiz, QuizAttempt } from '../../services/quizService';
+import type { Quiz, QuizAttempt } from '@/services/quizService';
 
 interface QuizRunnerProps {
     quiz: Quiz;
@@ -193,7 +193,7 @@ const styles: Record<string, React.CSSProperties> = {
     mapGrid: { padding: '16px 24px', display: 'flex', flexWrap: 'wrap', gap: 8, borderTop: '1px dashed #e5e7eb', background: '#fff' },
     mapBtn: { width: 36, height: 36, borderRadius: 8, background: '#f3f4f6', border: '1px solid #e5e7eb', color: '#6b7280', fontWeight: 600, cursor: 'pointer' },
     mapBtnAnswered: { background: '#e0e7ff', color: '#4338ca', borderColor: '#c7d2fe' },
-    mapBtnActive: { ring: '2px solid #4f46e5', background: '#4f46e5', color: '#fff', borderColor: '#4f46e5' }
+    mapBtnActive: { outline: '2px solid #4f46e5', outlineOffset: 1, background: '#4f46e5', color: '#fff', borderColor: '#4f46e5' }
 };
 
 export default QuizRunner;

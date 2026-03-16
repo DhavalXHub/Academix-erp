@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { fetchQuizAttemptsForFaculty, fetchQuizzes, QuizAttempt, Quiz } from '../../services/quizService';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchQuizAttemptsForFaculty, fetchQuizzes, QuizAttempt, Quiz } from '@/services/quizService';
 
 const FacultyQuizAttemptsPage: React.FC = () => {
     const { quizId } = useParams<{ quizId: string }>();

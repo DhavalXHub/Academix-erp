@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { fetchTeachingCourses } from '../../services/courseService';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchTeachingCourses } from '@/services/courseService';
 import {
     fetchMaterials, uploadMaterial, deleteMaterial,
     fetchAssignments, createAssignment, deleteAssignment,
     fetchSubmissions, gradeSubmission,
     CourseMaterial, Assignment, Submission
-} from '../../services/lmsService';
-import type { Course } from '../../services/courseService';
+} from '@/services/lmsService';
+import type { Course } from '@/services/courseService';
 
-import MaterialCard from '../../components/MaterialCard';
-import AssignmentCard from '../../components/AssignmentCard';
-import SubmissionTable from '../../components/SubmissionTable';
+import MaterialCard from '@/components/MaterialCard';
+import AssignmentCard from '@/components/AssignmentCard';
+import SubmissionTable from '@/components/SubmissionTable';
 
 type Tab = 'materials' | 'assignments' | 'grading';
 

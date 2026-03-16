@@ -1,6 +1,5 @@
 import React from 'react';
-import { Notification } from '../../contexts/SocketContext';
-import { formatDistanceToNow } from 'date-fns'; // optional if installed, else fallback
+import { Notification } from '@/contexts/SocketContext';
 
 interface NotificationListProps {
     notifications: Notification[];

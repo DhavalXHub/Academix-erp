@@ -1,5 +1,5 @@
 import React from 'react';
-import type { QuizAttempt, Quiz } from '../../services/quizService';
+import type { QuizAttempt, Quiz } from '@/services/quizService';
 
 interface QuizResultCardProps {
     attempt: QuizAttempt;

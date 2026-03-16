@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Course } from '../../services/courseService';
+import type { Course } from '@/services/courseService';
 
 interface CourseCardProps {
     course: Course;

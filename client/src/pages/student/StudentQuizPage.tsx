@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { fetchMyEnrollments, Course } from '../../services/courseService';
-import { fetchQuizzes, fetchMyAttempts, startQuiz, Quiz, QuizAttempt } from '../../services/quizService';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchMyEnrollments, Course } from '@/services/courseService';
+import { fetchQuizzes, fetchMyAttempts, startQuiz, Quiz, QuizAttempt } from '@/services/quizService';
 import { useNavigate } from 'react-router-dom';
-import QuizResultCard from '../../components/QuizResultCard';
+import QuizResultCard from '@/components/QuizResultCard';
 
 const StudentQuizPage: React.FC = () => {
     const { accessToken } = useAuth();

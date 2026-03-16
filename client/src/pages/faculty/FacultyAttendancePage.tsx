@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { fetchTeachingCourses, fetchCourseRoster } from '../../services/courseService';
-import { markAttendance, fetchCourseAttendance } from '../../services/attendanceService';
-import type { Course, Enrollment } from '../../services/courseService';
-import type { MarkAttendanceRecord, CourseAttendanceData } from '../../services/attendanceService';
-import AttendanceMarkingForm from '../../components/AttendanceMarkingForm';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchTeachingCourses, fetchCourseRoster } from '@/services/courseService';
+import { markAttendance, fetchCourseAttendance } from '@/services/attendanceService';
+import type { Course, Enrollment } from '@/services/courseService';
+import type { MarkAttendanceRecord, CourseAttendanceData } from '@/services/attendanceService';
+import AttendanceMarkingForm from '@/components/AttendanceMarkingForm';
 
 const FacultyAttendancePage: React.FC = () => {
     const { accessToken } = useAuth();
@@ -46,7 +46,7 @@ const FacultyAttendancePage: React.FC = () => {
                     fetchCourseRoster(accessToken, selectedCourse._id),
                     fetchCourseAttendance(accessToken, selectedCourse._id),
                 ]);
-                setRoster(rosterRes.data.roster);
+                setRoster((rosterRes as any).roster || []);
                 setAnalytics(analyticsRes);
             } catch (e: any) {
                 showToast(e.message || 'Failed to fetch course data.', 'error');

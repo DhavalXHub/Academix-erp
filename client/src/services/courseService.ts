@@ -54,7 +54,7 @@ export interface CreateCoursePayload {
 
 export const fetchCourses = (
     token: string,
-    params: { search?: string; department?: string; semester?: number; page?: number; limit?: number } = {}
+    params: { search?: string; department?: string; semester?: number; isActive?: boolean; page?: number; limit?: number } = {}
 ): Promise<CourseListResponse> => {
     const qs = new URLSearchParams(
         Object.entries(params)
@@ -74,7 +74,7 @@ export const fetchCourseRoster = (token: string, courseId: string) =>
     api.get(`/courses/${courseId}/roster`, token);
 
 export const createCourse = (token: string, payload: CreateCoursePayload): Promise<{ course: Course }> =>
-    api.post('/courses', payload as Record<string, unknown>, token);
+    api.post('/courses', payload as unknown as Record<string, unknown>, token);
 
 export const updateCourse = (
     token: string, id: string, payload: Partial<CreateCoursePayload>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import CourseCard from '../../components/CourseCard';
-import CourseFormModal from '../../components/CourseFormModal';
+import { useAuth } from '@/contexts/AuthContext';
+import CourseCard from '@/components/CourseCard';
+import CourseFormModal from '@/components/CourseFormModal';
 import {
     fetchCourses, createCourse, updateCourse, deleteCourse,
-} from '../../services/courseService';
-import type { Course, CreateCoursePayload } from '../../services/courseService';
+} from '@/services/courseService';
+import type { Course, CreateCoursePayload } from '@/services/courseService';
 
 const AdminCoursesPage: React.FC = () => {
     const { accessToken } = useAuth();

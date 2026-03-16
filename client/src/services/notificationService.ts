@@ -1,5 +1,5 @@
 import api from './api';
-import { Notification } from '../contexts/SocketContext';
+import { Notification } from '@/contexts/SocketContext';
 
 export const fetchNotifications = (token: string): Promise<{ notifications: Notification[] }> =>
     api.get('/notifications', token);

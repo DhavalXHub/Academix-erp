@@ -1,6 +1,6 @@
 import React from 'react';
-import type { Message } from '../../contexts/SocketContext';
-import { useAuth } from '../../contexts/AuthContext';
+import type { Message } from '@/contexts/SocketContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MessageBubbleProps {
     message: Message;

@@ -8,8 +8,9 @@ const connectDB = async () => {
         });
         console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
+        require('fs').writeFileSync(__dirname + '/../db_error.log', `Error: ${error.message}\nStack: ${error.stack}`);
         console.error(`Error: ${error.message}`);
-        process.exit(1);
+        // process.exit(1);
     }
 };
 

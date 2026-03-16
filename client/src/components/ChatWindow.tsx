@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useSocket, Message } from '../../contexts/SocketContext';
-import { getConversation, sendMessage } from '../../services/messageService';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSocket, Message } from '@/contexts/SocketContext';
+import { getConversation, sendMessage } from '@/services/messageService';
 import MessageBubble from './MessageBubble';
 
 interface ChatWindowProps {

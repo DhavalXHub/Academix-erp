@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { fetchMyProfile, updateMyProfile } from '../../services/userService';
-import type { ProfileData } from '../../services/userService';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchMyProfile, updateMyProfile } from '@/services/userService';
+import type { ProfileData } from '@/services/userService';
 
 /**
  * Shared profile page for Student and Faculty users.

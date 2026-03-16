@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { fetchMyAttendance } from '../../services/attendanceService';
-import type { StudentAttendanceData } from '../../services/attendanceService';
-import AttendanceChart from '../../components/AttendanceChart';
-import StudentAttendanceTable from '../../components/AttendanceTable';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchMyAttendance } from '@/services/attendanceService';
+import type { StudentAttendanceData } from '@/services/attendanceService';
+import AttendanceChart from '@/components/AttendanceChart';
+import StudentAttendanceTable from '@/components/AttendanceTable';
 
 const StudentAttendancePage: React.FC = () => {
     const { accessToken } = useAuth();

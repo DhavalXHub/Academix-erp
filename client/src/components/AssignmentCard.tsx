@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Assignment, Submission } from '../../services/lmsService';
+import type { Assignment, Submission } from '@/services/lmsService';
 
 interface AssignmentCardProps {
     assignment: Assignment;

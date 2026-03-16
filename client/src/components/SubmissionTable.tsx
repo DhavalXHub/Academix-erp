@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Submission } from '../../services/lmsService';
+import type { Submission } from '@/services/lmsService';
 
 interface SubmissionTableProps {
     submissions: Submission[];

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import CourseCard from '../../components/CourseCard';
+import { useAuth } from '@/contexts/AuthContext';
+import CourseCard from '@/components/CourseCard';
 import {
     fetchCourses, fetchMyEnrollments, enrollInCourse, dropCourse
-} from '../../services/courseService';
-import type { Course, Enrollment } from '../../services/courseService';
+} from '@/services/courseService';
+import type { Course, Enrollment } from '@/services/courseService';
 
 type Tab = 'my-courses' | 'browse';
 

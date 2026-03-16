@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { fetchTeachingCourses, Course } from '../../services/courseService';
-import { fetchQuizzes, deleteQuiz, createQuiz, updateQuiz, Quiz } from '../../services/quizService';
-import QuizBuilder from '../../components/QuizBuilder';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchTeachingCourses, Course } from '@/services/courseService';
+import { fetchQuizzes, deleteQuiz, createQuiz, updateQuiz, Quiz } from '@/services/quizService';
+import QuizBuilder from '@/components/QuizBuilder';
 import { useNavigate } from 'react-router-dom';
 
 const FacultyQuizPage: React.FC = () => {

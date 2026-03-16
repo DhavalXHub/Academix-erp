@@ -57,7 +57,7 @@ export const fetchUserById = (token: string, id: string): Promise<ProfileData> =
     api.get(`/users/${id}`, token);
 
 export const createUser = (token: string, payload: CreateUserPayload): Promise<UserRecord> =>
-    api.post('/users', payload as Record<string, unknown>, token);
+    api.post('/users', payload as unknown as Record<string, unknown>, token);
 
 export const updateUser = (
     token: string,

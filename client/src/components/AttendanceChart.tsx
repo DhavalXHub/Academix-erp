@@ -1,6 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import type { StudentAttendanceSummary } from '../../services/attendanceService';
+import type { StudentAttendanceSummary } from '@/services/attendanceService';
 
 const COLORS = ['#10b981', '#ef4444', '#f59e0b', '#6366f1'];
 

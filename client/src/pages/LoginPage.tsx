@@ -1,6 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth, UserRole } from '../contexts/AuthContext';
+import { useAuth, UserRole } from '@/contexts/AuthContext';
 
 type RoleOption = { value: UserRole; label: string; emoji: string; description: string };
 
