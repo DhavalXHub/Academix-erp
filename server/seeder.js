@@ -79,21 +79,21 @@ const importData = async () => {
         await Quiz.insertMany([
             {
                 title: 'Web Dev Basics', description: 'Test your HTML/CSS knowledge',
-                subject: subWeb._id, createdBy: faculty._id, timeLimitMinutes: 10, isActive: true,
+                course: faculty._id, faculty: faculty._id, timeLimitMinutes: 10, isActive: true,
                 questions: [
-                    { questionText: 'What does HTML stand for?', options: ['Hyper Text Markup Language', 'High Text Machine Language', 'Hyper Tool Multi Language', 'None'], correctOptionIndex: 0 },
-                    { questionText: 'Which tag is used for hyperlinks?', options: ['<link>', '<a>', '<href>', '<p>'], correctOptionIndex: 1 },
-                    { questionText: 'Which CSS property controls text size?', options: ['font-style', 'text-size', 'font-size', 'text-weight'], correctOptionIndex: 2 },
-                    { questionText: 'What does CSS stand for?', options: ['Computer Style Sheets', 'Creative Style Sheets', 'Cascading Style Sheets', 'Colorful Style Sheets'], correctOptionIndex: 2 }
+                    { text: 'What does HTML stand for?', options: ['Hyper Text Markup Language', 'High Text Machine Language', 'Hyper Tool Multi Language', 'None'], correctOptionIndex: 0 },
+                    { text: 'Which tag is used for hyperlinks?', options: ['<link>', '<a>', '<href>', '<p>'], correctOptionIndex: 1 },
+                    { text: 'Which CSS property controls text size?', options: ['font-style', 'text-size', 'font-size', 'text-weight'], correctOptionIndex: 2 },
+                    { text: 'What does CSS stand for?', options: ['Computer Style Sheets', 'Creative Style Sheets', 'Cascading Style Sheets', 'Colorful Style Sheets'], correctOptionIndex: 2 }
                 ]
             },
             {
                 title: 'Computer Networks Quiz', description: 'OSI Layers and TCP/IP fundamentals',
-                subject: subCN._id, createdBy: faculty._id, timeLimitMinutes: 15, isActive: true,
+                course: faculty._id, faculty: faculty._id, timeLimitMinutes: 15, isActive: true,
                 questions: [
-                    { questionText: 'How many layers are in the OSI model?', options: ['5', '6', '7', '8'], correctOptionIndex: 2 },
-                    { questionText: 'Which layer is responsible for routing?', options: ['Data Link', 'Transport', 'Network', 'Physical'], correctOptionIndex: 2 },
-                    { questionText: 'What does TCP stand for?', options: ['Transfer Control Protocol', 'Transmission Control Protocol', 'Transport Control Protocol', 'Terminal Control Protocol'], correctOptionIndex: 1 }
+                    { text: 'How many layers are in the OSI model?', options: ['5', '6', '7', '8'], correctOptionIndex: 2 },
+                    { text: 'Which layer is responsible for routing?', options: ['Data Link', 'Transport', 'Network', 'Physical'], correctOptionIndex: 2 },
+                    { text: 'What does TCP stand for?', options: ['Transfer Control Protocol', 'Transmission Control Protocol', 'Transport Control Protocol', 'Terminal Control Protocol'], correctOptionIndex: 1 }
                 ]
             }
         ]);

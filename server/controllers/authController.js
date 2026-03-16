@@ -68,7 +68,8 @@ const loginUser = async (req, res) => {
         await saveRefreshToken(user._id, refreshToken);
 
         // Set the refresh token as a secure cookie on the response
-        setRefreshTokenCookie(res, refreshToken);
+        // Cookie format must match refreshToken() expectations: "<userId>:<token>"
+        setRefreshTokenCookie(res, `${user._id}:${refreshToken}`);
 
         return sendSuccess(res, 200, {
             accessToken,

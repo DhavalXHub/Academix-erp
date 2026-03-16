@@ -27,8 +27,8 @@ app.use(cors({
     credentials: true, // Required to allow cookies to be sent cross-origin
 }));
 
-// ── Static Files (Legacy HTML frontend) ───────────────────────────────────
-app.use(express.static(path.join(__dirname, '../client')));
+// ── Static Files (React + Vite build output) ──────────────────────────────
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // ── API Routes (v1) ────────────────────────────────────────────────────────
 app.use('/api/v1/auth', require('./routes/authRoutes'));
@@ -79,9 +79,9 @@ app.use((err, req, res, next) => {
     });
 });
 
-// ── SPA Fallback (serves HTML frontend for all unmatched non-API routes) ──
+// ── SPA Fallback (serves React index for all unmatched non-API routes) ─────
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client', 'index.html'));
+    res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
 });
 
 // ── Socket Server ──────────────────────────────────────────────────────────
