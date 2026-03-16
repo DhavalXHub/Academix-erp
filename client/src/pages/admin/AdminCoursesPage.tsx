@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { showErrorToast } from '@/utils/errorHandler';
 import CourseCard from '@/components/CourseCard';
 import CourseFormModal from '@/components/CourseFormModal';
 import {
@@ -36,7 +37,9 @@ const AdminCoursesPage: React.FC = () => {
             setCourses(res.courses);
             if (res.meta) setMeta(res.meta);
         } catch (e: any) {
-            showToast(e.message || 'Failed to load courses.', 'error');
+            const errMsg = showErrorToast(e, 'Failed to load courses');
+            showToast(errMsg, 'error');
+            console.error('[AdminCoursesPage] Load error:', e);
         } finally {
             setIsLoading(false);
         }
@@ -64,7 +67,9 @@ const AdminCoursesPage: React.FC = () => {
             setModalOpen(false);
             loadCourses(1);
         } catch (e: any) {
-            showToast(e.message || 'Operation failed.', 'error');
+            const errMsg = showErrorToast(e, 'Failed to save course');
+            showToast(errMsg, 'error');
+            console.error('[AdminCoursesPage] Save error:', e);
         } finally {
             setIsSubmitting(false);
         }
@@ -76,7 +81,11 @@ const AdminCoursesPage: React.FC = () => {
             await deleteCourse(accessToken, course._id);
             showToast('Course deactivated.');
             loadCourses();
-        } catch (e: any) { showToast(e.message, 'error'); }
+        } catch (e: any) { 
+            const errMsg = showErrorToast(e, 'Failed to deactivate course');
+            showToast(errMsg, 'error');
+            console.error('[AdminCoursesPage] Delete error:', e);
+        }
     };
 
     return (

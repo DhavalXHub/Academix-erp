@@ -155,7 +155,7 @@ const getAdminAnalytics = async () => {
     const [totalStudents, totalFaculty, totalCourses] = await Promise.all([
         Student.countDocuments(),
         Faculty.countDocuments(),
-        Course.countDocuments(),
+        Course.countDocuments({ isActive: true }),
     ]);
 
     // 2. Revenue Collected vs Pending Dues
@@ -182,15 +182,7 @@ const getAdminAnalytics = async () => {
 
     // 3. Department Performance Comparison (Enrollments per department)
     const deptPerformance = await Course.aggregate([
-        {
-            $lookup: {
-                from: "departments",
-                localField: "department",
-                foreignField: "_id",
-                as: "dept"
-            }
-        },
-        { $unwind: "$dept" },
+        { $match: { isActive: true } },
         {
             $lookup: {
                 from: "enrollments",
@@ -200,15 +192,9 @@ const getAdminAnalytics = async () => {
             }
         },
         {
-            $project: {
-                deptName: "$dept.name",
-                enrollmentCount: { $size: "$enrollments" }
-            }
-        },
-        {
             $group: {
-                _id: "$deptName",
-                totalEnrollments: { $sum: "$enrollmentCount" }
+                _id: "$department",
+                totalEnrollments: { $sum: { $size: "$enrollments" } }
             }
         },
         { $sort: { totalEnrollments: -1 } }
@@ -217,6 +203,8 @@ const getAdminAnalytics = async () => {
     // 4. Monthly Revenue Trend mapping (past 6 months)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    sixMonthsAgo.setDate(1);
+    sixMonthsAgo.setHours(0, 0, 0, 0);
     
     const revenueTrend = await Payment.aggregate([
         { $match: { paymentDate: { $gte: sixMonthsAgo } } },
@@ -229,14 +217,21 @@ const getAdminAnalytics = async () => {
         { $sort: { "_id.year": 1, "_id.month": 1 } }
     ]);
 
+    // Map to month names for better readability
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const formattedTrend = revenueTrend.map(r => ({ 
+        label: monthNames[r._id.month - 1], 
+        revenue: r.revenue 
+    }));
+
     return {
         totalStudents,
         totalFaculty,
         totalCourses,
         totalRevenue,
         pendingDues,
-        deptPerformance: deptPerformance.map(d => ({ department: d._id, enrollments: d.totalEnrollments })),
-        revenueTrend: revenueTrend.map(r => ({ label: `${r._id.month}/${r._id.year}`, revenue: r.revenue }))
+        deptPerformance: deptPerformance.map(d => ({ department: d._id || 'Unassigned', enrollments: d.totalEnrollments })),
+        revenueTrend: formattedTrend
     };
 };
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchAdminAnalytics, AdminAnalytics } from '@/services/analyticsService';
+import { showErrorToast } from '@/utils/errorHandler';
 import FinanceStatsCards from '@/components/FinanceStatsCards';
 import RevenueChart from '@/components/analytics/RevenueChart';
 import DepartmentComparisonChart from '@/components/analytics/DepartmentComparisonChart';
@@ -9,17 +10,24 @@ const AdminDashboard: React.FC = () => {
     const { accessToken } = useAuth();
     const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
         if (!accessToken) return;
         setIsLoading(true);
+        setErrorMsg('');
         fetchAdminAnalytics(accessToken)
             .then(setAnalytics)
-            .catch(console.error)
+            .catch(err => {
+                const message = showErrorToast(err, 'Failed to load administrative telemetry');
+                setErrorMsg(message);
+                console.error('[AdminDashboard] Analytics fetch error:', err);
+            })
             .finally(() => setIsLoading(false));
     }, [accessToken]);
 
     if (isLoading) return <div style={styles.loader}>Compiling Organization Telemetry...</div>;
+    if (errorMsg) return <div style={styles.error}>⚠️ {errorMsg}</div>;
     if (!analytics) return <div style={styles.error}>Unable to load administrative telemetry payload.</div>;
 
     const topLevelStats = [
@@ -44,14 +52,22 @@ const AdminDashboard: React.FC = () => {
                         <h3 style={styles.cardTitle}>Revenue Collection Trajectory</h3>
                         <span style={styles.badgeSuccess}>Total Mined: ${analytics.totalRevenue.toLocaleString()}</span>
                     </div>
-                    <RevenueChart data={analytics.revenueTrend} />
+                    {analytics.revenueTrend && analytics.revenueTrend.length > 0 ? (
+                        <RevenueChart data={analytics.revenueTrend || []} />
+                    ) : (
+                        <div style={styles.emptyChart}>No revenue data available</div>
+                    )}
                 </div>
 
                 <div style={styles.cardSmall}>
                     <div style={styles.cardHeader}>
                         <h3 style={styles.cardTitle}>Department Scale</h3>
                     </div>
-                    <DepartmentComparisonChart data={analytics.deptPerformance} />
+                    {analytics.deptPerformance && analytics.deptPerformance.length > 0 ? (
+                        <DepartmentComparisonChart data={analytics.deptPerformance} />
+                    ) : (
+                        <div style={styles.emptyChart}>No enrollment data available</div>
+                    )}
                 </div>
             </div>
         </div>
@@ -64,13 +80,14 @@ const styles: Record<string, React.CSSProperties> = {
     title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
     subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
     loader: { padding: '4rem', textAlign: 'center', fontSize: 15, color: '#6b7280' },
-    error: { padding: '4rem', textAlign: 'center', fontSize: 15, color: '#dc2626' },
+    error: { padding: '4rem', textAlign: 'center', fontSize: 15, color: '#dc2626', background: '#fee2e2', borderRadius: 8, border: '1px solid #fca5a5', marginBottom: '2rem' },
     grid: { display: 'grid', gridTemplateColumns: '7fr 4fr', gap: 24 },
     cardLarge: { background: '#fff', padding: 24, borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
     cardSmall: { background: '#fff', padding: 24, borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
     cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
     cardTitle: { margin: 0, fontSize: 16, fontWeight: 700, color: '#1f2937' },
-    badgeSuccess: { background: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: 99, fontSize: 13, fontWeight: 700 }
+    badgeSuccess: { background: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: 99, fontSize: 13, fontWeight: 700 },
+    emptyChart: { padding: '3rem', textAlign: 'center', color: '#9ca3af', fontSize: 14 }
 };
 
 export default AdminDashboard;
