@@ -43,7 +43,7 @@ const courseSchema = new mongoose.Schema(
         },
         primaryFaculty: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Faculty',
+            ref: 'User',
             default: null,
         },
         isActive: {

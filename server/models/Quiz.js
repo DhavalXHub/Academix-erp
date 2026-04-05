@@ -30,7 +30,7 @@ const quizSchema = new mongoose.Schema({
     },
     faculty: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Faculty',
+        ref: 'User',
         required: true,
     },
     title: {

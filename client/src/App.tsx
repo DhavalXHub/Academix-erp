@@ -10,6 +10,7 @@ import FacultyLayout from '@/components/layouts/FacultyLayout';
 import AdminLayout from '@/components/layouts/AdminLayout';
 
 // Shared Pages
+import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/LoginPage';
 import ProfilePage from '@/pages/ProfilePage';
 
@@ -39,13 +40,6 @@ import AdminAnalyticsPage from '@/pages/admin/AdminAnalyticsPage';
 import AdminAnnouncementsPage from '@/pages/admin/AdminAnnouncementsPage';
 
 import MessagesPage from '@/pages/common/MessagesPage';
-import { useAuth } from '@/contexts/AuthContext';
-
-const RoleHomeRedirect: React.FC = () => {
-    const { user } = useAuth();
-    if (!user) return <Navigate to="/login" replace />;
-    return <Navigate to={`/${user.role}/dashboard`} replace />;
-};
 
 const App: React.FC = () => {
     return (
@@ -54,12 +48,8 @@ const App: React.FC = () => {
                 <SocketProvider>
                 <Routes>
                     {/* Public Route */}
+                    <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<LoginPage />} />
-
-                    {/* Root Redirect - Automatically bumps to dashboard based on role inside ProtectedRoute */}
-                    <Route path="/" element={<ProtectedRoute />}>
-                        <Route index element={<RoleHomeRedirect />} />
-                    </Route>
 
                     {/* Student Routes */}
                     <Route path="/student" element={<ProtectedRoute allowedRoles={['student']} />}>

@@ -7,6 +7,7 @@ interface CourseFormModalProps {
     onSubmit: (data: CreateCoursePayload) => void;
     isSubmitting: boolean;
     editCourse?: Course | null;
+    faculties: any[];
 }
 
 const DEFAULT: CreateCoursePayload = {
@@ -14,7 +15,7 @@ const DEFAULT: CreateCoursePayload = {
     department: '', semester: 1, primaryFaculty: '', maxEnrollment: 60,
 };
 
-const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSubmit, isSubmitting, editCourse }) => {
+const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSubmit, isSubmitting, editCourse, faculties }) => {
     const isEdit = !!editCourse;
     const [form, setForm] = useState<CreateCoursePayload>(DEFAULT);
 
@@ -65,7 +66,15 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSu
                     </div>
 
                     <div style={styles.row}>
-                        <Field label="Faculty ID (ObjectId)" type="text" value={form.primaryFaculty || ''} onChange={set('primaryFaculty')} placeholder="Optional faculty MongoDB ID" />
+                        <div style={styles.fieldGroup}>
+                            <label style={styles.label}>Primary Faculty</label>
+                            <select style={styles.select} value={form.primaryFaculty || ''} onChange={set('primaryFaculty')}>
+                                <option value="">-- None --</option>
+                                {faculties.map((f: any) => (
+                                    <option key={f._id} value={f._id}>{f.name} ({f.email})</option>
+                                ))}
+                            </select>
+                        </div>
                         <Field label="Max Enrollment" type="number" value={String(form.maxEnrollment)} onChange={set('maxEnrollment')} placeholder="60" />
                     </div>
 

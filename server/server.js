@@ -68,14 +68,16 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 
 // ── Global Error Handler ───────────────────────────────────────────────────
 app.use((err, req, res, next) => {
-    console.error('[SERVER ERROR]', err.stack);
+    console.error('[SERVER ERROR]', err);
+    if (err.name === 'CastError') {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid ID format'
+        });
+    }
     res.status(err.statusCode || 500).json({
         success: false,
-        data: null,
-        error: {
-            code: err.code || 'SERVER_ERROR',
-            message: err.message || 'An unexpected error occurred.',
-        },
+        message: err.message || 'Server Error'
     });
 });
 

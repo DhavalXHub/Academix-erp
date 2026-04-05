@@ -30,8 +30,7 @@ const getAllCourses = async ({ search, department, semester, isActive, page = 1,
     const skip = (page - 1) * limit;
     const [courses, total] = await Promise.all([
         Course.find(query)
-            .populate('primaryFaculty', 'employeeId designation department')
-            .populate({ path: 'primaryFaculty', populate: { path: 'user', select: 'name email' } })
+            .populate('primaryFaculty', 'name email')
             .sort({ department: 1, semester: 1, code: 1 })
             .skip(skip)
             .limit(Number(limit)),
@@ -49,8 +48,7 @@ const getAllCourses = async ({ search, department, semester, isActive, page = 1,
  */
 const getCourseById = async (id) => {
     const course = await Course.findById(id)
-        .populate('primaryFaculty', 'employeeId designation department')
-        .populate({ path: 'primaryFaculty', populate: { path: 'user', select: 'name email' } });
+        .populate('primaryFaculty', 'name email');
     if (!course) throw _notFound();
     return course;
 };
@@ -60,8 +58,7 @@ const getCourseById = async (id) => {
  */
 const getCoursesByFaculty = async (facultyId) => {
     return Course.find({ primaryFaculty: facultyId, isActive: true })
-        .populate('primaryFaculty', 'employeeId designation')
-        .populate({ path: 'primaryFaculty', populate: { path: 'user', select: 'name email' } })
+        .populate('primaryFaculty', 'name email')
         .sort({ semester: 1, code: 1 });
 };
 
@@ -79,8 +76,7 @@ const createCourse = async (data) => {
  */
 const updateCourse = async (id, updates) => {
     const course = await Course.findByIdAndUpdate(id, updates, { new: true, runValidators: true })
-        .populate('primaryFaculty', 'employeeId designation')
-        .populate({ path: 'primaryFaculty', populate: { path: 'user', select: 'name email' } });
+        .populate('primaryFaculty', 'name email');
     if (!course) throw _notFound();
     return course;
 };

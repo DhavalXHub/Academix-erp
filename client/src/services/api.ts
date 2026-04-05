@@ -25,7 +25,8 @@ const client: AxiosInstance = axios.create({
 
 const unwrap = <T>(envelope: ApiEnvelope<T>): T => {
     if ((envelope as any)?.success) return (envelope as any).data as T;
-    throw new Error((envelope as any)?.error?.message || 'Request failed.');
+    const msg = (envelope as any)?.error?.message || (envelope as any)?.message || 'Request failed.';
+    throw new Error(msg);
 };
 
 // ── Silent Refresh (401 TOKEN_EXPIRED) ──────────────────────────────────────
@@ -63,7 +64,15 @@ client.interceptors.response.use(
             !isAuthRefreshCall &&
             !originalRequest?._retry;
 
-        if (!shouldAttemptRefresh) throw error;
+        if (!shouldAttemptRefresh) {
+            if (status === 400) error.message = `Validation Error: ${error.response?.data?.message || error.response?.data?.error?.message || 'Bad Request'}`;
+            else if (status === 404) error.message = `Not Found: ${error.response?.data?.message || error.response?.data?.error?.message || 'Not Found'}`;
+            else if (status >= 500) error.message = `Server Error: ${error.response?.data?.message || error.response?.data?.error?.message || 'Server Error'}`;
+            else if (error.response?.data?.message || error.response?.data?.error?.message) {
+                error.message = error.response.data.message || error.response.data.error.message;
+            }
+            throw error;
+        }
 
         if (isRefreshing) {
             return new Promise((resolve, reject) => {

@@ -6,11 +6,13 @@ import CourseFormModal from '@/components/CourseFormModal';
 import {
     fetchCourses, createCourse, updateCourse, deleteCourse,
 } from '@/services/courseService';
+import api from '@/services/api';
 import type { Course, CreateCoursePayload } from '@/services/courseService';
 
 const AdminCoursesPage: React.FC = () => {
     const { accessToken } = useAuth();
     const [courses, setCourses] = useState<Course[]>([]);
+    const [faculties, setFaculties] = useState<any[]>([]);
     const [meta, setMeta] = useState({ page: 1, totalPages: 1, totalRecords: 0 });
     const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState('');
@@ -45,7 +47,14 @@ const AdminCoursesPage: React.FC = () => {
         }
     }, [accessToken, page, search, deptFilter]);
 
-    useEffect(() => { loadCourses(); }, []);
+    useEffect(() => { 
+        loadCourses(); 
+        if (accessToken) {
+            api.get('/users?role=faculty', accessToken).then((res: any) => {
+                setFaculties(res.data || res.users || []);
+            }).catch(console.error);
+        }
+    }, [accessToken]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -150,6 +159,7 @@ const AdminCoursesPage: React.FC = () => {
                 onSubmit={handleFormSubmit}
                 isSubmitting={isSubmitting}
                 editCourse={editCourse}
+                faculties={faculties}
             />
         </div>
     );

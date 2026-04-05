@@ -7,13 +7,13 @@ const _notFound = (msg) => Object.assign(new Error(msg), { code: 'NOT_FOUND', st
 
 const createInvoice = async (data) => {
     // Admin operation
-    const student = await Student.findOne({ _id: data.studentId });
-    if (!student) throw _bad('Student not found.');
+    const studentUser = await User.findById(data.studentId);
+    if (!studentUser || studentUser.role !== 'student') throw _bad('Student not found.');
 
     if (data.amountDue <= 0) throw _bad('Amount due must be positive.');
 
     const invoice = await Invoice.create({
-        student: student._id,
+        student: studentUser._id,
         amountDue: data.amountDue,
         dueDate: data.dueDate,
         type: data.type,
@@ -26,19 +26,12 @@ const createInvoice = async (data) => {
 const getAllInvoices = async () => {
     // Admin list
     return Invoice.find()
-        .populate({
-            path: 'student',
-            select: 'enrollmentYear rollNumber',
-            populate: { path: 'user', select: 'name email' }
-        })
+        .populate('student', 'name email')
         .sort({ createdAt: -1 });
 };
 
 const getInvoiceById = async (id) => {
-    const invoice = await Invoice.findById(id).populate({
-        path: 'student',
-        populate: { path: 'user', select: 'name email' }
-    });
+    const invoice = await Invoice.findById(id).populate('student', 'name email');
     if (!invoice) throw _notFound('Invoice not found.');
     return invoice;
 };
@@ -64,10 +57,10 @@ const updateInvoice = async (id, data) => {
 };
 
 const getMyInvoices = async (userId) => {
-    const student = await Student.findOne({ user: userId });
-    if (!student) throw _bad('Student profile not found.');
+    const studentUser = await User.findById(userId);
+    if (!studentUser) throw _bad('Student profile not found.');
 
-    return Invoice.find({ student: student._id }).sort({ createdAt: -1 });
+    return Invoice.find({ student: studentUser._id }).sort({ createdAt: -1 });
 };
 
 module.exports = {
