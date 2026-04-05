@@ -1,10 +1,11 @@
 import React from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Users, Book, DollarSign, BarChart2, MessageSquare, Settings, LogOut, Megaphone } from 'lucide-react';
+import { Users, Book, DollarSign, BarChart2, MessageSquare, Settings, LogOut, Megaphone, Home } from 'lucide-react';
+import TopBar from '@/components/TopBar';
 
 const AdminLayout: React.FC = () => {
-    const { user, logout } = useAuth();
+    const { logout } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -12,25 +13,25 @@ const AdminLayout: React.FC = () => {
         navigate('/login');
     };
 
-    // Note: Replaced "Dashboard" with "LayoutDashboard" logically but using SVG/lucide alias or standard string icons here.
-    // Using simple icons for brevity.
     const navItems = [
-        { icon: BarChart2, label: 'Telemetry', path: '/admin/dashboard' },
-        { icon: Users, label: 'Manage Users', path: '/admin/users' },
-        { icon: Book, label: 'Course Catalog', path: '/admin/courses' },
-        { icon: DollarSign, label: 'Finance Engine', path: '/admin/finance' },
-        { icon: BarChart2, label: 'Deep Analytics', path: '/admin/analytics' },
+        { icon: BarChart2, label: 'Dashboard', path: '/admin/dashboard' },
+        { icon: Users, label: 'Users', path: '/admin/users' },
+        { icon: Book, label: 'Courses', path: '/admin/courses' },
+        { icon: DollarSign, label: 'Finance', path: '/admin/finance' },
+        { icon: BarChart2, label: 'Analytics', path: '/admin/analytics' },
         { icon: Megaphone, label: 'Announcements', path: '/admin/announcements' },
-        { icon: MessageSquare, label: 'Broadcasts', path: '/admin/messages' },
-        { icon: Settings, label: 'System Settings', path: '/admin/profile' },
+        { icon: MessageSquare, label: 'Messages', path: '/admin/messages' },
+        { icon: Settings, label: 'Settings', path: '/admin/profile' },
     ];
 
     return (
         <div style={styles.layout}>
-            {/* Sidebar */}
             <aside style={styles.sidebar}>
                 <div style={styles.brand}>
-                    <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#4f46e5' }}>Academix</h2>
+                    <Link to="/" style={styles.logoLink}>
+                        <span style={styles.logoIcon}>📘</span>
+                        <h2 style={styles.logoText}>Academix</h2>
+                    </Link>
                     <span style={styles.roleTag}>Admin Console</span>
                 </div>
                 
@@ -44,29 +45,23 @@ const AdminLayout: React.FC = () => {
                                 ...(isActive ? styles.navLinkActive : {})
                             })}
                         >
-                            <item.icon size={20} />
+                            <item.icon size={18} />
                             <span>{item.label}</span>
                         </NavLink>
                     ))}
                 </nav>
 
                 <div style={styles.sidebarFooter}>
+                    <Link to="/" style={styles.homeLink}><Home size={16} /> Back to Home</Link>
                     <button onClick={handleLogout} style={styles.logoutBtn}>
-                        <LogOut size={20} />
+                        <LogOut size={16} />
                         <span>Logout</span>
                     </button>
                 </div>
             </aside>
 
-            {/* Main Content Area */}
             <div style={styles.main}>
-                <header style={styles.header}>
-                    <div style={{ flex: 1 }} />
-                    <div style={styles.userInfo}>
-                        <div style={styles.avatar}>{user?.name?.charAt(0) || 'A'}</div>
-                        <span style={styles.userName}>{user?.name}</span>
-                    </div>
-                </header>
+                <TopBar />
                 <main style={styles.content}>
                     <Outlet />
                 </main>
@@ -76,21 +71,45 @@ const AdminLayout: React.FC = () => {
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    layout: { display: 'flex', minHeight: '100vh', background: '#f1f5f9', fontFamily: "'Inter', sans-serif" },
-    sidebar: { width: 260, background: '#0f172a', color: '#f8fafc', display: 'flex', flexDirection: 'column' },
-    brand: { padding: '24px', borderBottom: '1px solid #1e293b' },
-    roleTag: { display: 'inline-block', marginTop: 4, fontSize: 12, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1 },
-    nav: { flex: 1, padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 8 },
-    navLink: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 8, color: '#cbd5e1', textDecoration: 'none', fontWeight: 500, transition: 'all 0.2s' },
-    navLinkActive: { background: '#4f46e5', color: '#fff', fontWeight: 600 },
-    sidebarFooter: { padding: '24px 16px', borderTop: '1px solid #1e293b' },
-    logoutBtn: { width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 8, background: 'transparent', border: 'none', color: '#f87171', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' },
+    layout: { display: 'flex', minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter', sans-serif" },
+    sidebar: {
+        width: 240, background: '#fff', color: '#111827',
+        display: 'flex', flexDirection: 'column', borderRight: '1px solid #e5e7eb',
+    },
+    brand: { padding: '20px 20px 16px', borderBottom: '1px solid #f3f4f6' },
+    logoLink: { display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' },
+    logoIcon: { fontSize: 20 },
+    logoText: { margin: 0, fontSize: 20, fontWeight: 800, color: '#111827', letterSpacing: '-0.5px' },
+    roleTag: {
+        display: 'inline-block', marginTop: 6, fontSize: 10, fontWeight: 700,
+        color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em',
+    },
+    nav: { flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 2 },
+    navLink: {
+        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+        borderRadius: 10, color: '#6b7280', textDecoration: 'none',
+        fontWeight: 500, fontSize: 13.5, transition: 'all 0.15s',
+    },
+    navLinkActive: {
+        background: '#eff6ff', color: '#2563eb', fontWeight: 600,
+    },
+    sidebarFooter: {
+        padding: '16px 12px', borderTop: '1px solid #f3f4f6',
+        display: 'flex', flexDirection: 'column', gap: 4,
+    },
+    homeLink: {
+        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+        borderRadius: 10, color: '#6b7280', textDecoration: 'none',
+        fontSize: 13, fontWeight: 500, transition: 'all 0.15s',
+    },
+    logoutBtn: {
+        width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+        padding: '10px 14px', borderRadius: 10, background: 'transparent',
+        border: 'none', color: '#ef4444', fontWeight: 600, fontSize: 13,
+        cursor: 'pointer', transition: 'background 0.15s',
+    },
     main: { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' },
-    header: { height: 72, background: '#fff', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', padding: '0 32px' },
-    userInfo: { display: 'flex', alignItems: 'center', gap: 12 },
-    avatar: { width: 36, height: 36, borderRadius: '50%', background: '#4f46e5', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 16 },
-    userName: { fontWeight: 600, color: '#0f172a' },
-    content: { flex: 1, overflowY: 'auto', padding: '32px' }
+    content: { flex: 1, overflowY: 'auto', padding: '28px' },
 };
 
 export default AdminLayout;

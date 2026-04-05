@@ -1,10 +1,11 @@
 import React from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { BookOpen, Calendar, CheckSquare, MessageSquare, CreditCard, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { BookOpen, Calendar, CheckSquare, MessageSquare, CreditCard, User, LogOut, LayoutDashboard, Home, FileText } from 'lucide-react';
+import TopBar from '@/components/TopBar';
 
 const StudentLayout: React.FC = () => {
-    const { user, logout } = useAuth();
+    const { logout } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -16,18 +17,21 @@ const StudentLayout: React.FC = () => {
         { icon: LayoutDashboard, label: 'Dashboard', path: '/student/dashboard' },
         { icon: BookOpen, label: 'Courses', path: '/student/courses' },
         { icon: CheckSquare, label: 'Attendance', path: '/student/attendance' },
+        { icon: FileText, label: 'Assignments', path: '/student/assignments' },
         { icon: Calendar, label: 'Quizzes', path: '/student/quizzes' },
         { icon: MessageSquare, label: 'Messages', path: '/student/messages' },
         { icon: CreditCard, label: 'Fees & Dues', path: '/student/fees' },
-        { icon: User, label: 'My Profile', path: '/student/profile' },
+        { icon: User, label: 'Profile', path: '/student/profile' },
     ];
 
     return (
         <div style={styles.layout}>
-            {/* Sidebar */}
             <aside style={styles.sidebar}>
                 <div style={styles.brand}>
-                    <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#4f46e5' }}>Academix</h2>
+                    <Link to="/" style={styles.logoLink}>
+                        <span style={styles.logoIcon}>📘</span>
+                        <h2 style={styles.logoText}>Academix</h2>
+                    </Link>
                     <span style={styles.roleTag}>Student Portal</span>
                 </div>
                 
@@ -41,29 +45,23 @@ const StudentLayout: React.FC = () => {
                                 ...(isActive ? styles.navLinkActive : {})
                             })}
                         >
-                            <item.icon size={20} />
+                            <item.icon size={18} />
                             <span>{item.label}</span>
                         </NavLink>
                     ))}
                 </nav>
 
                 <div style={styles.sidebarFooter}>
+                    <Link to="/" style={styles.homeLink}><Home size={16} /> Back to Home</Link>
                     <button onClick={handleLogout} style={styles.logoutBtn}>
-                        <LogOut size={20} />
+                        <LogOut size={16} />
                         <span>Logout</span>
                     </button>
                 </div>
             </aside>
 
-            {/* Main Content Area */}
             <div style={styles.main}>
-                <header style={styles.header}>
-                    <div style={{ flex: 1 }} />
-                    <div style={styles.userInfo}>
-                        <div style={styles.avatar}>{user?.name?.charAt(0) || 'S'}</div>
-                        <span style={styles.userName}>{user?.name}</span>
-                    </div>
-                </header>
+                <TopBar />
                 <main style={styles.content}>
                     <Outlet />
                 </main>
@@ -73,21 +71,45 @@ const StudentLayout: React.FC = () => {
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    layout: { display: 'flex', minHeight: '100vh', background: '#f3f4f6', fontFamily: "'Inter', sans-serif" },
-    sidebar: { width: 260, background: '#fff', borderRight: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column' },
-    brand: { padding: '24px', borderBottom: '1px solid #f3f4f6' },
-    roleTag: { display: 'inline-block', marginTop: 4, fontSize: 12, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 1 },
-    nav: { flex: 1, padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 8 },
-    navLink: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 8, color: '#4b5563', textDecoration: 'none', fontWeight: 500, transition: 'all 0.2s' },
-    navLinkActive: { background: '#eef2ff', color: '#4f46e5', fontWeight: 600 },
-    sidebarFooter: { padding: '24px 16px', borderTop: '1px solid #f3f4f6' },
-    logoutBtn: { width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 8, background: 'transparent', border: 'none', color: '#ef4444', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' },
+    layout: { display: 'flex', minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter', sans-serif" },
+    sidebar: {
+        width: 240, background: '#fff', borderRight: '1px solid #e5e7eb',
+        display: 'flex', flexDirection: 'column',
+    },
+    brand: { padding: '20px 20px 16px', borderBottom: '1px solid #f3f4f6' },
+    logoLink: { display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' },
+    logoIcon: { fontSize: 20 },
+    logoText: { margin: 0, fontSize: 20, fontWeight: 800, color: '#111827', letterSpacing: '-0.5px' },
+    roleTag: {
+        display: 'inline-block', marginTop: 6, fontSize: 10, fontWeight: 700,
+        color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em',
+    },
+    nav: { flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 2 },
+    navLink: {
+        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+        borderRadius: 10, color: '#6b7280', textDecoration: 'none',
+        fontWeight: 500, fontSize: 13.5, transition: 'all 0.15s',
+    },
+    navLinkActive: {
+        background: '#eff6ff', color: '#2563eb', fontWeight: 600,
+    },
+    sidebarFooter: {
+        padding: '16px 12px', borderTop: '1px solid #f3f4f6',
+        display: 'flex', flexDirection: 'column', gap: 4,
+    },
+    homeLink: {
+        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+        borderRadius: 10, color: '#6b7280', textDecoration: 'none',
+        fontSize: 13, fontWeight: 500, transition: 'all 0.15s',
+    },
+    logoutBtn: {
+        width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+        padding: '10px 14px', borderRadius: 10, background: 'transparent',
+        border: 'none', color: '#ef4444', fontWeight: 600, fontSize: 13,
+        cursor: 'pointer', transition: 'background 0.15s',
+    },
     main: { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' },
-    header: { height: 72, background: '#fff', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', padding: '0 32px' },
-    userInfo: { display: 'flex', alignItems: 'center', gap: 12 },
-    avatar: { width: 36, height: 36, borderRadius: '50%', background: '#4f46e5', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 16 },
-    userName: { fontWeight: 600, color: '#111827' },
-    content: { flex: 1, overflowY: 'auto', padding: '32px' }
+    content: { flex: 1, overflowY: 'auto', padding: '28px' },
 };
 
 export default StudentLayout;

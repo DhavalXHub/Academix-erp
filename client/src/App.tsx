@@ -12,6 +12,7 @@ import AdminLayout from '@/components/layouts/AdminLayout';
 // Shared Pages
 import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/LoginPage';
+import PricingPage from '@/pages/PricingPage';
 import ProfilePage from '@/pages/ProfilePage';
 
 // Student Pages
@@ -50,6 +51,7 @@ const App: React.FC = () => {
                     {/* Public Route */}
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/pricing" element={<PricingPage />} />
 
                     {/* Student Routes */}
                     <Route path="/student" element={<ProtectedRoute allowedRoles={['student']} />}>

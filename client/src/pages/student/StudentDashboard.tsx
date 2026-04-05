@@ -18,7 +18,15 @@ const StudentDashboard: React.FC = () => {
     }, [accessToken]);
 
     if (isLoading) return <div style={styles.loader}>Loading Analytics...</div>;
-    if (!analytics) return <div style={styles.error}>Unable to load dashboard data.</div>;
+
+    if (!analytics) return (
+        <div style={styles.errorContainer}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+            <h3 style={styles.errorTitle}>Something went wrong</h3>
+            <p style={styles.errorText}>Unable to load your analytics dashboard. Please try again later.</p>
+            <button style={styles.retryBtn} onClick={() => window.location.reload()}>Retry</button>
+        </div>
+    );
 
     const stats = [
         { label: 'Overall Perf', value: `${analytics.overallScore}%`, color: '#4f46e5', icon: '🏆' },
@@ -92,7 +100,10 @@ const styles: Record<string, React.CSSProperties> = {
     title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
     subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
     loader: { padding: '4rem', textAlign: 'center', fontSize: 16, color: '#6b7280' },
-    error: { padding: '4rem', textAlign: 'center', fontSize: 16, color: '#dc2626' },
+    errorContainer: { padding: '5rem 2rem', textAlign: 'center', maxWidth: 400, margin: '0 auto' },
+    errorTitle: { fontSize: 20, fontWeight: 700, color: '#111827', margin: '0 0 8px' },
+    errorText: { fontSize: 14, color: '#6b7280', margin: '0 0 24px', lineHeight: 1.6 },
+    retryBtn: { padding: '10px 24px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer' },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24 },
     card: { background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', padding: 24, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
     cardTitle: { margin: '0 0 20px', fontSize: 16, fontWeight: 700, color: '#111827' },

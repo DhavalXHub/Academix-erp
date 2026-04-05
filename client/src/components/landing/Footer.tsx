@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
     return (
-        <footer className="lp-footer">
+        <footer id="contact" className="lp-footer">
             <div className="lp-footer-inner">
                 <div>
                     <span className="lp-footer-brand">Academix ERP</span>
