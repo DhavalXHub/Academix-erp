@@ -9,7 +9,7 @@ import axios, { AxiosInstance } from 'axios';
 
 const API_BASE_URL =
     (import.meta as any).env?.VITE_API_BASE_URL ||
-    'http://localhost:5000/api/v1';
+    'http://localhost:5005/api/v1';
 
 const ACCESS_TOKEN_KEY = 'academix_access_token';
 

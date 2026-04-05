@@ -172,7 +172,7 @@ const LoginPage: React.FC = () => {
 
                 {/* Demo Credentials hint */}
                 <div style={styles.demoHint}>
-                    <strong>Demo:</strong> student@academix.edu / password123
+                    <strong>Demo:</strong> student1@academix.edu / password123
                 </div>
             </div>
         </div>

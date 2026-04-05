@@ -1,14 +1,15 @@
 const http = require('http');
 
 const data = JSON.stringify({
-    email: 'student@academix.edu',
-    password: 'password123'
+    email: 'student1@academix.edu',
+    password: 'password123',
+    role: 'student'
 });
 
 const options = {
     hostname: 'localhost',
-    port: 5000,
-    path: '/api/auth/login',
+    port: 5005,
+    path: '/api/v1/auth/login',
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
@@ -16,19 +17,14 @@ const options = {
     }
 };
 
-const req = http.request(options, (res) => {
-    let body = '';
-    res.on('data', (chunk) => {
-        body += chunk;
-    });
-    res.on('end', () => {
-        console.log('STATUS:', res.statusCode);
-        console.log('BODY:', body);
-    });
+const req = http.request(options, res => {
+    let raw = '';
+    res.on('data', chunk => raw += chunk);
+    res.on('end', () => console.log('Response:', raw));
 });
 
-req.on('error', (e) => {
-    console.error(`problem with request: ${e.message}`);
+req.on('error', error => {
+    console.error(error);
 });
 
 req.write(data);

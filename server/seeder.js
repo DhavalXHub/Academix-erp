@@ -41,12 +41,16 @@ const importData = async () => {
         const facultyUser2 = await User.create({ name: 'Prof. Sarah Johnson', email: 'sarah.johnson@academix.edu', password: 'password123', role: 'faculty' });
         const facultyUser3 = await User.create({ name: 'Dr. Michael Chen', email: 'michael.chen@academix.edu', password: 'password123', role: 'faculty' });
 
-        const studentUsers = await User.insertMany(Array.from({ length: 20 }, (_, i) => ({
-            name: `Student ${i + 1}`,
-            email: `student${i + 1}@academix.edu`,
-            password: 'password123',
-            role: 'student'
-        })));
+        const studentUsers = [];
+        for (let i = 0; i < 20; i++) {
+            const u = await User.create({
+                name: `Student ${i + 1}`,
+                email: `student${i + 1}@academix.edu`,
+                password: 'password123',
+                role: 'student'
+            });
+            studentUsers.push(u);
+        }
 
         // ── Create Faculty ────────────────────────────────────────────────────
         const faculty1 = await Faculty.create({
