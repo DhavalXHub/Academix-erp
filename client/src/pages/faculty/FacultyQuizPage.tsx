@@ -100,7 +100,7 @@ const FacultyQuizPage: React.FC = () => {
             {selectedCourse && (
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                        <h2 style={{ margin: 0, fontSize: 18, color: '#111827' }}>Quizzes Available</h2>
+                        <h2 style={{ margin: 0, fontSize: 18, color: 'var(--text-main)' }}>Quizzes Available</h2>
                         <button style={styles.createBtn} onClick={() => setIsBuilding(true)}>+ New Quiz</button>
                     </div>
 
@@ -147,26 +147,26 @@ const FacultyQuizPage: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1000, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
-    label: { display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 8 },
-    select: { padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 15, background: '#fff', width: '100%', maxWidth: 400 },
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
+    label: { display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 },
+    select: { padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 15, background:'var(--card-bg)', width: '100%', maxWidth: 400 },
     
-    createBtn: { padding: '10px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
+    createBtn: { padding: '10px 16px', background: 'var(--primary)', color:'var(--card-bg)', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
     
-    empty: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db' },
+    empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' },
     
-    quizCard: { padding: '20px', background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
-    qTitle: { margin: '0 0 8px', fontSize: 18, fontWeight: 700, color: '#111827' },
+    quizCard: { padding: '20px', background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+    qTitle: { margin: '0 0 8px', fontSize: 18, fontWeight: 700, color: 'var(--text-main)' },
     badgeActive: { padding: '4px 8px', background: '#d1fae5', color: '#047857', fontSize: 12, fontWeight: 700, borderRadius: 99, height: 'fit-content' },
     badgeDraft: { padding: '4px 8px', background: '#f1f5f9', color: '#475569', fontSize: 12, fontWeight: 700, borderRadius: 99, height: 'fit-content' },
-    qMeta: { margin: '0 0 20px', fontSize: 13, color: '#6b7280', fontWeight: 500 },
+    qMeta: { margin: '0 0 20px', fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 },
     
     qActions: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16, borderTop: '1px solid #f3f4f6' },
     actionBtn: { padding: '8px 12px', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
-    editBtn: { padding: '8px 12px', background: '#fff', color: '#374151', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
-    deleteBtn: { padding: '8px 12px', background: '#fff', color: '#ef4444', border: '1px solid #fecaca', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }
+    editBtn: { padding: '8px 12px', background:'var(--card-bg)', color: 'var(--text-main)', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
+    deleteBtn: { padding: '8px 12px', background:'var(--card-bg)', color: '#ef4444', border: '1px solid #fecaca', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }
 };
 
 export default FacultyQuizPage;

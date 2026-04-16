@@ -51,7 +51,7 @@ const AdminDashboard: React.FC = () => {
     if (!analytics) return null;
 
     const topLevelStats = [
-        { label: 'Active Students', value: analytics.totalStudents, color: '#4f46e5', icon: '👨‍🎓' },
+        { label: 'Active Students', value: analytics.totalStudents, color: 'var(--primary)', icon: '👨‍🎓' },
         { label: 'Total Faculty', value: analytics.totalFaculty, color: '#10b981', icon: '👨‍🏫' },
         { label: 'Active Courses', value: analytics.totalCourses, color: '#f59e0b', icon: '📚' },
         { label: 'Pending Dues ($)', value: `$${analytics.pendingDues.toLocaleString()}`, color: '#ef4444', icon: '⏳' },
@@ -94,19 +94,19 @@ const AdminDashboard: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1400, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     header: { marginBottom: 32 },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
-    loader: { padding: '4rem', textAlign: 'center', fontSize: 15, color: '#6b7280' },
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
+    loader: { padding: '4rem', textAlign: 'center', fontSize: 15, color: 'var(--text-muted)' },
     errorContainer: { padding: '5rem 2rem', textAlign: 'center', maxWidth: 400, margin: '0 auto' },
     errorIcon: { fontSize: 48, marginBottom: 16 },
-    errorTitle: { fontSize: 20, fontWeight: 700, color: '#111827', margin: '0 0 8px' },
-    errorText: { fontSize: 14, color: '#6b7280', margin: '0 0 24px', lineHeight: 1.6 },
-    retryBtn: { padding: '10px 24px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer' },
+    errorTitle: { fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' },
+    errorText: { fontSize: 14, color: 'var(--text-muted)', margin: '0 0 24px', lineHeight: 1.6 },
+    retryBtn: { padding: '10px 24px', background: '#2563eb', color:'var(--card-bg)', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer' },
     grid: { display: 'grid', gridTemplateColumns: '7fr 4fr', gap: 24 },
-    cardLarge: { background: '#fff', padding: 24, borderRadius: 16, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
-    cardSmall: { background: '#fff', padding: 24, borderRadius: 16, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
+    cardLarge: { background:'var(--card-bg)', padding: 24, borderRadius: 16, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
+    cardSmall: { background:'var(--card-bg)', padding: 24, borderRadius: 16, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
     cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-    cardTitle: { margin: 0, fontSize: 16, fontWeight: 700, color: '#1f2937' },
+    cardTitle: { margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-main)' },
     badgeSuccess: { background: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: 99, fontSize: 13, fontWeight: 700 },
 };
 

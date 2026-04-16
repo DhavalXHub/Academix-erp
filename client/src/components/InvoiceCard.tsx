@@ -65,25 +65,25 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, onPay, isAdminView }
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    card: { background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
-    header: { padding: '16px', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f9fafb' },
-    title: { margin: 0, fontSize: 14, fontWeight: 700, color: '#111827' },
-    subtitle: { margin: '4px 0 0', fontSize: 12, color: '#6b7280' },
+    card: { background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+    header: { padding: '16px', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--page-bg)' },
+    title: { margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--text-main)' },
+    subtitle: { margin: '4px 0 0', fontSize: 12, color: 'var(--text-muted)' },
     badge: { padding: '4px 10px', borderRadius: 99, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' },
     badgeSuccess: { background: '#dcfce7', color: '#166534' },
     badgeWarning: { background: '#fef08a', color: '#854d0e' },
     badgeDanger: { background: '#fee2e2', color: '#991b1b' },
     body: { padding: '16px', flex: 1 },
-    studentInfo: { margin: '0 0 12px', fontSize: 13, color: '#374151' },
-    desc: { margin: '0 0 16px', fontSize: 13, color: '#4b5563', fontStyle: 'italic' },
+    studentInfo: { margin: '0 0 12px', fontSize: 13, color: 'var(--text-main)' },
+    desc: { margin: '0 0 16px', fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic' },
     amountRow: { display: 'flex', justifyContent: 'space-between', marginBottom: 8 },
-    label: { fontSize: 14, color: '#6b7280' },
-    labelDark: { fontSize: 14, color: '#111827', fontWeight: 600 },
-    value: { fontSize: 14, color: '#374151', fontWeight: 600 },
+    label: { fontSize: 14, color: 'var(--text-muted)' },
+    labelDark: { fontSize: 14, color: 'var(--text-main)', fontWeight: 600 },
+    value: { fontSize: 14, color: 'var(--text-main)', fontWeight: 600 },
     valueSuccess: { fontSize: 14, color: '#16a34a', fontWeight: 600 },
     valueDanger: { fontSize: 14, color: '#dc2626', fontWeight: 700 },
-    footer: { padding: '16px', background: '#f9fafb', borderTop: '1px solid #f3f4f6' },
-    payBtn: { width: '100%', padding: '10px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer' }
+    footer: { padding: '16px', background: 'var(--page-bg)', borderTop: '1px solid #f3f4f6' },
+    payBtn: { width: '100%', padding: '10px', background: 'var(--primary)', color:'var(--card-bg)', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer' }
 };
 
 export default InvoiceCard;

@@ -157,13 +157,13 @@ const StudentCoursePage: React.FC = () => {
                 <div style={styles.overlay} onClick={() => setSubmittingAssignment(null)}>
                     <div style={styles.modal} onClick={e => e.stopPropagation()}>
                         <h2 style={styles.modalTitle}>Submit Work</h2>
-                        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#4b5563' }}>
+                        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text-muted)' }}>
                             Assignment: <strong>{submittingAssignment.title}</strong>
                         </p>
                         
                         <form onSubmit={handleSubmitUrl}>
                             <div style={{ marginBottom: 16 }}>
-                                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 8 }}>
+                                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 }}>
                                     File URL / Shared Drive Link
                                 </label>
                                 <input
@@ -193,27 +193,27 @@ const StudentCoursePage: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1000, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     header: { marginBottom: '1.5rem' },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
     controlsRow: { marginBottom: '2rem' },
     controlGroup: { display: 'flex', flexDirection: 'column', gap: 6, maxWidth: 400 },
-    label: { fontSize: 13, fontWeight: 600, color: '#374151' },
-    select: { padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 15, background: '#fff' },
+    label: { fontSize: 13, fontWeight: 600, color: 'var(--text-main)' },
+    select: { padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 15, background:'var(--card-bg)' },
     
     tabsMenu: { display: 'flex', gap: 12, borderBottom: '2px solid #e5e7eb', marginBottom: '2rem' },
-    tab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 600, color: '#6b7280', cursor: 'pointer', marginBottom: -2 },
-    activeTab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 700, color: '#4f46e5', cursor: 'pointer', borderBottom: '3px solid #4f46e5', marginBottom: -2 },
+    tab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer', marginBottom: -2 },
+    activeTab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 700, color: 'var(--primary)', cursor: 'pointer', borderBottom: '3px solid var(--primary)', marginBottom: -2 },
     
     contentArea: { minHeight: 400 },
-    empty: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db' },
+    empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
     listGridActive: { display: 'flex', flexDirection: 'column', gap: '1.5rem' },
     
     // Modal
     overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 },
-    modal: { background: '#fff', borderRadius: 16, width: '100%', maxWidth: 500, padding: 24, boxShadow: '0 25px 60px rgba(0,0,0,0.2)' },
-    modalTitle: { fontSize: 20, fontWeight: 700, color: '#111827', margin: '0 0 16px' },
-    cancelBtn: { padding: '9px 20px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 14, color: '#374151', fontWeight: 600 },
-    primaryBtn: { padding: '10px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
+    modal: { background:'var(--card-bg)', borderRadius: 16, width: '100%', maxWidth: 500, padding: 24, boxShadow: '0 25px 60px rgba(0,0,0,0.2)' },
+    modalTitle: { fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 16px' },
+    cancelBtn: { padding: '9px 20px', borderRadius: 8, border: '1px solid #d1d5db', background:'var(--card-bg)', cursor: 'pointer', fontSize: 14, color: 'var(--text-main)', fontWeight: 600 },
+    primaryBtn: { padding: '10px 20px', background: 'var(--primary)', color:'var(--card-bg)', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
 };
 
 export default StudentCoursePage;

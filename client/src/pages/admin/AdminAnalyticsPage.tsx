@@ -69,12 +69,12 @@ const AdminAnalyticsPage: React.FC = () => {
     if (error) return (
         <div style={styles.errorContainer}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>Something went wrong</h3>
-            <p style={{ fontSize: 14, color: '#6b7280', margin: '0 0 24px', lineHeight: 1.6 }}>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' }}>Something went wrong</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: '0 0 24px', lineHeight: 1.6 }}>
                 Unable to load analytics data. Please try again.
             </p>
             <button
-                style={{ padding: '10px 24px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
+                style={{ padding: '10px 24px', background: '#2563eb', color:'var(--card-bg)', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
                 onClick={() => window.location.reload()}
             >
                 Retry
@@ -113,14 +113,14 @@ const AdminAnalyticsPage: React.FC = () => {
                         <ResponsiveContainer width="100%" height={320}>
                             <BarChart data={deptData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                                <XAxis dataKey="department" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} />
-                                <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                                <XAxis dataKey="department" tick={{ fontSize: 12, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                                <YAxis tick={{ fontSize: 12, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                                 <Tooltip
                                     contentStyle={{ borderRadius: 10, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
-                                    cursor={{ fill: 'rgba(79,70,229,0.05)' }}
+                                    cursor={{ fill: 'rgba(var(--primary-rgb),0.05)' }}
                                 />
                                 <Legend />
-                                <Bar dataKey="enrollments" fill="#4f46e5" radius={[6, 6, 0, 0]} />
+                                <Bar dataKey="enrollments" fill="var(--primary)" radius={[6, 6, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -135,9 +135,9 @@ const AdminAnalyticsPage: React.FC = () => {
                         <ResponsiveContainer width="100%" height={320}>
                             <LineChart data={revenueData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                                <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                                <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                                 <YAxis
-                                    tick={{ fontSize: 12, fill: '#6b7280' }}
+                                    tick={{ fontSize: 12, fill: 'var(--text-muted)' }}
                                     axisLine={false} tickLine={false}
                                     tickFormatter={(v) => `$${v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v}`}
                                 />
@@ -146,7 +146,7 @@ const AdminAnalyticsPage: React.FC = () => {
                                     formatter={(v: number) => [`$${v.toLocaleString()}`, 'Revenue']}
                                 />
                                 <Legend />
-                                <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981', stroke: '#fff', strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                                <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981', stroke:'var(--card-bg)', strokeWidth: 2 }} activeDot={{ r: 6 }} />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
@@ -161,19 +161,19 @@ const styles: Record<string, React.CSSProperties> = {
     header: { marginBottom: '1.5rem' },
     title: { fontSize: 26, fontWeight: 800, color: '#0f172a', margin: 0 },
     subtitle: { fontSize: 14, color: '#64748b', margin: '6px 0 0' },
-    state: { padding: '4rem', textAlign: 'center', color: '#6b7280' },
+    state: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' },
     errorContainer: { padding: '5rem 2rem', textAlign: 'center', maxWidth: 400, margin: '0 auto' },
 
     kpiGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 20 },
-    kpiCard: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: 16, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+    kpiCard: { background:'var(--card-bg)', border: '1px solid #e5e7eb', borderRadius: 16, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
     kpiLabel: { fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em' },
     kpiValue: { fontSize: 24, fontWeight: 800, marginTop: 10 },
 
     chartsGrid: { display: 'grid', gridTemplateColumns: '1fr', gap: 16 },
-    chartCard: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
+    chartCard: { background:'var(--card-bg)', border: '1px solid #e5e7eb', borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' },
     chartHeader: { padding: '20px 20px 0' },
     chartTitle: { margin: 0, fontSize: 16, fontWeight: 800, color: '#0f172a' },
-    chartHint: { display: 'block', marginTop: 4, fontSize: 13, color: '#6b7280' },
+    chartHint: { display: 'block', marginTop: 4, fontSize: 13, color: 'var(--text-muted)' },
     chartBody: { padding: 16 },
 };
 

@@ -148,7 +148,7 @@ const AdminCoursesPage: React.FC = () => {
             {meta.totalPages > 1 && (
                 <div style={styles.pagination}>
                     <button style={styles.pageBtn} disabled={page <= 1} onClick={() => { setPage(p => p - 1); loadCourses(page - 1); }}>← Prev</button>
-                    <span style={{ fontSize: 13, color: '#6b7280' }}>Page {meta.page} of {meta.totalPages}</span>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Page {meta.page} of {meta.totalPages}</span>
                     <button style={styles.pageBtn} disabled={page >= meta.totalPages} onClick={() => { setPage(p => p + 1); loadCourses(page + 1); }}>Next →</button>
                 </div>
             )}
@@ -168,19 +168,19 @@ const AdminCoursesPage: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1200, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#9ca3af', margin: '4px 0 0' },
-    createBtn: { padding: '10px 20px', background: 'linear-gradient(135deg, #6366f1, #4f46e5)', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14, fontWeight: 600 },
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
+    createBtn: { padding: '10px 20px', background: 'linear-gradient(135deg, var(--primary-light), var(--primary))', color:'var(--card-bg)', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14, fontWeight: 600 },
     filterBar: { display: 'flex', gap: 10, marginBottom: '1.5rem', flexWrap: 'wrap' },
     searchInput: { flex: 1, minWidth: 200, padding: '9px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none' },
-    select: { padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, background: '#fff' },
-    searchBtn: { padding: '9px 18px', borderRadius: 8, border: 'none', background: '#111827', color: '#fff', cursor: 'pointer', fontSize: 14, fontWeight: 500 },
+    select: { padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, background:'var(--card-bg)' },
+    searchBtn: { padding: '9px 18px', borderRadius: 8, border: 'none', background: 'var(--text-main)', color:'var(--card-bg)', cursor: 'pointer', fontSize: 14, fontWeight: 500 },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' },
-    empty: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db' },
-    btnEdit: { flex: 1, padding: '7px 0', background: '#f3f4f6', color: '#374151', border: '1px solid #e5e7eb', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
+    empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
+    btnEdit: { flex: 1, padding: '7px 0', background: 'var(--border-color)', color: 'var(--text-main)', border: '1px solid #e5e7eb', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
     btnDelete: { flex: 1, padding: '7px 0', background: '#fef2f2', color: '#ef4444', border: '1px solid #fecaca', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
     pagination: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, marginTop: '2rem' },
-    pageBtn: { padding: '7px 16px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 500 },
+    pageBtn: { padding: '7px 16px', borderRadius: 8, border: '1px solid #d1d5db', background:'var(--card-bg)', cursor: 'pointer', fontSize: 13, fontWeight: 500 },
     toast: { position: 'fixed', top: 20, right: 20, padding: '12px 20px', borderRadius: 10, border: '1px solid', fontSize: 14, fontWeight: 500, zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' },
 };
 

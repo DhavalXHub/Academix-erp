@@ -55,18 +55,18 @@ const QuizResultCard: React.FC<QuizResultCardProps> = ({ attempt }) => {
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    card: { background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', padding: '24px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' },
+    card: { background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb', padding: '24px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-    title: { margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' },
-    date: { margin: '4px 0 0', fontSize: 13, color: '#6b7280' },
+    title: { margin: 0, fontSize: 18, fontWeight: 700, color: 'var(--text-main)' },
+    date: { margin: '4px 0 0', fontSize: 13, color: 'var(--text-muted)' },
     scoreCircle: { width: 64, height: 64 },
     circularChart: { display: 'block', margin: '0 auto', maxWidth: '100%', maxHeight: 250 },
-    percentageText: { fill: '#111827', fontSize: 10, fontFamily: 'sans-serif', fontWeight: 700, textAnchor: 'middle' },
+    percentageText: { fill: 'var(--text-main)', fontSize: 10, fontFamily: 'sans-serif', fontWeight: 700, textAnchor: 'middle' },
     
     detailsRow: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, borderTop: '1px solid #f3f4f6', paddingTop: 16 },
     statBox: { display: 'flex', flexDirection: 'column', gap: 4 },
-    statLabel: { fontSize: 12, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' },
-    statValue: { fontSize: 15, fontWeight: 700, color: '#111827' }
+    statLabel: { fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' },
+    statValue: { fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }
 };
 
 export default QuizResultCard;

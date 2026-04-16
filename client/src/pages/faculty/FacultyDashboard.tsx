@@ -125,7 +125,7 @@ const FacultyDashboard: React.FC = () => {
                             data={assignmentData}
                             nameKey="title"
                             dataKey="completionRate"
-                            fillColor="#4f46e5"
+                            fillColor="var(--primary)"
                         />
                     </div>
 
@@ -147,17 +147,17 @@ const FacultyDashboard: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1400, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
-    select: { padding: '10px 16px', borderRadius: 10, border: '1px solid #d1d5db', fontSize: 14, fontWeight: 600, background: '#fff', outline: 'none', minWidth: 200, color: '#111827', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' },
-    loader: { padding: '4rem', textAlign: 'center', color: '#6b7280', fontSize: 15 },
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
+    select: { padding: '10px 16px', borderRadius: 10, border: '1px solid #d1d5db', fontSize: 14, fontWeight: 600, background:'var(--card-bg)', outline: 'none', minWidth: 200, color: 'var(--text-main)', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' },
+    loader: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: 15 },
     errorContainer: { padding: '4rem 2rem', textAlign: 'center', maxWidth: 400, margin: '0 auto' },
-    errorTitle: { fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 8px' },
-    errorText: { fontSize: 14, color: '#6b7280', margin: 0, lineHeight: 1.6 },
+    errorTitle: { fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' },
+    errorText: { fontSize: 14, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 },
-    fullCard: { gridColumn: '1 / -1', background: '#fff', borderRadius: 16, border: '1px solid #e5e7eb', padding: 24, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
-    splitCard: { background: '#fff', borderRadius: 16, border: '1px solid #e5e7eb', padding: 24, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
-    cardTitle: { margin: '0 0 24px', fontSize: 16, fontWeight: 700, color: '#1f2937' },
+    fullCard: { gridColumn: '1 / -1', background:'var(--card-bg)', borderRadius: 16, border: '1px solid #e5e7eb', padding: 24, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
+    splitCard: { background:'var(--card-bg)', borderRadius: 16, border: '1px solid #e5e7eb', padding: 24, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
+    cardTitle: { margin: '0 0 24px', fontSize: 16, fontWeight: 700, color: 'var(--text-main)' },
 };
 
 export default FacultyDashboard;

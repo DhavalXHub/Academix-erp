@@ -53,8 +53,8 @@ const StudentFeesPage: React.FC = () => {
     return (
         <div style={styles.page}>
             <div style={styles.header}>
-                <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#111827' }}>My Fees & Dues</h1>
-                <p style={{ margin: '4px 0 0', color: '#6b7280', fontSize: 14 }}>Manage your campus financial obligations and view receipts.</p>
+                <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: 'var(--text-main)' }}>My Fees & Dues</h1>
+                <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: 14 }}>Manage your campus financial obligations and view receipts.</p>
             </div>
 
             <FinanceStatsCards stats={stats} />
@@ -103,9 +103,9 @@ const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1200, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     header: { marginBottom: 32 },
     splitLayout: { display: 'flex', gap: 32, alignItems: 'flex-start', flexWrap: 'wrap' },
-    sectionTitle: { fontSize: 18, fontWeight: 700, color: '#111827', margin: '0 0 16px' },
-    empty: { padding: '24px', background: '#f9fafb', borderRadius: 8, border: '1px dashed #d1d5db', textAlign: 'center', color: '#6b7280' },
-    tableCard: { background: '#fff', padding: 24, borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }
+    sectionTitle: { fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 16px' },
+    empty: { padding: '24px', background: 'var(--page-bg)', borderRadius: 8, border: '1px dashed #d1d5db', textAlign: 'center', color: 'var(--text-muted)' },
+    tableCard: { background:'var(--card-bg)', padding: 24, borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }
 };
 
 export default StudentFeesPage;

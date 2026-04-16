@@ -230,7 +230,7 @@ const badgeByCategory = (c: NoticeCategory): React.CSSProperties => {
     if (c === 'Urgent') return { background: '#fee2e2', color: '#b91c1c', borderColor: '#fecaca' };
     if (c === 'Academic') return { background: '#dbeafe', color: '#1d4ed8', borderColor: '#bfdbfe' };
     if (c === 'Event') return { background: '#fef3c7', color: '#92400e', borderColor: '#fde68a' };
-    return { background: '#e5e7eb', color: '#374151', borderColor: '#d1d5db' };
+    return { background: 'var(--border-color)', color: 'var(--text-main)', borderColor: 'var(--border-color)' };
 };
 
 const styles: Record<string, React.CSSProperties> = {
@@ -239,32 +239,32 @@ const styles: Record<string, React.CSSProperties> = {
     title: { fontSize: 26, fontWeight: 900, color: '#0f172a', margin: 0 },
     subtitle: { fontSize: 14, color: '#64748b', margin: '6px 0 0' },
     filters: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 },
-    label: { fontSize: 13, fontWeight: 800, color: '#374151' },
-    select: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff', fontSize: 14 },
+    label: { fontSize: 13, fontWeight: 800, color: 'var(--text-main)' },
+    select: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background:'var(--card-bg)', fontSize: 14 },
 
-    state: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db' },
+    state: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 14 },
-    card: { background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' },
+    card: { background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb', padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' },
     cardTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 10 },
     badges: { display: 'flex', gap: 8, flexWrap: 'wrap' },
     badge: { padding: '3px 8px', borderRadius: 999, border: '1px solid', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' },
     badgeAudience: { background: '#eef2ff', color: '#3730a3', borderColor: '#c7d2fe' },
-    date: { fontSize: 12, color: '#6b7280', fontWeight: 700 },
-    cardTitle: { margin: '6px 0 6px', fontSize: 16, fontWeight: 900, color: '#111827' },
-    cardBody: { margin: 0, fontSize: 13, color: '#374151', lineHeight: 1.55, whiteSpace: 'pre-wrap', flex: 1 },
+    date: { fontSize: 12, color: 'var(--text-muted)', fontWeight: 700 },
+    cardTitle: { margin: '6px 0 6px', fontSize: 16, fontWeight: 900, color: 'var(--text-main)' },
+    cardBody: { margin: 0, fontSize: 13, color: 'var(--text-main)', lineHeight: 1.55, whiteSpace: 'pre-wrap', flex: 1 },
     cardFooter: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, paddingTop: 12, marginTop: 12, borderTop: '1px solid #f3f4f6' },
     poster: { fontSize: 12, color: '#64748b', fontWeight: 700 },
 
-    primaryBtn: { padding: '10px 14px', borderRadius: 10, border: 'none', background: '#4f46e5', color: '#fff', fontWeight: 900, cursor: 'pointer' },
-    secondaryBtn: { padding: '9px 12px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff', color: '#111827', fontWeight: 800, cursor: 'pointer' },
-    dangerBtn: { padding: '9px 12px', borderRadius: 10, border: '1px solid #fecaca', background: '#fff', color: '#ef4444', fontWeight: 900, cursor: 'pointer' },
+    primaryBtn: { padding: '10px 14px', borderRadius: 10, border: 'none', background: 'var(--primary)', color:'var(--card-bg)', fontWeight: 900, cursor: 'pointer' },
+    secondaryBtn: { padding: '9px 12px', borderRadius: 10, border: '1px solid #d1d5db', background:'var(--card-bg)', color: 'var(--text-main)', fontWeight: 800, cursor: 'pointer' },
+    dangerBtn: { padding: '9px 12px', borderRadius: 10, border: '1px solid #fecaca', background:'var(--card-bg)', color: '#ef4444', fontWeight: 900, cursor: 'pointer' },
     toast: { position: 'fixed', top: 20, right: 20, padding: '12px 18px', borderRadius: 10, border: '1px solid', fontSize: 14, fontWeight: 800, zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' },
 
     overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 },
-    modal: { width: '100%', maxWidth: 680, background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb', boxShadow: '0 25px 60px rgba(0,0,0,0.2)', padding: 16 },
-    modalTitle: { margin: 0, fontSize: 18, fontWeight: 900, color: '#111827' },
+    modal: { width: '100%', maxWidth: 680, background:'var(--card-bg)', borderRadius: 14, border: '1px solid #e5e7eb', boxShadow: '0 25px 60px rgba(0,0,0,0.2)', padding: 16 },
+    modalTitle: { margin: 0, fontSize: 18, fontWeight: 900, color: 'var(--text-main)' },
     input: { width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: 10, fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' },
-    cancelBtn: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff', color: '#111827', fontWeight: 900, cursor: 'pointer' },
+    cancelBtn: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background:'var(--card-bg)', color: 'var(--text-main)', fontWeight: 900, cursor: 'pointer' },
 };
 
 export default AdminAnnouncementsPage;

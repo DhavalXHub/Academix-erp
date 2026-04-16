@@ -30,7 +30,7 @@ const UPCOMING_TASKS = [
 ];
 
 const ENROLLED_COURSES = [
-    { code: 'CS201', name: 'Data Structures', progress: 68, color: '#4f46e5', icon: '💻' },
+    { code: 'CS201', name: 'Data Structures', progress: 68, color: 'var(--primary)', icon: '💻' },
     { code: 'MA201', name: 'Calculus II',     progress: 55, color: '#0ea5e9', icon: '📐' },
     { code: 'PH101', name: 'Physics Fund.',   progress: 80, color: '#10b981', icon: '⚛️' },
     { code: 'EN101', name: 'English Comm.',   progress: 90, color: '#f59e0b', icon: '📚' },
@@ -134,7 +134,7 @@ const WeeklyChart: React.FC<WeeklyChartProps> = ({ data }) => {
                         {/* Attendance bar */}
                         <rect
                             x={x} y={chartH - attH} width={segW} height={attH}
-                            fill={isHov ? '#6d28d9' : '#4f46e5'} rx={3}
+                            fill={isHov ? 'var(--primary-dark)' : 'var(--primary)'} rx={3}
                             style={{ transition: 'fill 0.15s' }}
                         />
                         {/* Assignment bar */}
@@ -152,7 +152,7 @@ const WeeklyChart: React.FC<WeeklyChartProps> = ({ data }) => {
                         />
 
                         {/* Day label */}
-                        <text x={x + barW / 2} y={chartH + 16} fill={isHov ? '#4f46e5' : '#9ca3af'}
+                        <text x={x + barW / 2} y={chartH + 16} fill={isHov ? 'var(--primary)' : 'var(--text-muted)'}
                             fontSize={10} textAnchor="middle" fontWeight={isHov ? 700 : 500}>
                             {d.day}
                         </text>
@@ -197,7 +197,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ label, value, color, icon }) 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 16 }}>{icon}</span>
-                    <span style={{ fontSize: 13.5, fontWeight: 600, color: '#374151' }}>{label}</span>
+                    <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-main)' }}>{label}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color }}>
@@ -213,7 +213,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ label, value, color, icon }) 
                     />
                 </div>
             </div>
-            <div style={{ height: 10, background: '#f3f4f6', borderRadius: 99, overflow: 'hidden' }}>
+            <div style={{ height: 10, background: 'var(--border-color)', borderRadius: 99, overflow: 'hidden' }}>
                 <div style={{
                     height: '100%', borderRadius: 99,
                     width: `${width}%`,
@@ -238,7 +238,7 @@ interface StatCardProps {
 }
 const StatCard: React.FC<StatCardProps> = ({ label, value, color, icon, trend, trendUp }) => (
     <div style={{
-        background: '#fff', borderRadius: 16, border: '1px solid #e5e7eb',
+        background:'var(--card-bg)', borderRadius: 16, border: '1px solid #e5e7eb',
         padding: '20px 24px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03)',
         display: 'flex', alignItems: 'center', gap: 16,
     }}>
@@ -250,10 +250,10 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, color, icon, trend, t
             {icon}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ margin: '0 0 3px', fontSize: 12, color: '#9ca3af', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <p style={{ margin: '0 0 3px', fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {label}
             </p>
-            <h3 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: '#111827', lineHeight: 1 }}>
+            <h3 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: 'var(--text-main)', lineHeight: 1 }}>
                 {value}
             </h3>
         </div>
@@ -297,10 +297,10 @@ const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
                 {task.icon}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: '0 0 2px', fontSize: 13.5, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <p style={{ margin: '0 0 2px', fontSize: 13.5, fontWeight: 600, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {task.title}
                 </p>
-                <p style={{ margin: 0, fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>
+                <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
                     {task.course}
                 </p>
             </div>
@@ -308,7 +308,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
                 <span style={{ ...p, fontSize: 11, fontWeight: 700, borderRadius: 99, padding: '2px 8px' }}>
                     {task.priority}
                 </span>
-                <span style={{ fontSize: 11, color: '#9ca3af', fontWeight: 600 }}>{task.due}</span>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{task.due}</span>
             </div>
         </div>
     );
@@ -329,7 +329,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
 
     return (
         <div style={{
-            background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14,
+            background:'var(--card-bg)', border: '1px solid #e5e7eb', borderRadius: 14,
             padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
         }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
@@ -341,14 +341,14 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
                     {course.icon}
                 </div>
                 <div style={{ minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: '#111827' }}>{course.name}</p>
-                    <p style={{ margin: 0, fontSize: 11, color: '#9ca3af', fontWeight: 600 }}>{course.code}</p>
+                    <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: 'var(--text-main)' }}>{course.name}</p>
+                    <p style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{course.code}</p>
                 </div>
                 <span style={{ marginLeft: 'auto', fontSize: 14, fontWeight: 800, color: course.color }}>
                     {course.progress}%
                 </span>
             </div>
-            <div style={{ height: 6, background: '#f3f4f6', borderRadius: 99, overflow: 'hidden' }}>
+            <div style={{ height: 6, background: 'var(--border-color)', borderRadius: 99, overflow: 'hidden' }}>
                 <div style={{
                     height: '100%', borderRadius: 99, width: `${w}%`,
                     background: `linear-gradient(90deg, ${course.color}88, ${course.color})`,
@@ -419,7 +419,7 @@ const StudentDashboard: React.FC = () => {
         {
             label: 'Overall Score',
             value: `${data.overallScore.toFixed(0)}%`,
-            color: '#4f46e5',
+            color: 'var(--primary)',
             icon: '🏆',
             trend: '2.4%',
             trendUp: true,
@@ -493,7 +493,7 @@ const StudentDashboard: React.FC = () => {
                     <ProgressBar label="Attendance" value={data.attendancePercentage} color="#10b981" icon="📅" />
                     <ProgressBar label="Assignments" value={data.assignmentAverage}   color="#f59e0b" icon="✍️" />
                     <ProgressBar label="Quizzes"     value={data.quizAverage}         color="#9333ea" icon="📝" />
-                    <ProgressBar label="Overall"     value={data.overallScore}        color="#4f46e5" icon="🏆" />
+                    <ProgressBar label="Overall"     value={data.overallScore}        color="var(--primary)" icon="🏆" />
 
                     {/* Status banner */}
                     <div style={{ ...s.statusBanner, background: perfStatus.bg, border: `1px solid ${perfStatus.border}`, color: perfStatus.color }}>
@@ -508,19 +508,19 @@ const StudentDashboard: React.FC = () => {
                         <h2 style={s.cardTitle}>Weekly Activity</h2>
                         <div style={{ display: 'flex', gap: 12, flexShrink: 0 }}>
                             {[
-                                { label: 'Attend.', color: '#4f46e5' },
+                                { label: 'Attend.', color: 'var(--primary)' },
                                 { label: 'Assign.', color: '#0ea5e9' },
                                 { label: 'Quiz',    color: '#10b981' },
                             ].map(l => (
                                 <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                                     <div style={{ width: 8, height: 8, borderRadius: 2, background: l.color }} />
-                                    <span style={{ fontSize: 11, color: '#9ca3af', fontWeight: 600 }}>{l.label}</span>
+                                    <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{l.label}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
                     <WeeklyChart data={WEEKLY_ACTIVITY} />
-                    <p style={{ margin: '12px 0 0', fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>
+                    <p style={{ margin: '12px 0 0', fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
                         * Sample weekly breakdown. Live data will reflect actual records.
                     </p>
                 </div>
@@ -551,7 +551,7 @@ const StudentDashboard: React.FC = () => {
                     <div>
                         {UPCOMING_TASKS.map(task => <TaskItem key={task.id} task={task} />)}
                     </div>
-                    <p style={{ margin: '14px 0 0', fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>
+                    <p style={{ margin: '14px 0 0', fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
                         * Live tasks will appear as faculty posts assignments and quizzes.
                     </p>
                 </div>
@@ -579,10 +579,10 @@ const s: Record<string, React.CSSProperties> = {
     },
     spinner: {
         width: 40, height: 40, borderRadius: '50%',
-        border: '3px solid #e5e7eb', borderTop: '3px solid #4f46e5',
+        border: '3px solid #e5e7eb', borderTop: '3px solid var(--primary)',
         animation: 'spin 0.8s linear infinite',
     },
-    loaderText: { fontSize: 15, color: '#9ca3af', fontWeight: 500, margin: 0 },
+    loaderText: { fontSize: 15, color: 'var(--text-muted)', fontWeight: 500, margin: 0 },
 
     /* Fallback banner */
     fallbackBanner: {
@@ -596,12 +596,12 @@ const s: Record<string, React.CSSProperties> = {
         display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
         marginBottom: 28, flexWrap: 'wrap', gap: 12,
     },
-    greeting: { margin: '0 0 2px', fontSize: 14, color: '#9ca3af', fontWeight: 600 },
-    name: { margin: '0 0 4px', fontSize: 28, fontWeight: 800, color: '#111827', letterSpacing: '-0.5px' },
-    subtitle: { margin: 0, fontSize: 14, color: '#6b7280' },
+    greeting: { margin: '0 0 2px', fontSize: 14, color: 'var(--text-muted)', fontWeight: 600 },
+    name: { margin: '0 0 4px', fontSize: 28, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' },
+    subtitle: { margin: 0, fontSize: 14, color: 'var(--text-muted)' },
     headerDate: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' },
-    dateDay: { fontSize: 14, fontWeight: 700, color: '#4f46e5' },
-    dateFull: { fontSize: 13, color: '#9ca3af', fontWeight: 500 },
+    dateDay: { fontSize: 14, fontWeight: 700, color: 'var(--primary)' },
+    dateFull: { fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 },
 
     /* Stat cards grid */
     statsGrid: {
@@ -613,14 +613,14 @@ const s: Record<string, React.CSSProperties> = {
 
     /* Card base */
     card: {
-        background: '#fff',
+        background:'var(--card-bg)',
         borderRadius: 20,
         border: '1px solid #e5e7eb',
         padding: '24px 24px 20px',
         boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03)',
     },
     cardTitle: {
-        margin: '0 0 20px', fontSize: 16, fontWeight: 700, color: '#111827', letterSpacing: '-0.3px',
+        margin: '0 0 20px', fontSize: 16, fontWeight: 700, color: 'var(--text-main)', letterSpacing: '-0.3px',
     },
 
     /* Row layouts */

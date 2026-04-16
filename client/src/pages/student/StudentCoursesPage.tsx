@@ -157,20 +157,20 @@ const StudentCoursesPage: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1200, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     header: { marginBottom: '2rem' },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' },
-    empty: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db', lineHeight: 1.5 },
+    empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db', lineHeight: 1.5 },
     toast: { position: 'fixed', top: 20, right: 20, padding: '12px 20px', borderRadius: 10, border: '1px solid', fontSize: 14, fontWeight: 500, zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' },
     
     tabsMenu: { display: 'flex', gap: 12, borderBottom: '2px solid #e5e7eb', marginBottom: '2rem' },
-    tab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 600, color: '#6b7280', cursor: 'pointer', marginBottom: -2 },
-    activeTab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 700, color: '#4f46e5', cursor: 'pointer', borderBottom: '3px solid #4f46e5', marginBottom: -2 },
+    tab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer', marginBottom: -2 },
+    activeTab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 700, color: 'var(--primary)', cursor: 'pointer', borderBottom: '3px solid var(--primary)', marginBottom: -2 },
     
-    btnDrop: { width: '100%', padding: '9px 0', background: '#fff', color: '#ef4444', border: '1px solid #fca5a5', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' },
-    btnEnroll: { width: '100%', padding: '9px 0', background: 'linear-gradient(135deg, #10b981, #059669)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
-    btnFull: { width: '100%', padding: '9px 0', background: '#e5e7eb', color: '#9ca3af', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'not-allowed' },
-    browseBtn: { padding: '10px 24px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
+    btnDrop: { width: '100%', padding: '9px 0', background:'var(--card-bg)', color: '#ef4444', border: '1px solid #fca5a5', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' },
+    btnEnroll: { width: '100%', padding: '9px 0', background: 'linear-gradient(135deg, #10b981, #059669)', color:'var(--card-bg)', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
+    btnFull: { width: '100%', padding: '9px 0', background: 'var(--border-color)', color: 'var(--text-muted)', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'not-allowed' },
+    browseBtn: { padding: '10px 24px', background: 'var(--primary)', color:'var(--card-bg)', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
 };
 
 export default StudentCoursesPage;

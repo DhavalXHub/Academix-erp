@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Search, Bell, ChevronDown, User, Settings, LogOut, Home, X } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 /* ─────────────────────────────────────────────
    Mock Notifications (dummy data)
@@ -158,7 +159,7 @@ const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
                     position: 'relative',
                 }}
             >
-                <Search size={15} style={{ color: searchFocused ? '#2563eb' : '#9ca3af', flexShrink: 0, transition: 'color 0.15s' }} />
+                <Search size={15} style={{ color: searchFocused ? '#2563eb' : 'var(--text-muted)', flexShrink: 0, transition: 'color 0.15s' }} />
                 <input
                     id="topbar-search"
                     style={s.searchInput}
@@ -206,6 +207,7 @@ const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
 
             {/* ── Right: Notification bell + Profile ── */}
             <div style={s.right}>
+                <ThemeToggle />
 
                 {/* ──── Notification Bell ──── */}
                 <div ref={notifRef} style={{ position: 'relative' }}>
@@ -269,7 +271,7 @@ const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
                         <ChevronDown
                             size={13}
                             style={{
-                                color: '#9ca3af',
+                                color: 'var(--text-muted)',
                                 transform: showProfile ? 'rotate(180deg)' : 'none',
                                 transition: 'transform 0.2s',
                             }}
@@ -438,7 +440,7 @@ const ProfileMenuItem: React.FC<ProfileMenuItemProps> = ({ to, icon, label, onCl
             onClick={onClick}
             {...hoverProps}
         >
-            <span style={{ color: hovered ? '#4f46e5' : '#6b7280', transition: 'color 0.15s' }}>{icon}</span>
+            <span style={{ color: hovered ? 'var(--primary)' : 'var(--text-muted)', transition: 'color 0.15s' }}>{icon}</span>
             {label}
         </Link>
     );
@@ -469,7 +471,7 @@ const LogoutMenuItem: React.FC<{ onClick: () => void }> = ({ onClick }) => {
 const s: Record<string, React.CSSProperties> = {
     bar: {
         height: 64,
-        background: '#fff',
+        background:'var(--card-bg)',
         borderBottom: '1px solid #e5e7eb',
         display: 'flex',
         alignItems: 'center',
@@ -486,47 +488,47 @@ const s: Record<string, React.CSSProperties> = {
     homeBtn: {
         width: 34, height: 34, borderRadius: 8,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: '#6b7280', border: '1px solid #e5e7eb', background: '#f9fafb',
+        color: 'var(--text-muted)', border: '1px solid #e5e7eb', background: 'var(--page-bg)',
         textDecoration: 'none', flexShrink: 0, transition: 'all 0.15s',
     },
     homeBtnHover: {
         background: '#eff6ff', borderColor: '#bfdbfe', color: '#2563eb',
     },
     pageTitle: {
-        fontWeight: 700, fontSize: 15, color: '#111827',
+        fontWeight: 700, fontSize: 15, color: 'var(--text-main)',
         letterSpacing: '-0.3px', whiteSpace: 'nowrap',
     },
 
     /* Search */
     searchWrap: {
         flex: 1, maxWidth: 480, display: 'flex', alignItems: 'center', gap: 8,
-        background: '#f3f4f6', borderRadius: 10, padding: '8px 14px',
+        background: 'var(--border-color)', borderRadius: 10, padding: '8px 14px',
         border: '1.5px solid transparent', transition: 'border-color 0.15s, background 0.15s',
     },
     searchWrapFocused: {
-        background: '#fff', borderColor: '#2563eb',
+        background:'var(--card-bg)', borderColor: '#2563eb',
         boxShadow: '0 0 0 3px rgba(37,99,235,0.08)',
     },
     searchInput: {
         flex: 1, background: 'none', border: 'none', outline: 'none',
-        fontSize: 13.5, fontWeight: 500, color: '#111827',
+        fontSize: 13.5, fontWeight: 500, color: 'var(--text-main)',
         fontFamily: "'Inter', sans-serif",
     },
     clearBtn: {
         background: 'none', border: 'none', cursor: 'pointer',
-        color: '#9ca3af', display: 'flex', alignItems: 'center', padding: 2,
+        color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: 2,
         borderRadius: 4, transition: 'color 0.1s',
     },
 
     /* Search dropdown */
     searchDropdown: {
         position: 'absolute', top: 'calc(100% + 8px)', left: 0, right: 0,
-        background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb',
+        background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb',
         boxShadow: '0 16px 48px rgba(0,0,0,0.12)', zIndex: 300, overflow: 'hidden',
     },
     searchDropdownHeader: {
         padding: '10px 14px 6px',
-        fontSize: 11, fontWeight: 700, color: '#9ca3af',
+        fontSize: 11, fontWeight: 700, color: 'var(--text-muted)',
         letterSpacing: '0.06em', textTransform: 'uppercase',
     },
     searchResultItem: {
@@ -537,14 +539,14 @@ const s: Record<string, React.CSSProperties> = {
         background: '#f5f3ff',
     },
     searchResultIcon: { fontSize: 18, flexShrink: 0, width: 28, textAlign: 'center' },
-    searchResultLabel: { fontSize: 13.5, fontWeight: 500, color: '#111827' },
+    searchResultLabel: { fontSize: 13.5, fontWeight: 500, color: 'var(--text-main)' },
     searchResultCategory: {
-        fontSize: 11, fontWeight: 600, color: '#9ca3af',
-        background: '#f3f4f6', borderRadius: 99, padding: '2px 8px', flexShrink: 0,
+        fontSize: 11, fontWeight: 600, color: 'var(--text-muted)',
+        background: 'var(--border-color)', borderRadius: 99, padding: '2px 8px', flexShrink: 0,
     },
     searchNoResult: {
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-        padding: '24px 16px', color: '#6b7280', fontSize: 13.5, fontWeight: 500,
+        padding: '24px 16px', color: 'var(--text-muted)', fontSize: 13.5, fontWeight: 500,
     },
 
     /* Right */
@@ -552,8 +554,8 @@ const s: Record<string, React.CSSProperties> = {
     iconBtn: {
         width: 38, height: 38, borderRadius: 10,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: '#f3f4f6', border: '1px solid #e5e7eb',
-        cursor: 'pointer', color: '#374151',
+        background: 'var(--border-color)', border: '1px solid #e5e7eb',
+        cursor: 'pointer', color: 'var(--text-main)',
         position: 'relative', transition: 'all 0.15s',
     },
     iconBtnHover: {
@@ -561,7 +563,7 @@ const s: Record<string, React.CSSProperties> = {
     },
     badge: {
         position: 'absolute', top: -4, right: -4,
-        background: '#ef4444', color: '#fff',
+        background: '#ef4444', color:'var(--card-bg)',
         fontSize: 9, fontWeight: 800,
         width: 17, height: 17, borderRadius: '50%',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -571,23 +573,23 @@ const s: Record<string, React.CSSProperties> = {
     /* Profile button */
     profileBtn: {
         display: 'flex', alignItems: 'center', gap: 8,
-        background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 10,
+        background: 'var(--border-color)', border: '1px solid #e5e7eb', borderRadius: 10,
         padding: '5px 10px 5px 5px', cursor: 'pointer', transition: 'all 0.15s',
     },
     avatar: {
         width: 30, height: 30, borderRadius: 8,
-        background: 'linear-gradient(135deg, #2563eb, #4f46e5)', color: '#fff',
+        background: 'linear-gradient(135deg, #2563eb, var(--primary))', color:'var(--card-bg)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontWeight: 800, fontSize: 13, flexShrink: 0,
     },
     userInfo: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.2 },
-    userName: { fontWeight: 700, fontSize: 12.5, color: '#111827' },
-    userRole: { fontWeight: 500, fontSize: 11, color: '#9ca3af' },
+    userName: { fontWeight: 700, fontSize: 12.5, color: 'var(--text-main)' },
+    userRole: { fontWeight: 500, fontSize: 11, color: 'var(--text-muted)' },
 
     /* Notification dropdown */
     notifDropdown: {
         position: 'absolute', top: 'calc(100% + 8px)', right: 0, width: 360,
-        background: '#fff', borderRadius: 16, border: '1px solid #e5e7eb',
+        background:'var(--card-bg)', borderRadius: 16, border: '1px solid #e5e7eb',
         boxShadow: '0 20px 60px rgba(0,0,0,0.12)', zIndex: 200, overflow: 'hidden',
     },
     dropdownHeader: {
@@ -595,7 +597,7 @@ const s: Record<string, React.CSSProperties> = {
         padding: '14px 16px', borderBottom: '1px solid #f3f4f6',
     },
     dropdownTitle: {
-        fontWeight: 700, fontSize: 14, color: '#111827',
+        fontWeight: 700, fontSize: 14, color: 'var(--text-main)',
         display: 'flex', alignItems: 'center', gap: 8,
     },
     unreadPill: {
@@ -612,21 +614,21 @@ const s: Record<string, React.CSSProperties> = {
         borderBottom: '1px solid #f9fafb', cursor: 'pointer', transition: 'background 0.15s',
     },
     notifIcon: { fontSize: 18, flexShrink: 0, marginTop: 1 },
-    notifText: { margin: '0 0 3px', fontSize: 13, color: '#1f2937', lineHeight: 1.45 },
-    notifTime: { fontSize: 11, color: '#9ca3af', fontWeight: 600 },
+    notifText: { margin: '0 0 3px', fontSize: 13, color: 'var(--text-main)', lineHeight: 1.45 },
+    notifTime: { fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 },
     notifDot: {
         width: 7, height: 7, borderRadius: '50%', background: '#2563eb',
         marginTop: 5, flexShrink: 0,
     },
     dropdownFooter: {
-        padding: '10px 16px', borderTop: '1px solid #f3f4f6', background: '#fafafa',
+        padding: '10px 16px', borderTop: '1px solid #f3f4f6', background: 'var(--page-bg)',
     },
-    dropdownFooterText: { fontSize: 11, color: '#9ca3af', fontWeight: 600 },
+    dropdownFooterText: { fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 },
 
     /* Profile dropdown */
     profileDropdown: {
         position: 'absolute', top: 'calc(100% + 8px)', right: 0, width: 228,
-        background: '#fff', borderRadius: 16, border: '1px solid #e5e7eb',
+        background:'var(--card-bg)', borderRadius: 16, border: '1px solid #e5e7eb',
         boxShadow: '0 20px 60px rgba(0,0,0,0.12)', zIndex: 200, overflow: 'hidden',
     },
     profileHeader: {
@@ -635,27 +637,27 @@ const s: Record<string, React.CSSProperties> = {
     },
     profileAvatarLg: {
         width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-        background: 'linear-gradient(135deg, #2563eb, #4f46e5)', color: '#fff',
+        background: 'linear-gradient(135deg, #2563eb, var(--primary))', color:'var(--card-bg)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontWeight: 800, fontSize: 17,
     },
-    profileName: { margin: '0 0 1px', fontSize: 13, fontWeight: 700, color: '#111827' },
+    profileName: { margin: '0 0 1px', fontSize: 13, fontWeight: 700, color: 'var(--text-main)' },
     profileEmail: {
-        margin: '0 0 5px', fontSize: 11, color: '#9ca3af', fontWeight: 500,
+        margin: '0 0 5px', fontSize: 11, color: 'var(--text-muted)', fontWeight: 500,
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140,
     },
     profileRoleBadge: {
         background: '#eff6ff', color: '#2563eb', borderRadius: 99,
         padding: '1px 8px', fontSize: 10, fontWeight: 700,
     },
-    menuDivider: { height: 1, background: '#f3f4f6' },
+    menuDivider: { height: 1, background: 'var(--border-color)' },
     menuItem: {
         display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
-        fontSize: 13, fontWeight: 600, color: '#374151', textDecoration: 'none',
+        fontSize: 13, fontWeight: 600, color: 'var(--text-main)', textDecoration: 'none',
         transition: 'background 0.15s', cursor: 'pointer',
     },
     menuItemHover: {
-        background: '#f5f3ff', color: '#4f46e5',
+        background: '#f5f3ff', color: 'var(--primary)',
     },
     menuItemDanger: {
         display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', width: '100%',

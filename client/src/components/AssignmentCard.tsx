@@ -66,7 +66,7 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
                     ) : (
                         onClickSubmit && (
                             <button 
-                                style={{ ...styles.primaryBtn, background: mySubmission ? '#f3f4f6' : '#4f46e5', color: mySubmission ? '#374151' : '#fff' }} 
+                                style={{ ...styles.primaryBtn, background: mySubmission ? 'var(--border-color)' : 'var(--primary)', color: mySubmission ? 'var(--text-main)' :'var(--card-bg)' }} 
                                 onClick={() => onClickSubmit(assignment)}
                             >
                                 {mySubmission ? 'Update Submision' : 'Submit Assignment'}
@@ -79,8 +79,8 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
             {/* Student Feedback Display */}
             {!isFaculty && mySubmission && mySubmission.marksAwarded !== null && (
                 <div style={styles.feedbackBox}>
-                    <div style={{ fontWeight: 600, color: '#111827' }}>Graded: {mySubmission.marksAwarded} / {assignment.maxMarks}</div>
-                    {mySubmission.feedback && <div style={{ fontSize: 13, color: '#4b5563', marginTop: 4 }}>"{mySubmission.feedback}"</div>}
+                    <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>Graded: {mySubmission.marksAwarded} / {assignment.maxMarks}</div>
+                    {mySubmission.feedback && <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>"{mySubmission.feedback}"</div>}
                 </div>
             )}
         </div>
@@ -88,20 +88,20 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    card: { background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: 12 },
+    card: { background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: 12 },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' },
-    title: { margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' },
-    meta: { margin: '4px 0 0', fontSize: 13, color: '#6b7280', fontWeight: 500 },
+    title: { margin: 0, fontSize: 18, fontWeight: 700, color: 'var(--text-main)' },
+    meta: { margin: '4px 0 0', fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 },
     badge: { padding: '4px 10px', borderRadius: 99, fontSize: 12, fontWeight: 600 },
-    desc: { margin: 0, fontSize: 14, color: '#4b5563', lineHeight: 1.5, whiteSpace: 'pre-wrap' },
+    desc: { margin: 0, fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.5, whiteSpace: 'pre-wrap' },
     footer: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, paddingTop: 16, borderTop: '1px solid #f3f4f6' },
     stats: { display: 'flex', gap: 16, alignItems: 'center', fontSize: 13 },
-    marks: { fontWeight: 600, color: '#374151' },
-    link: { color: '#4f46e5', textDecoration: 'none', fontWeight: 500 },
+    marks: { fontWeight: 600, color: 'var(--text-main)' },
+    link: { color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 },
     actions: { display: 'flex', gap: 8 },
-    primaryBtn: { padding: '8px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
+    primaryBtn: { padding: '8px 16px', background: 'var(--primary)', color:'var(--card-bg)', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
     deleteBtn: { padding: '8px', background: '#fef2f2', color: '#ef4444', border: '1px solid #fecaca', borderRadius: 8, cursor: 'pointer' },
-    feedbackBox: { marginTop: 12, padding: '12px', background: '#f8fafc', borderRadius: 8, border: '1px dashed #cbd5e1' }
+    feedbackBox: { marginTop: 12, padding: '12px', background: 'var(--page-bg)', borderRadius: 8, border: '1px dashed #cbd5e1' }
 };
 
 export default AssignmentCard;

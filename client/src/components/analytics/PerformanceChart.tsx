@@ -10,7 +10,7 @@ interface PerformanceChartProps {
 
 const PerformanceChart: React.FC<PerformanceChartProps> = ({ data, dataKey, nameKey, fillColor = '#10b981' }) => {
     if (!data || data.length === 0) {
-        return <div style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}>No performance data available.</div>;
+        return <div style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>No performance data available.</div>;
     }
 
     return (
@@ -18,8 +18,8 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({ data, dataKey, name
             <ResponsiveContainer>
                 <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                    <XAxis dataKey={nameKey} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} domain={[0, 100]} />
+                    <XAxis dataKey={nameKey} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} domain={[0, 100]} />
                     <Tooltip 
                         contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
                         formatter={(value: number) => [`${Math.round(value)}%`, 'Rate']}

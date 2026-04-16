@@ -302,7 +302,7 @@ const FacultyAssignmentsPage: React.FC = () => {
             {isCreating && selectedCourse && (
                 <div style={styles.modalOverlay} onClick={() => setIsCreating(false)}>
                     <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-                        <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#111827' }}>
+                        <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'var(--text-main)' }}>
                             New Assignment ({selectedCourse.code})
                         </h3>
                         <form onSubmit={handleCreate} style={{ display: 'grid', gap: 12, marginTop: 14 }}>
@@ -362,37 +362,37 @@ const styles: Record<string, React.CSSProperties> = {
 
     controlsRow: { display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: 18 },
     controlGroup: { display: 'flex', flexDirection: 'column', gap: 6, minWidth: 260 },
-    label: { fontSize: 13, fontWeight: 700, color: '#374151' },
-    select: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff', fontSize: 14 },
+    label: { fontSize: 13, fontWeight: 700, color: 'var(--text-main)' },
+    select: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background:'var(--card-bg)', fontSize: 14 },
 
     grid: { display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 14, alignItems: 'start' },
-    card: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
-    cardTitle: { margin: '0 0 12px', fontSize: 16, fontWeight: 800, color: '#111827', display: 'flex', alignItems: 'center', gap: 10 },
+    card: { background:'var(--card-bg)', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+    cardTitle: { margin: '0 0 12px', fontSize: 16, fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: 10 },
     pill: { fontSize: 12, fontWeight: 800, padding: '4px 10px', background: '#eef2ff', border: '1px solid #c7d2fe', color: '#3730a3', borderRadius: 999 },
     list: { display: 'grid', gap: 10 },
-    listItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, width: '100%', border: '1px solid #e5e7eb', borderRadius: 10, background: '#fff', padding: 12, cursor: 'pointer', textAlign: 'left' },
+    listItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, width: '100%', border: '1px solid #e5e7eb', borderRadius: 10, background:'var(--card-bg)', padding: 12, cursor: 'pointer', textAlign: 'left' },
     listItemActive: { borderColor: '#a5b4fc', background: '#eef2ff' },
-    itemTitle: { fontSize: 14, fontWeight: 800, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-    itemMeta: { fontSize: 12, color: '#6b7280', marginTop: 3 },
+    itemTitle: { fontSize: 14, fontWeight: 800, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+    itemMeta: { fontSize: 12, color: 'var(--text-muted)', marginTop: 3 },
 
-    state: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db' },
-    stateSm: { padding: '1.5rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 10, border: '1px dashed #d1d5db' },
+    state: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
+    stateSm: { padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 10, border: '1px dashed #d1d5db' },
 
     tableWrap: { overflowX: 'auto', border: '1px solid #e5e7eb', borderRadius: 10 },
     table: { width: '100%', borderCollapse: 'collapse', fontSize: 13, textAlign: 'left' },
-    th: { padding: '10px 12px', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 11 },
+    th: { padding: '10px 12px', background: 'var(--page-bg)', borderBottom: '1px solid #e5e7eb', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 11 },
     tr: { borderBottom: '1px solid #f3f4f6' },
-    td: { padding: '10px 12px', color: '#111827' },
+    td: { padding: '10px 12px', color: 'var(--text-main)' },
     badgeOk: { padding: '3px 8px', borderRadius: 999, background: '#d1fae5', color: '#065f46', fontWeight: 800, fontSize: 12 },
     badgeWarn: { padding: '3px 8px', borderRadius: 999, background: '#fef3c7', color: '#92400e', fontWeight: 800, fontSize: 12 },
 
-    primaryBtn: { padding: '10px 14px', borderRadius: 10, border: 'none', background: '#4f46e5', color: '#fff', fontWeight: 800, cursor: 'pointer' },
-    secondaryBtn: { padding: '8px 10px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff', color: '#111827', fontWeight: 700, cursor: 'pointer' },
-    dangerBtn: { padding: '8px 10px', borderRadius: 10, border: '1px solid #fecaca', background: '#fff', color: '#ef4444', fontWeight: 800, cursor: 'pointer', flexShrink: 0 },
-    cancelBtn: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff', color: '#111827', fontWeight: 800, cursor: 'pointer' },
+    primaryBtn: { padding: '10px 14px', borderRadius: 10, border: 'none', background: 'var(--primary)', color:'var(--card-bg)', fontWeight: 800, cursor: 'pointer' },
+    secondaryBtn: { padding: '8px 10px', borderRadius: 10, border: '1px solid #d1d5db', background:'var(--card-bg)', color: 'var(--text-main)', fontWeight: 700, cursor: 'pointer' },
+    dangerBtn: { padding: '8px 10px', borderRadius: 10, border: '1px solid #fecaca', background:'var(--card-bg)', color: '#ef4444', fontWeight: 800, cursor: 'pointer', flexShrink: 0 },
+    cancelBtn: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background:'var(--card-bg)', color: 'var(--text-main)', fontWeight: 800, cursor: 'pointer' },
 
     modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 },
-    modal: { background: '#fff', borderRadius: 14, width: '100%', maxWidth: 560, padding: 18, border: '1px solid #e5e7eb', boxShadow: '0 25px 60px rgba(0,0,0,0.2)' },
+    modal: { background:'var(--card-bg)', borderRadius: 14, width: '100%', maxWidth: 560, padding: 18, border: '1px solid #e5e7eb', boxShadow: '0 25px 60px rgba(0,0,0,0.2)' },
     input: { flex: 1, padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: 10, fontSize: 14, outline: 'none', fontFamily: 'inherit' },
 
     toast: { position: 'fixed', top: 20, right: 20, padding: '12px 18px', borderRadius: 10, border: '1px solid', fontSize: 14, fontWeight: 700, zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' },

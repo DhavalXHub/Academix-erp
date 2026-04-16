@@ -32,7 +32,7 @@ const MessagesPage: React.FC = () => {
                 {/* Sidebar (Contacts) */}
                 <div style={styles.sidebar}>
                     <div style={styles.sidebarHeader}>
-                        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>Messages</h2>
+                        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: 'var(--text-main)' }}>Messages</h2>
                         <input 
                             type="text" 
                             placeholder="Search contacts..." 
@@ -73,8 +73,8 @@ const MessagesPage: React.FC = () => {
                     ) : (
                         <div style={styles.noSelection}>
                             <div style={{ fontSize: 48, marginBottom: 16 }}>💬</div>
-                            <h3 style={{ margin: 0, fontSize: 20, color: '#374151' }}>Your Messages</h3>
-                            <p style={{ color: '#6b7280', marginTop: 8 }}>Select a contact from the sidebar to start chatting securely.</p>
+                            <h3 style={{ margin: 0, fontSize: 20, color: 'var(--text-main)' }}>Your Messages</h3>
+                            <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Select a contact from the sidebar to start chatting securely.</p>
                         </div>
                     )}
                 </div>
@@ -86,23 +86,23 @@ const MessagesPage: React.FC = () => {
 
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', height: 'calc(100vh - 64px)', boxSizing: 'border-box', margin: '0 auto', maxWidth: 1400, fontFamily: "'Inter', sans-serif" },
-    layout: { display: 'flex', height: '100%', background: '#fff', borderRadius: 16, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' },
+    layout: { display: 'flex', height: '100%', background:'var(--card-bg)', borderRadius: 16, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' },
     
-    sidebar: { width: 320, borderRight: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', background: '#f8fafc' },
-    sidebarHeader: { padding: '20px', borderBottom: '1px solid #e5e7eb', background: '#fff' },
-    searchInput: { width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none', background: '#f3f4f6', marginTop: 16, boxSizing: 'border-box' },
+    sidebar: { width: 320, borderRight: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', background: 'var(--page-bg)' },
+    sidebarHeader: { padding: '20px', borderBottom: '1px solid #e5e7eb', background:'var(--card-bg)' },
+    searchInput: { width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none', background: 'var(--border-color)', marginTop: 16, boxSizing: 'border-box' },
     contactsList: { flex: 1, overflowY: 'auto' },
-    emptyContacts: { padding: 20, textAlign: 'center', color: '#9ca3af', fontSize: 14 },
+    emptyContacts: { padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 },
     
     contactCard: { display: 'flex', alignItems: 'center', padding: '16px 20px', cursor: 'pointer', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' },
     contactActive: { display: 'flex', alignItems: 'center', padding: '16px 20px', cursor: 'pointer', background: '#e0e7ff', borderBottom: '1px solid #c7d2fe' },
     avatar: { width: 44, height: 44, borderRadius: '50%', background: '#cbd5e1', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, marginRight: 16, flexShrink: 0 },
-    contactName: { fontSize: 15, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+    contactName: { fontSize: 15, fontWeight: 600, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
     contactRole: { fontSize: 12, color: '#64748b', textTransform: 'capitalize', marginTop: 4 },
-    badge: { minWidth: 22, height: 22, padding: '0 6px', borderRadius: 999, background: '#ef4444', color: '#fff', fontWeight: 800, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+    badge: { minWidth: 22, height: 22, padding: '0 6px', borderRadius: 999, background: '#ef4444', color:'var(--card-bg)', fontWeight: 800, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' },
     
     mainArea: { flex: 1, display: 'flex', flexDirection: 'column', background: '#f1f5f9', padding: 16 },
-    noSelection: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', background: '#fff', borderRadius: 12, border: '1px dashed #cbd5e1' }
+    noSelection: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', background:'var(--card-bg)', borderRadius: 12, border: '1px dashed #cbd5e1' }
 };
 
 export default MessagesPage;

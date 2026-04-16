@@ -64,7 +64,7 @@ const SubmissionTable: React.FC<SubmissionTableProps> = ({ submissions, maxMarks
                                 <tr style={styles.tr}>
                                     <td style={styles.td}>
                                         <div style={{ fontWeight: 600 }}>{st.rollNumber}</div>
-                                        <div style={{ fontSize: 13, color: '#6b7280' }}>{st.user.name}</div>
+                                        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{st.user.name}</div>
                                     </td>
                                     <td style={styles.td}>{stDate}</td>
                                     <td style={styles.td}>
@@ -125,19 +125,19 @@ const SubmissionTable: React.FC<SubmissionTableProps> = ({ submissions, maxMarks
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    empty: { padding: '3rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 8, border: '1px dashed #d1d5db' },
-    tableWrapper: { overflowX: 'auto', background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb' },
+    empty: { padding: '3rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 8, border: '1px dashed #d1d5db' },
+    tableWrapper: { overflowX: 'auto', background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb' },
     table: { width: '100%', borderCollapse: 'collapse', fontSize: 14, textAlign: 'left' },
-    th: { padding: '12px 16px', color: '#6b7280', fontWeight: 600, borderBottom: '2px solid #e5e7eb', background: '#f9fafb' },
+    th: { padding: '12px 16px', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '2px solid #e5e7eb', background: 'var(--page-bg)' },
     tr: { borderBottom: '1px solid #f3f4f6' },
-    td: { padding: '12px 16px', color: '#111827', verticalAlign: 'middle' },
-    link: { color: '#4f46e5', textDecoration: 'none', fontWeight: 500 },
+    td: { padding: '12px 16px', color: 'var(--text-main)', verticalAlign: 'middle' },
+    link: { color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 },
     badge: { padding: '4px 8px', borderRadius: 6, fontWeight: 700, background: '#d1fae5', color: '#047857', fontSize: 13 },
     gradeBtn: { padding: '6px 12px', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
-    gradeEditor: { padding: '16px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' },
+    gradeEditor: { padding: '16px', background: 'var(--page-bg)', borderBottom: '1px solid #e2e8f0' },
     gradeForm: { display: 'flex', gap: 12, alignItems: 'center', maxWidth: 600 },
     input: { padding: '8px 12px', borderRadius: 6, border: '1px solid #cbd5e1', fontSize: 14, outline: 'none' },
-    saveBtn: { padding: '8px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: 'pointer' }
+    saveBtn: { padding: '8px 16px', background: 'var(--primary)', color:'var(--card-bg)', border: 'none', borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: 'pointer' }
 };
 
 export default SubmissionTable;

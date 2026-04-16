@@ -197,7 +197,7 @@ const StudentAssignmentsPage: React.FC = () => {
                                     </div>
                                 </div>
                                 {mySubmission.feedback ? (
-                                    <div style={{ marginTop: 10, fontSize: 13, color: '#374151' }}>
+                                    <div style={{ marginTop: 10, fontSize: 13, color: 'var(--text-main)' }}>
                                         <strong>Feedback:</strong> {mySubmission.feedback}
                                     </div>
                                 ) : null}
@@ -235,34 +235,34 @@ const styles: Record<string, React.CSSProperties> = {
 
     controlsRow: { display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: 18 },
     controlGroup: { display: 'flex', flexDirection: 'column', gap: 6, minWidth: 280 },
-    label: { fontSize: 13, fontWeight: 700, color: '#374151' },
-    select: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background: '#fff', fontSize: 14 },
+    label: { fontSize: 13, fontWeight: 700, color: 'var(--text-main)' },
+    select: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background:'var(--card-bg)', fontSize: 14 },
     summaryPill: { padding: '9px 12px', borderRadius: 999, background: '#eef2ff', border: '1px solid #c7d2fe', color: '#3730a3', fontWeight: 800, fontSize: 13, height: 'fit-content' },
 
     grid: { display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: 14, alignItems: 'start' },
-    card: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
-    cardTitle: { margin: '0 0 12px', fontSize: 16, fontWeight: 800, color: '#111827' },
+    card: { background:'var(--card-bg)', border: '1px solid #e5e7eb', borderRadius: 12, padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+    cardTitle: { margin: '0 0 12px', fontSize: 16, fontWeight: 800, color: 'var(--text-main)' },
 
     list: { display: 'grid', gap: 10 },
-    listItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, width: '100%', border: '1px solid #e5e7eb', borderRadius: 10, background: '#fff', padding: 12, cursor: 'pointer', textAlign: 'left' },
+    listItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, width: '100%', border: '1px solid #e5e7eb', borderRadius: 10, background:'var(--card-bg)', padding: 12, cursor: 'pointer', textAlign: 'left' },
     listItemActive: { borderColor: '#a5b4fc', background: '#eef2ff' },
-    itemTitle: { fontSize: 14, fontWeight: 800, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-    itemMeta: { fontSize: 12, color: '#6b7280', marginTop: 3 },
-    chev: { fontWeight: 900, color: '#4f46e5' },
+    itemTitle: { fontSize: 14, fontWeight: 800, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+    itemMeta: { fontSize: 12, color: 'var(--text-muted)', marginTop: 3 },
+    chev: { fontWeight: 900, color: 'var(--primary)' },
 
-    state: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db' },
-    stateSm: { padding: '1.5rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 10, border: '1px dashed #d1d5db' },
+    state: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
+    stateSm: { padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 10, border: '1px dashed #d1d5db' },
     stateError: { background: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca' },
 
     form: { display: 'grid', gap: 10 },
-    help: { fontSize: 13, color: '#6b7280', lineHeight: 1.5 },
+    help: { fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 },
     input: { padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: 10, fontSize: 14, outline: 'none', fontFamily: 'inherit' },
-    primaryBtn: { padding: '10px 14px', borderRadius: 10, border: 'none', background: '#4f46e5', color: '#fff', fontWeight: 800, cursor: 'pointer' },
+    primaryBtn: { padding: '10px 14px', borderRadius: 10, border: 'none', background: 'var(--primary)', color:'var(--card-bg)', fontWeight: 800, cursor: 'pointer' },
 
-    submissionBox: { border: '1px solid #e5e7eb', borderRadius: 10, padding: 12, background: '#f9fafb' },
+    submissionBox: { border: '1px solid #e5e7eb', borderRadius: 10, padding: 12, background: 'var(--page-bg)' },
     row: { display: 'flex', justifyContent: 'space-between', gap: 12, padding: '6px 0' },
-    k: { fontSize: 12, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' },
-    v: { fontSize: 13, fontWeight: 700, color: '#111827' },
+    k: { fontSize: 12, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' },
+    v: { fontSize: 13, fontWeight: 700, color: 'var(--text-main)' },
     badgeOk: { padding: '3px 8px', borderRadius: 999, background: '#d1fae5', color: '#065f46', fontWeight: 900, fontSize: 12 },
     badgeWarn: { padding: '3px 8px', borderRadius: 999, background: '#fef3c7', color: '#92400e', fontWeight: 900, fontSize: 12 },
 };

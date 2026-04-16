@@ -147,25 +147,25 @@ const StudentQuizPage: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1000, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     headerRow: { marginBottom: 32 },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
     
     tabsMenu: { display: 'flex', gap: 12, borderBottom: '2px solid #e5e7eb', marginBottom: '2rem' },
-    tab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 600, color: '#6b7280', cursor: 'pointer', marginBottom: -2 },
-    activeTab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 700, color: '#4f46e5', cursor: 'pointer', borderBottom: '3px solid #4f46e5', marginBottom: -2 },
+    tab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer', marginBottom: -2 },
+    activeTab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 700, color: 'var(--primary)', cursor: 'pointer', borderBottom: '3px solid var(--primary)', marginBottom: -2 },
     
-    label: { display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 8 },
-    select: { padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 15, background: '#fff', width: '100%', maxWidth: 400 },
+    label: { display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8 },
+    select: { padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 15, background:'var(--card-bg)', width: '100%', maxWidth: 400 },
     
-    empty: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db' },
+    empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' },
     
-    quizCard: { padding: '20px', background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column' },
-    qTitle: { margin: '0 0 8px', fontSize: 18, fontWeight: 700, color: '#111827' },
-    qMeta: { margin: '0 0 12px', fontSize: 13, color: '#4f46e5', fontWeight: 600 },
-    qDesc: { margin: '0 0 20px', fontSize: 14, color: '#4b5563', flex: 1 },
-    startBtn: { padding: '10px', background: '#10b981', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', textAlign: 'center', width: '100%' },
-    doneBtn: { padding: '10px', background: '#f3f4f6', color: '#374151', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 14, fontWeight: 600, textAlign: 'center', width: '100%', cursor: 'not-allowed' },
+    quizCard: { padding: '20px', background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column' },
+    qTitle: { margin: '0 0 8px', fontSize: 18, fontWeight: 700, color: 'var(--text-main)' },
+    qMeta: { margin: '0 0 12px', fontSize: 13, color: 'var(--primary)', fontWeight: 600 },
+    qDesc: { margin: '0 0 20px', fontSize: 14, color: 'var(--text-muted)', flex: 1 },
+    startBtn: { padding: '10px', background: '#10b981', color:'var(--card-bg)', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', textAlign: 'center', width: '100%' },
+    doneBtn: { padding: '10px', background: 'var(--border-color)', color: 'var(--text-main)', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 14, fontWeight: 600, textAlign: 'center', width: '100%', cursor: 'not-allowed' },
 };
 
 export default StudentQuizPage;

@@ -52,7 +52,7 @@ const NotificationsPanel: React.FC = () => {
 
             <div style={styles.card}>
                 {isLoading ? (
-                    <div style={{ padding: '4rem', textAlign: 'center', color: '#6b7280' }}>Loading your alerts...</div>
+                    <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading your alerts...</div>
                 ) : (
                     <NotificationList 
                         notifications={notifications} 
@@ -67,10 +67,10 @@ const NotificationsPanel: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 800, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
-    markAllBtn: { padding: '8px 16px', background: '#fff', border: '1px solid #d1d5db', color: '#374151', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
-    card: { background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
+    markAllBtn: { padding: '8px 16px', background:'var(--card-bg)', border: '1px solid #d1d5db', color: 'var(--text-main)', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' },
+    card: { background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden' }
 };
 
 export default NotificationsPanel;

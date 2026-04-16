@@ -119,21 +119,21 @@ const AttendanceMarkingForm: React.FC<AttendanceMarkingFormProps> = ({
 const styles: Record<string, React.CSSProperties> = {
     formContainer: { display: 'flex', flexDirection: 'column', gap: 16 },
     headerRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 },
-    infoText: { fontSize: 14, color: '#4b5563' },
+    infoText: { fontSize: 14, color: 'var(--text-muted)' },
     bulkActions: { display: 'flex', gap: 8 },
     bulkBtn: { padding: '6px 12px', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer' },
     tableWrapper: { overflowX: 'auto', border: '1px solid #e5e7eb', borderRadius: 8, maxHeight: 500 },
     table: { width: '100%', borderCollapse: 'collapse', fontSize: 14, textAlign: 'left' },
-    th: { padding: '12px 16px', background: '#f9fafb', color: '#6b7280', fontWeight: 600, borderBottom: '2px solid #e5e7eb', position: 'sticky', top: 0, zIndex: 10 },
-    tr: { borderBottom: '1px solid #f3f4f6', background: '#fff' },
-    td: { padding: '10px 16px', color: '#111827', verticalAlign: 'middle' },
+    th: { padding: '12px 16px', background: 'var(--page-bg)', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '2px solid #e5e7eb', position: 'sticky', top: 0, zIndex: 10 },
+    tr: { borderBottom: '1px solid #f3f4f6', background:'var(--card-bg)' },
+    td: { padding: '10px 16px', color: 'var(--text-main)', verticalAlign: 'middle' },
     radioP: { accentColor: '#10b981', transform: 'scale(1.2)' },
     radioA: { accentColor: '#ef4444', transform: 'scale(1.2)' },
     radioL: { accentColor: '#f59e0b', transform: 'scale(1.2)' },
-    radioE: { accentColor: '#6366f1', transform: 'scale(1.2)' },
+    radioE: { accentColor: 'var(--primary-light)', transform: 'scale(1.2)' },
     actions: { display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 },
-    cancelBtn: { padding: '9px 20px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 14, color: '#374151' },
-    submitBtn: { padding: '9px 20px', borderRadius: 8, border: 'none', background: '#4f46e5', color: '#fff', cursor: 'pointer', fontSize: 14, fontWeight: 600 },
+    cancelBtn: { padding: '9px 20px', borderRadius: 8, border: '1px solid #d1d5db', background:'var(--card-bg)', cursor: 'pointer', fontSize: 14, color: 'var(--text-main)' },
+    submitBtn: { padding: '9px 20px', borderRadius: 8, border: 'none', background: 'var(--primary)', color:'var(--card-bg)', cursor: 'pointer', fontSize: 14, fontWeight: 600 },
 };
 
 export default AttendanceMarkingForm;

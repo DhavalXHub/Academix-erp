@@ -56,7 +56,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, isLoading, onEdit, onDeact
                                         <span style={{ fontWeight: 500 }}>{user.name}</span>
                                     </div>
                                 </td>
-                                <td style={{ ...styles.td, color: '#6b7280' }}>{user.email}</td>
+                                <td style={{ ...styles.td, color: 'var(--text-muted)' }}>{user.email}</td>
                                 <td style={styles.td}>
                                     <span style={{ ...styles.badge, background: badge.bg, color: badge.color }}>
                                         {badge.label}
@@ -71,7 +71,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, isLoading, onEdit, onDeact
                                         {user.isActive ? '● Active' : '● Inactive'}
                                     </span>
                                 </td>
-                                <td style={{ ...styles.td, color: '#6b7280', fontSize: 13 }}>{lastLogin}</td>
+                                <td style={{ ...styles.td, color: 'var(--text-muted)', fontSize: 13 }}>{lastLogin}</td>
                                 <td style={styles.td}>
                                     <div style={styles.actionGroup}>
                                         <button style={styles.btnEdit} onClick={() => onEdit(user)}>Edit</button>
@@ -93,19 +93,19 @@ const UserTable: React.FC<UserTableProps> = ({ users, isLoading, onEdit, onDeact
 const styles: Record<string, React.CSSProperties> = {
     tableWrapper: { overflowX: 'auto', borderRadius: 12, border: '1px solid #e5e7eb' },
     table: { width: '100%', borderCollapse: 'collapse', fontSize: 14 },
-    th: { padding: '12px 16px', textAlign: 'left', background: '#f9fafb', color: '#6b7280', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #e5e7eb' },
+    th: { padding: '12px 16px', textAlign: 'left', background: 'var(--page-bg)', color: 'var(--text-muted)', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #e5e7eb' },
     tr: { borderBottom: '1px solid #f3f4f6', transition: 'background 0.15s' },
     td: { padding: '14px 16px', verticalAlign: 'middle' },
     nameCell: { display: 'flex', alignItems: 'center', gap: 10 },
-    avatar: { width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #4f46e5)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14, flexShrink: 0 },
+    avatar: { width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-light), var(--primary))', color:'var(--card-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14, flexShrink: 0 },
     badge: { padding: '3px 10px', borderRadius: 99, fontSize: 12, fontWeight: 600 },
     actionGroup: { display: 'flex', gap: 6 },
-    btnEdit: { padding: '5px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 500, color: '#374151' },
+    btnEdit: { padding: '5px 12px', borderRadius: 6, border: '1px solid #d1d5db', background:'var(--card-bg)', cursor: 'pointer', fontSize: 12, fontWeight: 500, color: 'var(--text-main)' },
     btnDeactivate: { padding: '5px 12px', borderRadius: 6, border: '1px solid #fbbf24', background: '#fffbeb', cursor: 'pointer', fontSize: 12, fontWeight: 500, color: '#92400e' },
     btnDelete: { padding: '5px 12px', borderRadius: 6, border: '1px solid #fca5a5', background: '#fff1f2', cursor: 'pointer', fontSize: 12, fontWeight: 500, color: '#991b1b' },
     loadingBox: { display: 'flex', flexDirection: 'column', gap: 10, padding: 16 },
     skeleton: { height: 48, borderRadius: 8, background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.2s infinite' },
-    empty: { padding: '3rem', textAlign: 'center', color: '#9ca3af', fontSize: 15 },
+    empty: { padding: '3rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: 15 },
 };
 
 export default UserTable;

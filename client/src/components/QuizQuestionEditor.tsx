@@ -54,7 +54,7 @@ const QuizQuestionEditor: React.FC<QuizQuestionEditorProps> = ({ question, index
                             placeholder={`Option ${String.fromCharCode(65 + oIdx)}`}
                             value={opt}
                             onChange={(e) => handleOptionChange(oIdx, e.target.value)}
-                            style={{ ...styles.input, flex: 1, borderColor: question.correctOptionIndex === oIdx ? '#10b981' : '#d1d5db' }}
+                            style={{ ...styles.input, flex: 1, borderColor: question.correctOptionIndex === oIdx ? '#10b981' : 'var(--border-color)' }}
                             required
                         />
                     </div>
@@ -66,7 +66,7 @@ const QuizQuestionEditor: React.FC<QuizQuestionEditorProps> = ({ question, index
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    card: { background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '16px', marginBottom: '16px' },
+    card: { background: 'var(--page-bg)', border: '1px solid #e2e8f0', borderRadius: 8, padding: '16px', marginBottom: '16px' },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
     title: { margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' },
     deleteBtn: { background: 'none', border: 'none', color: '#ef4444', fontSize: 13, fontWeight: 600, cursor: 'pointer' },

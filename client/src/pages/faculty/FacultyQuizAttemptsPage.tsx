@@ -41,7 +41,7 @@ const FacultyQuizAttemptsPage: React.FC = () => {
     }, [accessToken, quizId]);
 
     const getGradeColor = (score: number) => {
-        if (maxMarks === 0) return '#111827';
+        if (maxMarks === 0) return 'var(--text-main)';
         const p = (score / maxMarks) * 100;
         if (p < 40) return '#dc2626';
         if (p < 70) return '#d97706';
@@ -86,7 +86,7 @@ const FacultyQuizAttemptsPage: React.FC = () => {
                                 return (
                                     <tr key={a._id} style={styles.tr}>
                                         <td style={styles.td}>{st.rollNumber}</td>
-                                        <td style={{ ...styles.td, color: '#374151' }}>{st.user?.name}</td>
+                                        <td style={{ ...styles.td, color: 'var(--text-main)' }}>{st.user?.name}</td>
                                         <td style={styles.td}>
                                             <span style={isFinished ? styles.badgeDone : styles.badgeRunning}>
                                                 {isFinished ? 'Completed' : 'Running'}
@@ -109,18 +109,18 @@ const FacultyQuizAttemptsPage: React.FC = () => {
 
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1000, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
-    backBtn: { padding: '8px 16px', borderRadius: 8, background: '#f3f4f6', color: '#374151', fontWeight: 600, border: '1px solid #d1d5db', cursor: 'pointer' },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 24px' },
+    backBtn: { padding: '8px 16px', borderRadius: 8, background: 'var(--border-color)', color: 'var(--text-main)', fontWeight: 600, border: '1px solid #d1d5db', cursor: 'pointer' },
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 24px' },
     
-    empty: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db' },
+    empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
     emptyError: { padding: '4rem', textAlign: 'center', color: '#dc2626', background: '#fef2f2', borderRadius: 12, border: '1px dashed #fecaca' },
     
-    tableWrapper: { overflowX: 'auto', background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb' },
+    tableWrapper: { overflowX: 'auto', background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb' },
     table: { width: '100%', borderCollapse: 'collapse', fontSize: 14, textAlign: 'left' },
-    th: { padding: '12px 16px', color: '#6b7280', fontWeight: 600, borderBottom: '2px solid #e5e7eb', background: '#f9fafb' },
+    th: { padding: '12px 16px', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '2px solid #e5e7eb', background: 'var(--page-bg)' },
     tr: { borderBottom: '1px solid #f3f4f6' },
-    td: { padding: '12px 16px', color: '#111827', verticalAlign: 'middle' },
+    td: { padding: '12px 16px', color: 'var(--text-main)', verticalAlign: 'middle' },
     
     badgeDone: { padding: '4px 8px', borderRadius: 6, fontWeight: 700, background: '#d1fae5', color: '#047857', fontSize: 12 },
     badgeRunning: { padding: '4px 8px', borderRadius: 6, fontWeight: 700, background: '#fef3c7', color: '#b45309', fontSize: 12 },

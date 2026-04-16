@@ -52,7 +52,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ invoice, onSubmit, onCancel }
                             style={styles.input}
                             required
                         />
-                        <p style={{ fontSize: 12, color: '#6b7280', margin: '4px 0 0' }}>Max available: ${remaining.toFixed(2)}</p>
+                        <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0' }}>Max available: ${remaining.toFixed(2)}</p>
                     </div>
 
                     <div style={styles.field}>
@@ -71,7 +71,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ invoice, onSubmit, onCancel }
 
                     {/* Mock Card UI */}
                     <div style={styles.mockCard}>
-                        <p style={{ margin: 0, fontSize: 12, color: '#9ca3af', marginBottom: 8 }}>Secure Payment Gateway</p>
+                        <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Secure Payment Gateway</p>
                         <input type="text" placeholder="Card Number" style={{ ...styles.input, marginBottom: 8 }} required={method.includes('card')} disabled={method === 'upi' || method === 'net_banking'} />
                         <div style={{ display: 'flex', gap: 8 }}>
                             <input type="text" placeholder="MM/YY" style={styles.input} required={method.includes('card')} disabled={method === 'upi' || method === 'net_banking'} />
@@ -93,16 +93,16 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ invoice, onSubmit, onCancel }
 
 const styles: Record<string, React.CSSProperties> = {
     overlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
-    modal: { background: '#fff', padding: 32, borderRadius: 16, width: 400, maxWidth: '90%', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
-    title: { margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' },
-    subtitle: { margin: '4px 0 0', fontSize: 14, color: '#6b7280' },
+    modal: { background:'var(--card-bg)', padding: 32, borderRadius: 16, width: 400, maxWidth: '90%', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
+    title: { margin: 0, fontSize: 20, fontWeight: 700, color: 'var(--text-main)' },
+    subtitle: { margin: '4px 0 0', fontSize: 14, color: 'var(--text-muted)' },
     field: { marginBottom: 16 },
-    label: { display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 },
+    label: { display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-main)', marginBottom: 6 },
     input: { width: '100%', padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, boxSizing: 'border-box', outline: 'none' },
-    mockCard: { background: '#f8fafc', border: '1px solid #e5e7eb', padding: 16, borderRadius: 8, marginBottom: 24 },
+    mockCard: { background: 'var(--page-bg)', border: '1px solid #e5e7eb', padding: 16, borderRadius: 8, marginBottom: 24 },
     actions: { display: 'flex', justifyContent: 'flex-end', gap: 12 },
-    cancelBtn: { padding: '10px 16px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', color: '#374151', fontWeight: 600, cursor: 'pointer' },
-    submitBtn: { padding: '10px 16px', borderRadius: 8, border: 'none', background: '#4f46e5', color: '#fff', fontWeight: 600, cursor: 'pointer' }
+    cancelBtn: { padding: '10px 16px', borderRadius: 8, border: '1px solid #d1d5db', background:'var(--card-bg)', color: 'var(--text-main)', fontWeight: 600, cursor: 'pointer' },
+    submitBtn: { padding: '10px 16px', borderRadius: 8, border: 'none', background: 'var(--primary)', color:'var(--card-bg)', fontWeight: 600, cursor: 'pointer' }
 };
 
 export default PaymentForm;

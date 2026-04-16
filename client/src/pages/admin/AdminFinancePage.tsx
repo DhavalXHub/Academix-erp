@@ -70,7 +70,7 @@ const AdminFinancePage: React.FC = () => {
     return (
         <div style={styles.page}>
             <div style={styles.header}>
-                <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#111827' }}>Finance Hub</h1>
+                <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: 'var(--text-main)' }}>Finance Hub</h1>
                 <button style={styles.createBtn} onClick={() => setIsCreating(true)}>+ New Invoice</button>
             </div>
 
@@ -140,15 +140,15 @@ const AdminFinancePage: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1200, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-    createBtn: { background: '#111827', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: 8, fontWeight: 600, cursor: 'pointer' },
+    createBtn: { background: 'var(--text-main)', color:'var(--card-bg)', border: 'none', padding: '10px 16px', borderRadius: 8, fontWeight: 600, cursor: 'pointer' },
     splitLayout: { display: 'flex', gap: 32, alignItems: 'flex-start', flexWrap: 'wrap' },
-    tableCard: { background: '#fff', padding: 24, borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+    tableCard: { background:'var(--card-bg)', padding: 24, borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
     
     modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
-    modalForm: { background: '#fff', padding: 32, borderRadius: 12, width: 500, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
+    modalForm: { background:'var(--card-bg)', padding: 32, borderRadius: 12, width: 500, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
     input: { flex: 1, padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 14, outline: 'none', fontFamily: 'inherit' },
-    cancelBtn: { padding: '8px 16px', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: 8, cursor: 'pointer', fontWeight: 600 },
-    submitBtn: { padding: '8px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }
+    cancelBtn: { padding: '8px 16px', background: 'var(--border-color)', border: '1px solid #d1d5db', borderRadius: 8, cursor: 'pointer', fontWeight: 600 },
+    submitBtn: { padding: '8px 16px', background: 'var(--primary)', color:'var(--card-bg)', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }
 };
 
 export default AdminFinancePage;

@@ -163,37 +163,37 @@ const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, attempt, onSubmit }) => {
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    loader: { padding: '4rem', textAlign: 'center', fontSize: 18, color: '#4f46e5', fontWeight: 600 },
-    container: { background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', maxWidth: 800, margin: '0 auto', overflow: 'hidden' },
-    topBar: { background: '#f8fafc', padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-    title: { margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' },
+    loader: { padding: '4rem', textAlign: 'center', fontSize: 18, color: 'var(--primary)', fontWeight: 600 },
+    container: { background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', maxWidth: 800, margin: '0 auto', overflow: 'hidden' },
+    topBar: { background: 'var(--page-bg)', padding: '16px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+    title: { margin: 0, fontSize: 18, fontWeight: 700, color: 'var(--text-main)' },
     timer: { fontSize: 16, fontWeight: 700, color: '#047857', background: '#d1fae5', padding: '6px 16px', borderRadius: 99 },
     timerWarning: { fontSize: 16, fontWeight: 700, color: '#b91c1c', background: '#fee2e2', padding: '6px 16px', borderRadius: 99, animation: 'pulse 1s infinite' },
     
     progressContainer: { padding: '16px 24px 0' },
-    progressText: { fontSize: 13, fontWeight: 600, color: '#6b7280', marginBottom: 8 },
-    progressBarBg: { height: 6, background: '#e5e7eb', borderRadius: 3, overflow: 'hidden' },
-    progressBarFill: { height: '100%', background: '#4f46e5', transition: 'width 0.3s ease' },
+    progressText: { fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 },
+    progressBarBg: { height: 6, background: 'var(--border-color)', borderRadius: 3, overflow: 'hidden' },
+    progressBarFill: { height: '100%', background: 'var(--primary)', transition: 'width 0.3s ease' },
     
     questionCard: { padding: '32px 24px' },
-    questionText: { margin: '0 0 24px', fontSize: 20, fontWeight: 600, color: '#111827', lineHeight: 1.5 },
+    questionText: { margin: '0 0 24px', fontSize: 20, fontWeight: 600, color: 'var(--text-main)', lineHeight: 1.5 },
     optionsGrid: { display: 'flex', flexDirection: 'column', gap: 12 },
-    optionBox: { display: 'flex', alignItems: 'center', padding: '16px', border: '2px solid #e5e7eb', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s', background: '#fff' },
-    optionSelected: { display: 'flex', alignItems: 'center', padding: '16px', border: '2px solid #4f46e5', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s', background: '#eef2ff' },
+    optionBox: { display: 'flex', alignItems: 'center', padding: '16px', border: '2px solid #e5e7eb', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s', background:'var(--card-bg)' },
+    optionSelected: { display: 'flex', alignItems: 'center', padding: '16px', border: '2px solid var(--primary)', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s', background: '#eef2ff' },
     optionRadio: { width: 22, height: 22, borderRadius: '50%', border: '2px solid #9ca3af', marginRight: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-    optionRadioInner: { width: 12, height: 12, borderRadius: '50%', background: '#4f46e5' },
-    optionText: { fontSize: 16, color: '#374151', fontWeight: 500 },
+    optionRadioInner: { width: 12, height: 12, borderRadius: '50%', background: 'var(--primary)' },
+    optionText: { fontSize: 16, color: 'var(--text-main)', fontWeight: 500 },
     
-    footer: { padding: '16px 24px', background: '#f9fafb', borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between' },
-    navBtn: { padding: '10px 24px', background: '#fff', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 15, fontWeight: 600, color: '#374151', cursor: 'pointer' },
-    navBtnDisabled: { padding: '10px 24px', background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 15, fontWeight: 600, color: '#9ca3af', cursor: 'not-allowed' },
-    navBtnPrimary: { padding: '10px 24px', background: '#4f46e5', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 600, color: '#fff', cursor: 'pointer' },
-    submitBtn: { padding: '10px 24px', background: '#059669', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, color: '#fff', cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(16,185,129,0.3)' },
+    footer: { padding: '16px 24px', background: 'var(--page-bg)', borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between' },
+    navBtn: { padding: '10px 24px', background:'var(--card-bg)', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 15, fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer' },
+    navBtnDisabled: { padding: '10px 24px', background: 'var(--border-color)', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 15, fontWeight: 600, color: 'var(--text-muted)', cursor: 'not-allowed' },
+    navBtnPrimary: { padding: '10px 24px', background: 'var(--primary)', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 600, color:'var(--card-bg)', cursor: 'pointer' },
+    submitBtn: { padding: '10px 24px', background: '#059669', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, color:'var(--card-bg)', cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(16,185,129,0.3)' },
     
-    mapGrid: { padding: '16px 24px', display: 'flex', flexWrap: 'wrap', gap: 8, borderTop: '1px dashed #e5e7eb', background: '#fff' },
-    mapBtn: { width: 36, height: 36, borderRadius: 8, background: '#f3f4f6', border: '1px solid #e5e7eb', color: '#6b7280', fontWeight: 600, cursor: 'pointer' },
-    mapBtnAnswered: { background: '#e0e7ff', color: '#4338ca', borderColor: '#c7d2fe' },
-    mapBtnActive: { outline: '2px solid #4f46e5', outlineOffset: 1, background: '#4f46e5', color: '#fff', borderColor: '#4f46e5' }
+    mapGrid: { padding: '16px 24px', display: 'flex', flexWrap: 'wrap', gap: 8, borderTop: '1px dashed #e5e7eb', background:'var(--card-bg)' },
+    mapBtn: { width: 36, height: 36, borderRadius: 8, background: 'var(--border-color)', border: '1px solid #e5e7eb', color: 'var(--text-muted)', fontWeight: 600, cursor: 'pointer' },
+    mapBtnAnswered: { background: '#e0e7ff', color: 'var(--primary-dark)', borderColor: '#c7d2fe' },
+    mapBtnActive: { outline: '2px solid var(--primary)', outlineOffset: 1, background: 'var(--primary)', color:'var(--card-bg)', borderColor: 'var(--primary)' }
 };
 
 export default QuizRunner;

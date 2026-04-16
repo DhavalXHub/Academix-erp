@@ -80,9 +80,9 @@ const FacultyCoursesPage: React.FC = () => {
                         </div>
                         <div style={styles.rosterBody}>
                             {isLoadingRoster ? (
-                                <p style={{ textAlign: 'center', color: '#6b7280', padding: 20 }}>Loading students...</p>
+                                <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>Loading students...</p>
                             ) : rosterData.length === 0 ? (
-                                <p style={{ textAlign: 'center', color: '#6b7280', padding: 20 }}>No students enrolled yet.</p>
+                                <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No students enrolled yet.</p>
                             ) : (
                                 <table style={styles.table}>
                                     <thead>
@@ -101,7 +101,7 @@ const FacultyCoursesPage: React.FC = () => {
                                                 <tr key={enr._id} style={styles.tr}>
                                                     <td style={styles.td}><strong>{st.rollNumber}</strong></td>
                                                     <td style={styles.td}>{u.name}</td>
-                                                    <td style={{ ...styles.td, color: '#6b7280' }}>{u.email}</td>
+                                                    <td style={{ ...styles.td, color: 'var(--text-muted)' }}>{u.email}</td>
                                                     <td style={styles.td}>{st.department}</td>
                                                 </tr>
                                             );
@@ -120,21 +120,21 @@ const FacultyCoursesPage: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1200, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     header: { marginBottom: '2rem' },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' },
-    empty: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db' },
+    empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
     btnRoster: { width: '100%', padding: '9px 0', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' },
     
     // Modal
     overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 },
-    modal: { background: '#fff', borderRadius: 16, width: '100%', maxWidth: 700, boxShadow: '0 25px 60px rgba(0,0,0,0.2)', overflow: 'hidden', maxHeight: '85vh', display: 'flex', flexDirection: 'column' },
-    modalHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #f3f4f6', background: '#f9fafb' },
-    modalTitle: { fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 },
-    closeBtn: { background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9ca3af' },
+    modal: { background:'var(--card-bg)', borderRadius: 16, width: '100%', maxWidth: 700, boxShadow: '0 25px 60px rgba(0,0,0,0.2)', overflow: 'hidden', maxHeight: '85vh', display: 'flex', flexDirection: 'column' },
+    modalHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #f3f4f6', background: 'var(--page-bg)' },
+    modalTitle: { fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    closeBtn: { background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text-muted)' },
     rosterBody: { padding: 0, overflowY: 'auto' },
     table: { width: '100%', borderCollapse: 'collapse', fontSize: 13, textAlign: 'left' },
-    th: { padding: '12px 24px', background: '#fff', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #e5e7eb', position: 'sticky', top: 0 },
+    th: { padding: '12px 24px', background:'var(--card-bg)', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #e5e7eb', position: 'sticky', top: 0 },
     tr: { borderBottom: '1px solid #f3f4f6' },
     td: { padding: '12px 24px' }
 };

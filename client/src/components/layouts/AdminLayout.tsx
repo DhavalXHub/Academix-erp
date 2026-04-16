@@ -71,23 +71,23 @@ const AdminLayout: React.FC = () => {
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    layout: { display: 'flex', minHeight: '100vh', background: '#f9fafb', fontFamily: "'Inter', sans-serif" },
+    layout: { display: 'flex', minHeight: '100vh', background: 'var(--page-bg)', fontFamily: "'Inter', sans-serif" },
     sidebar: {
-        width: 240, background: '#fff', color: '#111827',
+        width: 240, background:'var(--card-bg)', color: 'var(--text-main)',
         display: 'flex', flexDirection: 'column', borderRight: '1px solid #e5e7eb',
     },
     brand: { padding: '20px 20px 16px', borderBottom: '1px solid #f3f4f6' },
     logoLink: { display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' },
     logoIcon: { fontSize: 20 },
-    logoText: { margin: 0, fontSize: 20, fontWeight: 800, color: '#111827', letterSpacing: '-0.5px' },
+    logoText: { margin: 0, fontSize: 20, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' },
     roleTag: {
         display: 'inline-block', marginTop: 6, fontSize: 10, fontWeight: 700,
-        color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em',
+        color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em',
     },
     nav: { flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 2 },
     navLink: {
         display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
-        borderRadius: 10, color: '#6b7280', textDecoration: 'none',
+        borderRadius: 10, color: 'var(--text-muted)', textDecoration: 'none',
         fontWeight: 500, fontSize: 13.5, transition: 'all 0.15s',
     },
     navLinkActive: {
@@ -99,7 +99,7 @@ const styles: Record<string, React.CSSProperties> = {
     },
     homeLink: {
         display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
-        borderRadius: 10, color: '#6b7280', textDecoration: 'none',
+        borderRadius: 10, color: 'var(--text-muted)', textDecoration: 'none',
         fontSize: 13, fontWeight: 500, transition: 'all 0.15s',
     },
     logoutBtn: {

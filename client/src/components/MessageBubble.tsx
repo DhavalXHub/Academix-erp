@@ -35,12 +35,12 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
 
 const styles: Record<string, React.CSSProperties> = {
     container: { display: 'flex', width: '100%', marginBottom: 16, alignItems: 'flex-end' },
-    avatar: { width: 32, height: 32, borderRadius: '50%', background: '#e0e7ff', color: '#4338ca', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, marginRight: 8, flexShrink: 0 },
-    bubbleMe: { background: '#4f46e5', color: '#fff', padding: '10px 14px', borderRadius: '16px 16px 4px 16px', maxWidth: '70%', fontSize: 14, lineHeight: 1.4, boxShadow: '0 1px 2px rgba(0,0,0,0.1)' },
-    bubbleThem: { background: '#fff', color: '#1f2937', padding: '10px 14px', borderRadius: '16px 16px 16px 4px', maxWidth: '70%', fontSize: 14, lineHeight: 1.4, border: '1px solid #e5e7eb', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' },
-    senderName: { fontSize: 12, fontWeight: 700, color: '#4f46e5', marginBottom: 4 },
+    avatar: { width: 32, height: 32, borderRadius: '50%', background: '#e0e7ff', color: 'var(--primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, marginRight: 8, flexShrink: 0 },
+    bubbleMe: { background: 'var(--primary)', color:'var(--card-bg)', padding: '10px 14px', borderRadius: '16px 16px 4px 16px', maxWidth: '70%', fontSize: 14, lineHeight: 1.4, boxShadow: '0 1px 2px rgba(0,0,0,0.1)' },
+    bubbleThem: { background:'var(--card-bg)', color: 'var(--text-main)', padding: '10px 14px', borderRadius: '16px 16px 16px 4px', maxWidth: '70%', fontSize: 14, lineHeight: 1.4, border: '1px solid #e5e7eb', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' },
+    senderName: { fontSize: 12, fontWeight: 700, color: 'var(--primary)', marginBottom: 4 },
     timeMe: { fontSize: 10, color: '#c7d2fe', textAlign: 'right', marginTop: 4, letterSpacing: '0.5px' },
-    timeThem: { fontSize: 10, color: '#9ca3af', textAlign: 'right', marginTop: 4 }
+    timeThem: { fontSize: 10, color: 'var(--text-muted)', textAlign: 'right', marginTop: 4 }
 };
 
 export default MessageBubble;

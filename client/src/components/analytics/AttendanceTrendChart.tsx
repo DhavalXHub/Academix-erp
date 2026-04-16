@@ -13,7 +13,7 @@ const AttendanceTrendChart: React.FC<AttendanceTrendChartProps> = ({ data }) => 
     }));
 
     if (!data || data.length === 0) {
-        return <div style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}>No attendance data available.</div>;
+        return <div style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>No attendance data available.</div>;
     }
 
     return (
@@ -21,14 +21,14 @@ const AttendanceTrendChart: React.FC<AttendanceTrendChartProps> = ({ data }) => 
             <ResponsiveContainer>
                 <LineChart data={formattedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                    <XAxis dataKey="displayDate" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                    <XAxis dataKey="displayDate" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} />
                     <Tooltip 
                         contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
                         formatter={(value: number, name: string) => [value, name === 'presentCount' ? 'Students Present' : name]}
-                        labelStyle={{ fontWeight: 700, color: '#111827', marginBottom: '8px' }}
+                        labelStyle={{ fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}
                     />
-                    <Line type="monotone" dataKey="presentCount" stroke="#4f46e5" strokeWidth={3} dot={{ r: 4, fill: '#4f46e5', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                    <Line type="monotone" dataKey="presentCount" stroke="var(--primary)" strokeWidth={3} dot={{ r: 4, fill: 'var(--primary)', strokeWidth: 2, stroke:'var(--card-bg)' }} activeDot={{ r: 6 }} />
                 </LineChart>
             </ResponsiveContainer>
         </div>

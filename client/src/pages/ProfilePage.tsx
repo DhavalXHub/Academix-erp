@@ -156,7 +156,7 @@ const ProfilePage: React.FC = () => {
                             placeholder="Write something about yourself..."
                         />
                     ) : (
-                        <p style={{ fontSize: 14, color: '#6b7280', margin: 0 }}>
+                        <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
                             {p?.bio || 'No bio added yet.'}
                         </p>
                     )}
@@ -168,24 +168,24 @@ const ProfilePage: React.FC = () => {
 
 const InfoRow: React.FC<{ label: string; value: string | React.ReactNode }> = ({ label, value }) => (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f3f4f6' }}>
-        <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 500 }}>{label}</span>
-        <span style={{ fontSize: 14, color: '#111827', fontWeight: 400 }}>{value}</span>
+        <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>{label}</span>
+        <span style={{ fontSize: 14, color: 'var(--text-main)', fontWeight: 400 }}>{value}</span>
     </div>
 );
 
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 900, margin: '0 auto', fontFamily: "'Inter', sans-serif", position: 'relative' },
-    loading: { display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, color: '#9ca3af', fontSize: 16 },
-    heroCard: { display: 'flex', alignItems: 'center', gap: 20, background: 'linear-gradient(135deg, #1e1b4b, #312e81)', borderRadius: 16, padding: '2rem', marginBottom: '1.5rem', color: '#fff', flexWrap: 'wrap' },
+    loading: { display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, color: 'var(--text-muted)', fontSize: 16 },
+    heroCard: { display: 'flex', alignItems: 'center', gap: 20, background: 'linear-gradient(135deg, #1e1b4b, #312e81)', borderRadius: 16, padding: '2rem', marginBottom: '1.5rem', color:'var(--card-bg)', flexWrap: 'wrap' },
     avatarLarge: { width: 72, height: 72, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', border: '3px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, fontWeight: 700, flexShrink: 0 },
     heroName: { fontSize: 22, fontWeight: 700, margin: 0 },
     heroEmail: { color: '#a5b4fc', fontSize: 14, margin: '4px 0' },
     roleBadge: { background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 99, padding: '3px 12px', fontSize: 12, fontWeight: 600 },
-    editBtn: { padding: '10px 18px', borderRadius: 8, border: 'none', background: '#fff', color: '#4f46e5', cursor: 'pointer', fontSize: 13, fontWeight: 600 },
-    cancelBtn: { padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.3)', background: 'transparent', color: '#fff', cursor: 'pointer', fontSize: 13 },
+    editBtn: { padding: '10px 18px', borderRadius: 8, border: 'none', background:'var(--card-bg)', color: 'var(--primary)', cursor: 'pointer', fontSize: 13, fontWeight: 600 },
+    cancelBtn: { padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.3)', background: 'transparent', color:'var(--card-bg)', cursor: 'pointer', fontSize: 13 },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.25rem' },
-    card: { background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', padding: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' },
-    cardTitle: { fontSize: 15, fontWeight: 700, color: '#111827', margin: '0 0 1rem' },
+    card: { background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb', padding: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' },
+    cardTitle: { fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 1rem' },
     editInput: { width: '100%', padding: '7px 10px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 13, outline: 'none', boxSizing: 'border-box' },
     toast: { position: 'fixed', top: 20, right: 20, padding: '12px 20px', borderRadius: 10, border: '1px solid', fontSize: 14, fontWeight: 500, zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' },
 };

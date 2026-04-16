@@ -10,7 +10,7 @@ interface CourseCardProps {
 }
 
 const DEPT_COLORS: Record<string, string> = {
-    'Computer Science': '#6366f1',
+    'Computer Science': 'var(--primary-light)',
     'Mathematics': '#0ea5e9',
     'Physics': '#f59e0b',
     'Chemistry': '#10b981',
@@ -18,7 +18,7 @@ const DEPT_COLORS: Record<string, string> = {
     'Mechanical': '#8b5cf6',
 };
 
-const deptColor = (dept: string) => DEPT_COLORS[dept] ?? '#6366f1';
+const deptColor = (dept: string) => DEPT_COLORS[dept] ?? 'var(--primary-light)';
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, actionSlot, showRosterCount }) => {
     const color = deptColor(course.department);
@@ -66,15 +66,15 @@ const StatChip: React.FC<{ icon: string; value: string }> = ({ icon, value }) =>
 );
 
 const styles: Record<string, React.CSSProperties> = {
-    card: { background: '#fff', borderRadius: 12, padding: '1.25rem', boxShadow: '0 1px 6px rgba(0,0,0,0.07)', border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', gap: 8, position: 'relative', overflow: 'hidden', transition: 'box-shadow 0.2s, transform 0.15s' },
+    card: { background:'var(--card-bg)', borderRadius: 12, padding: '1.25rem', boxShadow: '0 1px 6px rgba(0,0,0,0.07)', border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', gap: 8, position: 'relative', overflow: 'hidden', transition: 'box-shadow 0.2s, transform 0.15s' },
     cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
     codeChip: { padding: '3px 10px', borderRadius: 6, fontSize: 12, fontWeight: 700, letterSpacing: '0.05em' },
-    semBadge: { fontSize: 12, color: '#9ca3af', fontWeight: 500 },
-    title: { fontSize: 16, fontWeight: 700, color: '#111827', margin: 0, lineHeight: 1.4 },
-    dept: { fontSize: 12, color: '#6b7280', margin: 0 },
-    desc: { fontSize: 13, color: '#6b7280', margin: 0, lineHeight: 1.6 },
+    semBadge: { fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 },
+    title: { fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0, lineHeight: 1.4 },
+    dept: { fontSize: 12, color: 'var(--text-muted)', margin: 0 },
+    desc: { fontSize: 13, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 },
     statsRow: { display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 },
-    chip: { fontSize: 12, color: '#374151', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 6, padding: '3px 8px' },
+    chip: { fontSize: 12, color: 'var(--text-main)', background: 'var(--page-bg)', border: '1px solid #e5e7eb', borderRadius: 6, padding: '3px 8px' },
     actionSlot: { marginTop: 8 },
     inactiveOverlay: { position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#ef4444', backdropFilter: 'blur(2px)', borderRadius: 12 },
 };

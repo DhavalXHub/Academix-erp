@@ -5,11 +5,11 @@ interface DepartmentComparisonChartProps {
     data: { department: string; enrollments: number }[];
 }
 
-const COLORS = ['#4f46e5', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'];
+const COLORS = ['var(--primary)', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'];
 
 const DepartmentComparisonChart: React.FC<DepartmentComparisonChartProps> = ({ data }) => {
     if (!data || data.length === 0) {
-        return <div style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}>No enrollment data found.</div>;
+        return <div style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>No enrollment data found.</div>;
     }
 
     return (

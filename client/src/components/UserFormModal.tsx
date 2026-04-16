@@ -104,26 +104,26 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
 interface FieldProps { label: string; name: string; type: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; required?: boolean; placeholder?: string; }
 const Field: React.FC<FieldProps> = ({ label, name, type, value, onChange, required, placeholder }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-        <label style={{ fontSize: 13, fontWeight: 500, color: '#374151' }}>{label}{required && ' *'}</label>
+        <label style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-main)' }}>{label}{required && ' *'}</label>
         <input name={name} type={type} value={value} onChange={onChange} required={required} placeholder={placeholder}
-            style={{ padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none', color: '#111827' }} />
+            style={{ padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none', color: 'var(--text-main)' }} />
     </div>
 );
 
 const styles: Record<string, React.CSSProperties> = {
     overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 },
-    modal: { background: '#fff', borderRadius: 16, width: '100%', maxWidth: 480, boxShadow: '0 25px 60px rgba(0,0,0,0.2)', overflow: 'hidden' },
+    modal: { background:'var(--card-bg)', borderRadius: 16, width: '100%', maxWidth: 480, boxShadow: '0 25px 60px rgba(0,0,0,0.2)', overflow: 'hidden' },
     modalHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #f3f4f6' },
-    modalTitle: { fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 },
-    closeBtn: { background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9ca3af', width: 32, height: 32, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+    modalTitle: { fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    closeBtn: { background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text-muted)', width: 32, height: 32, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' },
     editBadge: { background: '#eff6ff', padding: '8px 24px', fontSize: 13, color: '#1d4ed8' },
     form: { padding: '24px', display: 'flex', flexDirection: 'column', gap: 16 },
     fieldGroup: { display: 'flex', flexDirection: 'column', gap: 5 },
-    label: { fontSize: 13, fontWeight: 500, color: '#374151' },
-    select: { padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, color: '#111827', background: '#fff' },
+    label: { fontSize: 13, fontWeight: 500, color: 'var(--text-main)' },
+    select: { padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, color: 'var(--text-main)', background:'var(--card-bg)' },
     actions: { display: 'flex', justifyContent: 'flex-end', gap: 10, paddingTop: 8 },
-    cancelBtn: { padding: '9px 20px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 14, color: '#374151' },
-    submitBtn: { padding: '9px 20px', borderRadius: 8, border: 'none', background: 'linear-gradient(135deg, #6366f1, #4f46e5)', color: '#fff', cursor: 'pointer', fontSize: 14, fontWeight: 600 },
+    cancelBtn: { padding: '9px 20px', borderRadius: 8, border: '1px solid #d1d5db', background:'var(--card-bg)', cursor: 'pointer', fontSize: 14, color: 'var(--text-main)' },
+    submitBtn: { padding: '9px 20px', borderRadius: 8, border: 'none', background: 'linear-gradient(135deg, var(--primary-light), var(--primary))', color:'var(--card-bg)', cursor: 'pointer', fontSize: 14, fontWeight: 600 },
 };
 
 export default UserFormModal;

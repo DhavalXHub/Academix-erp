@@ -157,7 +157,7 @@ const FacultyCoursePage: React.FC = () => {
                     </div>
 
                     <div style={styles.contentArea}>
-                        {isLoading && <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Loading...</div>}
+                        {isLoading && <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>}
 
                         {/* ── MATERIALS TAB ── */}
                         {!isLoading && activeTab === 'materials' && (
@@ -170,7 +170,7 @@ const FacultyCoursePage: React.FC = () => {
                                 
                                 {showMaterialForm && (
                                     <form style={styles.formBox} onSubmit={handleUploadMaterial}>
-                                        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#111827' }}>Upload New Material</h3>
+                                        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: 'var(--text-main)' }}>Upload New Material</h3>
                                         <div style={styles.formGrid}>
                                             <input required placeholder="Title" value={mTitle} onChange={e => setMTitle(e.target.value)} style={styles.input} />
                                             <select value={mType} onChange={e => setMType(e.target.value)} style={styles.input}>
@@ -217,7 +217,7 @@ const FacultyCoursePage: React.FC = () => {
                                 
                                 {showAssignmentForm && (
                                     <form style={styles.formBox} onSubmit={handleCreateAssignment}>
-                                        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#111827' }}>Create New Assignment</h3>
+                                        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: 'var(--text-main)' }}>Create New Assignment</h3>
                                         <div style={styles.formGrid}>
                                             <input required placeholder="Title" value={aTitle} onChange={e => setATitle(e.target.value)} style={{ ...styles.input, gridColumn: '1 / -1' }} />
                                             <textarea placeholder="Description / Instructions" value={aDesc} onChange={e => setADesc(e.target.value)} style={{ ...styles.input, gridColumn: '1 / -1', minHeight: 80 }} />
@@ -255,7 +255,7 @@ const FacultyCoursePage: React.FC = () => {
                             <div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
                                     <button style={styles.backBtn} onClick={() => setActiveTab('assignments')}>← Back</button>
-                                    <h3 style={{ margin: 0, fontSize: 18, color: '#111827' }}>Grading: {gradingAssignment.title}</h3>
+                                    <h3 style={{ margin: 0, fontSize: 18, color: 'var(--text-main)' }}>Grading: {gradingAssignment.title}</h3>
                                 </div>
                                 <SubmissionTable 
                                     submissions={submissions} 
@@ -278,28 +278,28 @@ const FacultyCoursePage: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1200, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     header: { marginBottom: '1.5rem' },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
     controlsRow: { marginBottom: '2rem' },
     controlGroup: { display: 'flex', flexDirection: 'column', gap: 6, maxWidth: 400 },
-    label: { fontSize: 13, fontWeight: 600, color: '#374151' },
-    select: { padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 15, background: '#fff' },
+    label: { fontSize: 13, fontWeight: 600, color: 'var(--text-main)' },
+    select: { padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 15, background:'var(--card-bg)' },
     
     tabsMenu: { display: 'flex', gap: 12, borderBottom: '2px solid #e5e7eb', marginBottom: '2rem' },
-    tab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 600, color: '#6b7280', cursor: 'pointer', marginBottom: -2 },
-    activeTab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 700, color: '#4f46e5', cursor: 'pointer', borderBottom: '3px solid #4f46e5', marginBottom: -2 },
+    tab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer', marginBottom: -2 },
+    activeTab: { background: 'none', border: 'none', padding: '0 16px 12px', fontSize: 15, fontWeight: 700, color: 'var(--primary)', cursor: 'pointer', borderBottom: '3px solid var(--primary)', marginBottom: -2 },
     
     contentArea: { minHeight: 400 },
-    primaryBtn: { padding: '10px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
-    backBtn: { padding: '8px 16px', background: '#f3f4f6', color: '#374151', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
+    primaryBtn: { padding: '10px 20px', background: 'var(--primary)', color:'var(--card-bg)', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
+    backBtn: { padding: '8px 16px', background: 'var(--border-color)', color: 'var(--text-main)', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
     
-    formBox: { background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '1.5rem', marginBottom: '2rem' },
+    formBox: { background: 'var(--page-bg)', border: '1px solid #e2e8f0', borderRadius: 12, padding: '1.5rem', marginBottom: '2rem' },
     formGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 },
     input: { padding: '10px 14px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 14, outline: 'none', fontFamily: 'inherit' },
     
     listGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' },
     listGridActive: { display: 'flex', flexDirection: 'column', gap: '1.5rem' },
-    empty: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db' },
+    empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
 };
 
 export default FacultyCoursePage;

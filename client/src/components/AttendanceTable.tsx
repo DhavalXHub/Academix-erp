@@ -29,7 +29,7 @@ export const StudentAttendanceTable: React.FC<StudentAttendanceTableProps> = ({ 
                                 <tr key={s.course._id} style={styles.tr}>
                                     <td style={styles.td}>
                                         <div style={{ fontWeight: 600 }}>{s.course.code}</div>
-                                        <div style={{ fontSize: 12, color: '#6b7280' }}>{s.course.title}</div>
+                                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{s.course.title}</div>
                                     </td>
                                     <td style={{ ...styles.td, textAlign: 'center', color: '#059669' }}>{s.present}</td>
                                     <td style={{ ...styles.td, textAlign: 'center', color: '#dc2626' }}>{s.absent}</td>
@@ -82,11 +82,11 @@ export const StudentAttendanceTable: React.FC<StudentAttendanceTableProps> = ({ 
 };
 
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-    let bg = '#f3f4f6', color = '#374151';
+    let bg = 'var(--border-color)', color = 'var(--text-main)';
     if (status === 'present') { bg = '#d1fae5'; color = '#047857'; }
     else if (status === 'absent') { bg = '#fee2e2'; color = '#b91c1c'; }
     else if (status === 'late') { bg = '#fef3c7'; color = '#b45309'; }
-    else if (status === 'excused') { bg = '#e0e7ff'; color = '#4338ca'; }
+    else if (status === 'excused') { bg = '#e0e7ff'; color = 'var(--primary-dark)'; }
 
     return (
         <span style={{ padding: '4px 10px', borderRadius: 99, fontSize: 12, fontWeight: 600, textTransform: 'capitalize', background: bg, color }}>
@@ -97,14 +97,14 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
 
 const styles: Record<string, React.CSSProperties> = {
     container: { display: 'flex', flexDirection: 'column', gap: '2rem' },
-    card: { background: '#fff', borderRadius: 12, padding: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', border: '1px solid #e5e7eb' },
-    title: { fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 1rem' },
+    card: { background:'var(--card-bg)', borderRadius: 12, padding: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', border: '1px solid #e5e7eb' },
+    title: { fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 1rem' },
     tableWrapper: { overflowX: 'auto' },
     table: { width: '100%', borderCollapse: 'collapse', fontSize: 14, textAlign: 'left' },
-    th: { padding: '12px 16px', color: '#6b7280', fontWeight: 600, borderBottom: '2px solid #e5e7eb' },
+    th: { padding: '12px 16px', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '2px solid #e5e7eb' },
     tr: { borderBottom: '1px solid #f3f4f6' },
-    td: { padding: '12px 16px', color: '#111827', verticalAlign: 'middle' },
-    empty: { padding: '2rem', textAlign: 'center', color: '#6b7280' },
+    td: { padding: '12px 16px', color: 'var(--text-main)', verticalAlign: 'middle' },
+    empty: { padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' },
     badge: { padding: '4px 8px', borderRadius: 6, fontWeight: 700 }
 };
 

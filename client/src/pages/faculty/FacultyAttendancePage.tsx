@@ -155,7 +155,7 @@ const FacultyAttendancePage: React.FC = () => {
                                     </div>
                                 </div>
                                 
-                                <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: '#6b7280', marginTop: '1.5rem', marginBottom: '0.5rem' }}>Low Attendance Alert ({"<"}75%)</h4>
+                                <h4 style={{ fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)', marginTop: '1.5rem', marginBottom: '0.5rem' }}>Low Attendance Alert ({"<"}75%)</h4>
                                 <div style={styles.alertList}>
                                     {analytics.aggregateRoster.filter(r => r.percentage < 75).length === 0 ? (
                                         <p style={{ margin: 0, fontSize: 13, color: '#059669' }}>All students have healthy attendance! 🎉</p>
@@ -164,7 +164,7 @@ const FacultyAttendancePage: React.FC = () => {
                                             <div key={r.student._id} style={styles.alertItem}>
                                                 <div>
                                                     <strong>{r.student.rollNumber}</strong><br />
-                                                    <span style={{ fontSize: 12, color: '#6b7280' }}>{r.student.user?.name}</span>
+                                                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{r.student.user?.name}</span>
                                                 </div>
                                                 <div style={{ ...styles.badge, background: '#fee2e2', color: '#b91c1c' }}>{r.percentage}%</div>
                                             </div>
@@ -183,32 +183,32 @@ const FacultyAttendancePage: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: { padding: '2rem', maxWidth: 1200, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     header: { marginBottom: '1.5rem' },
-    title: { fontSize: 26, fontWeight: 700, color: '#111827', margin: 0 },
-    subtitle: { fontSize: 14, color: '#6b7280', margin: '4px 0 0' },
+    title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
     
     controlsRow: { display: 'flex', gap: '1.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' },
     controlGroup: { display: 'flex', flexDirection: 'column', gap: 6, minWidth: 250 },
-    label: { fontSize: 13, fontWeight: 600, color: '#374151' },
-    select: { padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none', background: '#fff' },
-    inputDate: { padding: '9px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none', background: '#fff' },
+    label: { fontSize: 13, fontWeight: 600, color: 'var(--text-main)' },
+    select: { padding: '10px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none', background:'var(--card-bg)' },
+    inputDate: { padding: '9px 14px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none', background:'var(--card-bg)' },
     
     divider: { border: 'none', borderTop: '2px solid #e5e7eb', margin: '0 0 2rem' },
     
-    empty: { padding: '4rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 12, border: '1px dashed #d1d5db', fontSize: 15 },
+    empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db', fontSize: 15 },
     mainGrid: { display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' },
     leftCol: { flex: '1 1 600px', width: '100%' },
     rightCol: { flex: '0 0 350px', width: '100%' },
     
-    card: { background: '#fff', borderRadius: 12, padding: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', border: '1px solid #e5e7eb' },
-    cardTitle: { fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 1.25rem' },
+    card: { background:'var(--card-bg)', borderRadius: 12, padding: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', border: '1px solid #e5e7eb' },
+    cardTitle: { fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 1.25rem' },
     
     statsList: { display: 'flex', flexWrap: 'wrap', gap: 10 },
-    statBox: { padding: '1rem', background: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0', flex: 1, minWidth: 100 },
+    statBox: { padding: '1rem', background: 'var(--page-bg)', borderRadius: 8, border: '1px solid #e2e8f0', flex: 1, minWidth: 100 },
     statLabel: { fontSize: 12, color: '#64748b', fontWeight: 600, textTransform: 'uppercase' },
     statValue: { fontSize: 24, fontWeight: 700, color: '#0f172a', margin: '4px 0 0' },
 
     alertList: { display: 'flex', flexDirection: 'column', gap: 8 },
-    alertItem: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: '#fff', border: '1px solid #fca5a5', borderRadius: 8 },
+    alertItem: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background:'var(--card-bg)', border: '1px solid #fca5a5', borderRadius: 8 },
     badge: { padding: '4px 8px', borderRadius: 6, fontWeight: 700, fontSize: 14 },
     toast: { position: 'fixed', top: 20, right: 20, padding: '12px 20px', borderRadius: 10, border: '1px solid', fontSize: 14, fontWeight: 500, zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' },
 };

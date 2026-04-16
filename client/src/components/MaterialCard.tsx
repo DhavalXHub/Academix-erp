@@ -41,12 +41,12 @@ const MaterialCard: React.FC<MaterialCardProps> = ({ material, isFaculty, onDele
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    card: { display: 'flex', alignItems: 'center', background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', padding: '1rem', gap: 16, transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
-    iconBox: { width: 48, height: 48, borderRadius: 12, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 },
+    card: { display: 'flex', alignItems: 'center', background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb', padding: '1rem', gap: 16, transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+    iconBox: { width: 48, height: 48, borderRadius: 12, background: 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 },
     content: { flex: 1 },
-    title: { margin: '0 0 4px', fontSize: 16, fontWeight: 600, color: '#111827' },
-    desc: { margin: '0 0 8px', fontSize: 14, color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' },
-    meta: { display: 'flex', gap: 12, fontSize: 12, color: '#9ca3af' },
+    title: { margin: '0 0 4px', fontSize: 16, fontWeight: 600, color: 'var(--text-main)' },
+    desc: { margin: '0 0 8px', fontSize: 14, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' },
+    meta: { display: 'flex', gap: 12, fontSize: 12, color: 'var(--text-muted)' },
     date: { fontWeight: 500 },
     actions: { display: 'flex', gap: 8, alignItems: 'center' },
     downloadBtn: { textDecoration: 'none', padding: '6px 12px', background: '#eff6ff', color: '#1d4ed8', fontSize: 13, fontWeight: 600, borderRadius: 6 },

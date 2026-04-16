@@ -1,100 +1,217 @@
-# Academix – College ERP Management System
+# Academix ERP
 
-**Complete Project Documentation & Progress Report**
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
+![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
+![MIT License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)
+![Active Status](https://img.shields.io/badge/Status-Active-brightgreen.svg?style=for-the-badge)
 
-## 1. Project Overview
-"Academix" is a comprehensive Enterprise Resource Planning (ERP) system designed for colleges and universities. It streamlines academic and administrative processes by providing role-based portals for Students, Faculty, and Administrators. The system handles Attendance, Results, Fees/Billing, Quizzes, Announcements, Timetables, and User Management.
+> **College ERP Management System**
 
-## 2. Technology Stack
-The project is built using a custom stack emphasizing Vanilla JS and native frontend technologies paired with a modern Node.js backend.
+A full-stack web application for managing students, faculty, and admin operations including attendance, assignments, quizzes, messaging, and analytics.
+
+---
+
+## 🚀 Live Demo
+
+**[👉 Try Academix ERP Here 👈](#)** *(Placeholder link – update with your deployment URL)*
+
+---
+
+## 📌 Key Highlights
+
+- **Full-stack MERN Application:** Built with powerful, scaleable, and modern technologies.
+- **Role-based Access Control:** Distinct custom experiences for Admins, Faculty, and Students.
+- **Real-time Engine:** Integrated Socket.io for instant messaging capabilities.
+
+---
+
+## ✨ Features
+
+- **Role-based Authentication:** Secure access for Student, Faculty, and Admin roles.
+- **Student Dashboard:** Track attendance, view results, and manage enrolled courses.
+- **Faculty Panel:** Effortless attendance marking, and assignment/quiz management.
+- **Admin Panel:** Comprehensive user management and system-wide analytics.
+- **Attendance Management System:** Track and record student attendance efficiently.
+- **Assignment & Quiz System:** Create, submit, and grade assignments and quizzes.
+- **Messaging System:** Real-time communication between users.
+- **Finance / Fee Management:** Simplified administration of student fees and finances.
+- **Analytics Dashboard:** Graphical insights into system usage, performance, and data.
+
+---
+
+## 🛠 Tech Stack
 
 ### Frontend
-- **HTML5:** Semantic structure for all pages.
-- **CSS3:** Custom styling with CSS Variables for theming (Root colors, spacing), mobile-first responsiveness, and Dark Mode toggling using CSS Grid/Flexbox. No external CSS frameworks (Bootstrap/Tailwind) were used; all styles are hand-written.
-- **Vanilla JavaScript (ES6+):** DOM manipulation, async/await for API calls, and local storage/session storage for state management (auth, quiz state).
+- **React.js** - UI Library
+- **Vite** - Build Tool
+- **HTML & CSS** - Structure & Styling
 
 ### Backend
-- **Node.js:** Runtime environment.
-- **Express.js:** Web framework for routing and middleware (MVC Architecture).
-- **MongoDB:** Database (connected via Mongoose ODM).
+- **Node.js** - JavaScript Runtime
+- **Express.js** - Web Framework
 
-### Key Libraries & Dependencies
-- **bcryptjs:** For hashing user passwords securely.
-- **jsonwebtoken (JWT):** For secure authentication and session management.
-- **cors:** To handle Cross-Origin Resource Sharing.
-- **dotenv:** To manage environment variables.
-- **pdfkit:** For generating downloadable PDF marksheets dynamically on the server side.
+### Database & Realtime
+- **MongoDB** - NoSQL Database
+- **Socket.io** - Real-time Messaging
 
-## 3. What Has Been Done Till Now (Implemented Features)
+---
 
-The following modules and interfaces have been fully designed and integrated:
+## 🏗 System Architecture
 
-### Core System & Authentication
-- **Role-Based Access Control (RBAC):** Distinct roles for Student, Faculty, and Admin.
-- **Single Page Login Flow:** A modern, seamless single-page login experience. Users first select their role via visually distinct interactive cards (Student, Faculty, Admin), which then smoothly transitions to the login form for that specific role.
-- **JWT Auth & Session Management:** Complete token-based authentication flow with `localStorage` injection for maintaining persistent sessions.
-- **Database schemas** mapped to models (User, Student, Attendance, Marks, Quiz, etc.).
-- Robust routing and middleware protecting unauthorized access to API endpoints.
+The application follows a standard Client-Server Architecture:
+- **Client:** A React-based SPA served via Vite, managing local states and communicating with the server via REST APIs and WebSockets.
+- **Server:** An Express.js REST API node server handling business logic, authenticating endpoints via JWT, and emitting real-time events.
+- **Database:** MongoDB documents modeling out Users, Courses, Attendance, Assignments, and Messages.
 
-### Student Module
-- **Student Dashboard (`student-dashboard.html`):** Overview with widgets and analytics charts indicating attendance risks, exam performance, active notices, and upcoming classes.
-- **Attendance (`attendance.html`):** Visual calendar and chart representation of the student's monthly attendance records with color-coded safety statuses (Safe/Warning/Critical).
-- **Results (`results.html`):** View performance history (Internal/External marks) across semesters with a built-in CGPA calculator and the ability to download a dynamically generated **PDF Marksheet**.
-- **Billing (`billing.html`):** View term fees, pending invoices, and a simulated "Pay Now" functionality.
-- **Timetable (`timetable.html`):** Interactive, dynamic schedule viewer.
-- **Quizzes (`quiz.html`):** Active instant-quiz interface with a server-synced countdown timer and auto-grading on submission or timeout.
+---
 
-### Faculty Module
-- **Faculty Dashboard (`faculty-dashboard.html`):** Specialized interface tailored for course management, featuring quick actions (Mark Attendance, Upload Notes) and low-attendance alerts.
-- **Attendance Marking (`faculty-attendance.html`):** Interface to select Subject/Date, fetch the enrolled student roster, and bulk-mark Present/Absent status.
-- **Grading & Results (`faculty-results.html`):** Interface to fetch class lists per subject/exam and seamlessly enter and save marks.
-- **Quiz Management (`faculty-quizzes.html`):** Creation suite for new quizzes, enabling faculty to add MCQ questions, define the correct answers key, and set strict time limits.
+## 🔌 API Overview
 
-### Admin Module
-- **Admin Dashboard (`admin-dashboard.html`):** System-wide overview and health statistics (Total Users, Compliance metrics).
-- **User Management (`admin-users.html`):** Interface to view all users, filter by assigned roles, and efficiently add/edit/delete distinct Student and Faculty accounts.
+Here are some of the primary API endpoints exposed by the backend:
+- `POST /auth/login` - Authenticate users and receive a JWT.
+- `GET /users` - Fetch user details (Admin only).
+- `GET /courses` - Retrieve all enrolled or available courses.
+- `POST /attendance` - Mark attendance for students (Faculty).
+- `GET /messages` - Fetch chat history for real-time views.
 
-### Shared / Global Components
-- **Announcements / Notice Board (`announcements.html`):** Global and department-level message boards categorizing alerts as Urgent, Academic, and Events.
-- **Responsive Layout:** A modular left-sidebar layout with collapsible functionality, smooth hover effects, and a clean professional blue-and-white enterprise theme across all interfaces.
+---
 
-## 4. Setup & Execution Instructions
+## 📂 Folder Structure
+
+```text
+Academix/
+├── client/                     # Frontend Workspace (React + Vite)
+│   ├── public/                 # Static Assets
+│   ├── src/
+│   │   ├── components/         # Reusable UI Components
+│   │   ├── pages/              # Page Components (Dashboards, Login, etc.)
+│   │   ├── assets/             # Images, Icons, CSS
+│   │   ├── App.jsx             # Main App Component
+│   │   └── main.jsx            # Entry Point
+│   └── package.json            # Frontend Dependencies
+│
+├── server/                     # Backend Workspace (Node.js + Express)
+│   ├── controllers/            # Request Handlers
+│   ├── models/                 # Mongoose Database Models
+│   ├── routes/                 # API Endpoints
+│   ├── middleware/             # Custom Express Middleware (e.g., Auth)
+│   ├── server.js               # Main Server Entry Point
+│   └── package.json            # Backend Dependencies
+│
+├── .env                        # Environment Variables
+├── package.json                # Root Package Configurations
+└── README.md                   # Project Documentation
+```
+
+---
+
+## 🚀 Installation Steps
+
+Follow these steps to set up the project locally on your machine.
 
 ### Prerequisites
-- Node.js installed.
-- MongoDB installed locally or a MongoDB connection string.
+- [Node.js](https://nodejs.org/) installed
+- [MongoDB](https://www.mongodb.com/) installed and running locally, or a MongoDB Atlas URI.
 
-### Steps to Run
-1. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
-2. **Configure Environment:**
-   Ensure a `.env` file exists in the root directory:
-   ```env
-   PORT=5000
-   MONGO_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
-   ```
-3. **Database Seeding (Optional but recommended):**
-   ```bash
-   node server/seeder.js
-   ```
-   *(Creates default Admin/Student/Faculty accounts)*
-4. **Start the Server:**
-   ```bash
-   npm run dev
-   ```
-5. **Access the Application:**
-   Open browser and go to `http://localhost:5000` (or `http://localhost:<PORT>`). Wait for port conflicts to be resolved if `EADDRINUSE` occurs (kill any existing processes on the port).
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/academix-erp.git
+cd academix-erp
+```
 
-### Default Login Credentials (If Seeded)
-- **Student**: `student@academix.edu` / `password123`
-- **Faculty**: `faculty@academix.edu` / `password123`
-- **Admin**: `admin@academix.edu` / `password123`
+### 2. Frontend Setup
+```bash
+cd client
+npm install
+```
 
-## 5. Future Enhancements Planned
-- Complete AI Performance Predictor using historical data.
-- Live library module for book tracking.
-- Internal Messaging System for direct Faculty-to-Student chat.
-- Real Payment Gateway integration for the billing module.
+### 3. Backend Setup
+```bash
+# Open a new terminal and navigate to the project root
+cd server
+npm install
+```
+
+---
+
+## ⚙️ Environment Variables
+
+Create a `.env` file in the **root** folder (or inside the `server/` folder depending on your setup) and add the following:
+
+```env
+# Server Configuration
+PORT=5000                                           # The port where the backend server runs
+
+# Database Configuration
+MONGO_URI=mongodb://localhost:27017/academix_db     # Your MongoDB connection string
+
+# JWT Secret Key
+JWT_SECRET=your_super_secret_jwt_key                # Secret string for signing JWT tokens
+
+# Socket.io Configuration (Optional based on implementation)
+CORS_ORIGIN=http://localhost:5173                   # URL for frontend to allow realtime access
+```
+
+---
+
+## 🏃‍♂️ How to Run Project
+
+You will need two terminal windows to run the frontend and backend concurrently.
+
+### Run Backend (Server)
+```bash
+cd server
+npm run dev
+# or: node server.js
+```
+*The server should now be running on http://localhost:5000*
+
+### Run Frontend (Client)
+```bash
+cd client
+npm run dev
+```
+*The frontend should now be accessible at http://localhost:5173 (Vite default)*
+
+*(Alternatively, you can configure a single script in the root package.json to run both using `concurrently` if available).*
+
+---
+
+## 📸 Screenshots
+
+> **Note:** Replace the placeholders below with actual screenshots of your project.
+
+| Login Page | Student Dashboard |
+| :---: | :---: |
+| ![Login Page Placeholder](https://via.placeholder.com/600x350?text=Login+Page) | ![Student Dashboard Placeholder](https://via.placeholder.com/600x350?text=Student+Dashboard) |
+
+| Faculty Attendance Marker | Admin Analytics |
+| :---: | :---: |
+| ![Faculty Attendance Placeholder](https://via.placeholder.com/600x350?text=Faculty+Panel) | ![Admin Analytics Placeholder](https://via.placeholder.com/600x350?text=Admin+Analytics) |
+
+---
+
+## 🔮 Future Improvements
+
+- Add email/SMS notifications for important alerts.
+- Implement a comprehensive grading rubric system.
+- Add payment gateway integration for direct fee processing.
+- Build a native mobile app companion using React Native.
+- Introduce AI-based insights for student performance prediction.
+
+---
+
+## 🧑‍💻 Author Details
+
+> **Built with ❤️ by [Your Name / Team Name]**
+
+- 🌐 **Website:** [yourwebsite.com](https://yourwebsite.com)
+- 🐙 **GitHub:** [@your-github-username](https://github.com/your-github-username)
+- 💼 **LinkedIn:** [Your Name](https://linkedin.com/in/yourprofile)
+- 📧 **Email:** [your.email@example.com](mailto:your.email@example.com)
+
+---
+
+*If you found this project helpful, please consider leaving a ⭐ on the repository!*

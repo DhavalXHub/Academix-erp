@@ -8,7 +8,7 @@ interface PaymentHistoryTableProps {
 
 const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = ({ payments, isAdminView }) => {
     if (!payments || payments.length === 0) {
-        return <div style={{ padding: 20, textAlign: 'center', color: '#6b7280' }}>No payments found.</div>;
+        return <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)' }}>No payments found.</div>;
     }
 
     return (
@@ -49,11 +49,11 @@ const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = ({ payments, isA
 
 const styles: Record<string, React.CSSProperties> = {
     table: { width: '100%', borderCollapse: 'collapse', fontSize: 14, textAlign: 'left' },
-    th: { backgroundColor: '#f9fafb', padding: '12px 16px', borderBottom: '1px solid #e5e7eb', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', fontSize: 12 },
+    th: { backgroundColor: 'var(--page-bg)', padding: '12px 16px', borderBottom: '1px solid #e5e7eb', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', fontSize: 12 },
     tr: { borderBottom: '1px solid #e5e7eb', transition: 'background 0.2s' },
-    td: { padding: '16px', color: '#374151', verticalAlign: 'middle' },
-    txnId: { background: '#f3f4f6', padding: '4px 8px', borderRadius: 4, fontFamily: 'monospace', fontSize: 12, color: '#4b5563' },
-    downloadBtn: { background: 'none', border: 'none', color: '#4f46e5', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }
+    td: { padding: '16px', color: 'var(--text-main)', verticalAlign: 'middle' },
+    txnId: { background: 'var(--border-color)', padding: '4px 8px', borderRadius: 4, fontFamily: 'monospace', fontSize: 12, color: 'var(--text-muted)' },
+    downloadBtn: { background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }
 };
 
 export default PaymentHistoryTable;

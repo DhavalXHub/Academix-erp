@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import ThemeToggle from '../ThemeToggle';
 
 const Navbar: React.FC = () => {
     const [showSolutions, setShowSolutions] = useState(false);
@@ -30,30 +31,26 @@ const Navbar: React.FC = () => {
                     <li><a href="#process">About</a></li>
                     <li><a href="#contact">Contact</a></li>
                 </ul>
-                <div className="lp-nav-right">
-                    <Link to="/login" style={loginLinkStyle}>Login</Link>
-                    <Link to="/login" className="lp-nav-cta">Get Started →</Link>
+                <div className="lp-nav-right" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <ThemeToggle />
+                    <Link to="/login" className="lp-btn-secondary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem' }}>Login</Link>
+                    <Link to="/login" className="lp-btn-primary" style={{ padding: '0.5rem 1.1rem', fontSize: '0.85rem' }}>Get Started →</Link>
                 </div>
             </div>
         </nav>
     );
 };
 
-const loginLinkStyle: React.CSSProperties = {
-    fontSize: '0.875rem', fontWeight: 600, color: '#374151',
-    textDecoration: 'none', transition: 'color 0.2s',
-};
-
 const dropdownStyle: React.CSSProperties = {
     position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
-    background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb',
+    background:'var(--card-bg)', borderRadius: 14, border: '1px solid #e5e7eb',
     boxShadow: '0 16px 40px rgba(0,0,0,0.1)', padding: 8, minWidth: 200, zIndex: 100,
     display: 'flex', flexDirection: 'column', gap: 2, marginTop: 8,
 };
 
 const dropItemStyle: React.CSSProperties = {
     display: 'block', padding: '10px 14px', borderRadius: 8, fontSize: 13.5,
-    fontWeight: 600, color: '#374151', textDecoration: 'none', transition: 'background 0.15s',
+    fontWeight: 600, color: 'var(--text-main)', textDecoration: 'none', transition: 'background 0.15s',
 };
 
 export default Navbar;

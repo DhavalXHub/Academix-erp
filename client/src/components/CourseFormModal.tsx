@@ -104,27 +104,27 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSu
 interface FieldProps { label: string; type: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; placeholder?: string; required?: boolean; disabled?: boolean; }
 const Field: React.FC<FieldProps> = ({ label, type, value, onChange, placeholder, required, disabled }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
-        <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</label>
+        <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</label>
         <input type={type} value={value} onChange={onChange} placeholder={placeholder} required={required} disabled={disabled}
-            style={{ padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none', color: '#111827', background: disabled ? '#f9fafb' : '#fff' }} />
+            style={{ padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, outline: 'none', color: 'var(--text-main)', background: disabled ? 'var(--page-bg)' :'var(--card-bg)' }} />
     </div>
 );
 
 const styles: Record<string, React.CSSProperties> = {
     overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 },
-    modal: { background: '#fff', borderRadius: 16, width: '100%', maxWidth: 580, boxShadow: '0 25px 60px rgba(0,0,0,0.2)', overflow: 'hidden', maxHeight: '90vh', overflowY: 'auto' },
+    modal: { background:'var(--card-bg)', borderRadius: 16, width: '100%', maxWidth: 580, boxShadow: '0 25px 60px rgba(0,0,0,0.2)', overflow: 'hidden', maxHeight: '90vh', overflowY: 'auto' },
     header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #f3f4f6' },
-    title: { fontSize: 18, fontWeight: 700, color: '#111827', margin: 0 },
-    closeBtn: { background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#9ca3af' },
+    title: { fontSize: 18, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
+    closeBtn: { background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: 'var(--text-muted)' },
     form: { padding: 24, display: 'flex', flexDirection: 'column', gap: 16 },
     row: { display: 'flex', gap: 12 },
     fieldGroup: { display: 'flex', flexDirection: 'column', gap: 5, flex: 1 },
-    label: { fontSize: 12, fontWeight: 600, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em' },
-    select: { padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, color: '#111827', background: '#fff' },
-    textarea: { padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, color: '#111827', outline: 'none', resize: 'vertical' },
+    label: { fontSize: 12, fontWeight: 600, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.05em' },
+    select: { padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, color: 'var(--text-main)', background:'var(--card-bg)' },
+    textarea: { padding: '9px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, color: 'var(--text-main)', outline: 'none', resize: 'vertical' },
     actions: { display: 'flex', justifyContent: 'flex-end', gap: 10, paddingTop: 4 },
-    cancelBtn: { padding: '9px 20px', borderRadius: 8, border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontSize: 14, color: '#374151' },
-    submitBtn: { padding: '9px 20px', borderRadius: 8, border: 'none', background: 'linear-gradient(135deg, #6366f1, #4f46e5)', color: '#fff', cursor: 'pointer', fontSize: 14, fontWeight: 600 },
+    cancelBtn: { padding: '9px 20px', borderRadius: 8, border: '1px solid #d1d5db', background:'var(--card-bg)', cursor: 'pointer', fontSize: 14, color: 'var(--text-main)' },
+    submitBtn: { padding: '9px 20px', borderRadius: 8, border: 'none', background: 'linear-gradient(135deg, var(--primary-light), var(--primary))', color:'var(--card-bg)', cursor: 'pointer', fontSize: 14, fontWeight: 600 },
 };
 
 export default CourseFormModal;

@@ -47,7 +47,7 @@ const LandingPage: React.FC = () => {
                     </div>
                     <div className="lp-stat-divider"></div>
                     <div className="lp-stat-item">
-                        <span className="lp-stat-number" style={{ color: '#4f46e5', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span className="lp-stat-number" style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                             <span style={{ fontSize: '1.75rem' }}>⚡</span> Real-time
                         </span>
                         <span className="lp-stat-label-text">Analytics & Data</span>
@@ -95,7 +95,7 @@ const LandingPage: React.FC = () => {
             <section id="roles" className="lp-roles">
                 <div className="lp-section-inner">
                     <div className="lp-section-head">
-                        <span className="lp-section-label" style={{ color: '#818cf8' }}>Role-Based Portals</span>
+                        <span className="lp-section-label" style={{ color: 'var(--primary-light)' }}>Role-Based Portals</span>
                         <h2 className="lp-section-title lp-roles-title">Tailored for every academic role</h2>
                         <p className="lp-section-sub lp-roles-sub">Different responsibilities demand different native workflows. We engineered Academix to deliver the ideal workspace for everyone.</p>
                     </div>
@@ -127,7 +127,7 @@ const LandingPage: React.FC = () => {
                 <div className="lp-cta-inner">
                     <h2>Ready to transform your campus?</h2>
                     <p className="lp-cta-sub">Join forward-thinking universities running their administration effortlessly with Academix ERP.</p>
-                    <Link to="/login" className="lp-btn-white">Enter the Platform →</Link>
+                    <Link to="/login" className="lp-btn-var(--card-bg)">Enter the Platform →</Link>
                 </div>
             </section>
 

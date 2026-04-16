@@ -2,7 +2,7 @@ import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { StudentAttendanceSummary } from '@/services/attendanceService';
 
-const COLORS = ['#10b981', '#ef4444', '#f59e0b', '#6366f1'];
+const COLORS = ['#10b981', '#ef4444', '#f59e0b', 'var(--primary-light)'];
 
 interface AttendanceChartProps {
     summary: StudentAttendanceSummary[];
@@ -29,7 +29,7 @@ const AttendanceChart: React.FC<AttendanceChartProps> = ({ summary }) => {
     ].filter(d => d.value > 0);
 
     if (data.length === 0) {
-        return <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>No attendance data available yet.</div>;
+        return <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No attendance data available yet.</div>;
     }
 
     const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -70,9 +70,9 @@ const AttendanceChart: React.FC<AttendanceChartProps> = ({ summary }) => {
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    card: { background: '#fff', borderRadius: 12, padding: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', border: '1px solid #e5e7eb' },
+    card: { background:'var(--card-bg)', borderRadius: 12, padding: '1.5rem', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', border: '1px solid #e5e7eb' },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' },
-    title: { fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 },
+    title: { fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
     badge: { padding: '4px 10px', borderRadius: 99, fontSize: 14, fontWeight: 700 }
 };
 

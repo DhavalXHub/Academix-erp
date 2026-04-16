@@ -98,7 +98,7 @@ const QuizBuilder: React.FC<QuizBuilderProps> = ({ courseId, onSave, onCancel, i
 
             <div style={styles.questionsSection}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                    <h3 style={{ margin: 0, fontSize: 18, color: '#111827' }}>Questions ({questions.length})</h3>
+                    <h3 style={{ margin: 0, fontSize: 18, color: 'var(--text-main)' }}>Questions ({questions.length})</h3>
                     <button type="button" onClick={handleAddQuestion} style={styles.addBtn}>+ Add Question</button>
                 </div>
 
@@ -121,23 +121,23 @@ const QuizBuilder: React.FC<QuizBuilderProps> = ({ courseId, onSave, onCancel, i
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    container: { background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb', padding: '24px' },
+    container: { background:'var(--card-bg)', borderRadius: 12, border: '1px solid #e5e7eb', padding: '24px' },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, paddingBottom: 16, borderBottom: '1px solid #f3f4f6' },
-    title: { margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' },
-    cancelBtn: { padding: '8px 16px', background: '#f3f4f6', color: '#4b5563', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
-    saveBtn: { padding: '8px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
+    title: { margin: 0, fontSize: 20, fontWeight: 700, color: 'var(--text-main)' },
+    cancelBtn: { padding: '8px 16px', background: 'var(--border-color)', color: 'var(--text-muted)', border: '1px solid #d1d5db', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
+    saveBtn: { padding: '8px 16px', background: 'var(--primary)', color:'var(--card-bg)', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
     
-    metaSection: { background: '#f8fafc', padding: '16px', borderRadius: 8, border: '1px solid #e2e8f0', marginBottom: 24 },
+    metaSection: { background: 'var(--page-bg)', padding: '16px', borderRadius: 8, border: '1px solid #e2e8f0', marginBottom: 24 },
     gridRow: { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 16 },
     fieldGroup: { display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 },
-    label: { fontSize: 13, fontWeight: 600, color: '#374151' },
+    label: { fontSize: 13, fontWeight: 600, color: 'var(--text-main)' },
     input: { padding: '10px 14px', borderRadius: 6, border: '1px solid #cbd5e1', fontSize: 14, outline: 'none', fontFamily: 'inherit' },
-    checkboxLabel: { display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500, color: '#111827', cursor: 'pointer' },
-    checkbox: { transform: 'scale(1.2)', accentColor: '#4f46e5' },
+    checkboxLabel: { display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500, color: 'var(--text-main)', cursor: 'pointer' },
+    checkbox: { transform: 'scale(1.2)', accentColor: 'var(--primary)' },
     
     questionsSection: { marginTop: '1rem' },
-    addBtn: { padding: '8px 16px', background: '#e0e7ff', color: '#4338ca', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
-    empty: { padding: '3rem', textAlign: 'center', color: '#6b7280', background: '#f9fafb', borderRadius: 8, border: '1px dashed #d1d5db' },
+    addBtn: { padding: '8px 16px', background: '#e0e7ff', color: 'var(--primary-dark)', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' },
+    empty: { padding: '3rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 8, border: '1px dashed #d1d5db' },
 };
 
 export default QuizBuilder;

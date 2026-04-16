@@ -55,17 +55,17 @@ const QuizAttemptPage: React.FC = () => {
     };
 
     if (isLoading) {
-        return <div style={{ padding: '4rem', textAlign: 'center', color: '#6b7280', fontSize: 18 }}>Setting up your exam environment...</div>;
+        return <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: 18 }}>Setting up your exam environment...</div>;
     }
 
     if (error || !quiz || !attempt) {
         return (
             <div style={{ padding: '4rem', textAlign: 'center' }}>
                 <h2 style={{ color: '#ef4444', marginBottom: 16 }}>Unable to load quiz</h2>
-                <p style={{ color: '#4b5563', marginBottom: 24 }}>{error}</p>
+                <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>{error}</p>
                 <button 
                     onClick={() => navigate('/student/quizzes')}
-                    style={{ padding: '10px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer' }}
+                    style={{ padding: '10px 20px', background: 'var(--primary)', color:'var(--card-bg)', border: 'none', borderRadius: 8, cursor: 'pointer' }}
                 >
                     Return to Dashboard
                 </button>
@@ -83,7 +83,7 @@ const QuizAttemptPage: React.FC = () => {
                             navigate('/student/quizzes');
                         }
                     }}
-                    style={{ background: 'none', border: 'none', color: '#6b7280', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontWeight: 600, cursor: 'pointer', padding: 0 }}
                 >
                     ← Exit to Dashboard
                 </button>

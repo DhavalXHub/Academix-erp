@@ -98,8 +98,8 @@ const LoginPage: React.FC = () => {
                                         (e.currentTarget as HTMLButtonElement).style.background = '#f0f7ff';
                                     }}
                                     onMouseLeave={e => {
-                                        (e.currentTarget as HTMLButtonElement).style.borderColor = '#e5e7eb';
-                                        (e.currentTarget as HTMLButtonElement).style.background = '#fff';
+                                        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-color)';
+                                        (e.currentTarget as HTMLButtonElement).style.background ='var(--card-bg)';
                                     }}
                                 >
                                     <span style={styles.roleEmoji}>{r.emoji}</span>
@@ -192,34 +192,34 @@ const styles: Record<string, React.CSSProperties> = {
     },
     bgCircle2: {
         position: 'absolute', bottom: '-15%', left: '-10%', width: 500, height: 500, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(79,70,229,0.06) 0%, transparent 70%)', pointerEvents: 'none',
+        background: 'radial-gradient(circle, rgba(var(--primary-rgb),0.06) 0%, transparent 70%)', pointerEvents: 'none',
     },
     backBtn: {
         position: 'absolute', top: 24, left: 24, fontSize: 13, fontWeight: 600,
-        color: '#6b7280', textDecoration: 'none', zIndex: 20,
-        padding: '8px 16px', borderRadius: 10, background: '#fff', border: '1px solid #e5e7eb',
+        color: 'var(--text-muted)', textDecoration: 'none', zIndex: 20,
+        padding: '8px 16px', borderRadius: 10, background:'var(--card-bg)', border: '1px solid #e5e7eb',
         boxShadow: '0 1px 3px rgba(0,0,0,0.06)', transition: 'all 0.15s',
     },
     card: {
-        background: '#fff', borderRadius: 20, padding: '2.5rem', width: '100%', maxWidth: 440,
+        background:'var(--card-bg)', borderRadius: 20, padding: '2.5rem', width: '100%', maxWidth: 440,
         boxShadow: '0 20px 60px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)',
         position: 'relative', zIndex: 10,
     },
     header: { textAlign: 'center', marginBottom: '2rem' },
     logo: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: '1.25rem' },
-    logoText: { fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', color: '#111827' },
-    title: { fontSize: 24, fontWeight: 800, margin: '0 0 0.4rem', color: '#111827', letterSpacing: '-0.5px' },
-    subtitle: { color: '#6b7280', fontSize: 14, margin: 0, fontWeight: 500 },
-    roleLabel: { textAlign: 'center', color: '#6b7280', fontSize: 13, marginBottom: '1rem', fontWeight: 600 },
+    logoText: { fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', color: 'var(--text-main)' },
+    title: { fontSize: 24, fontWeight: 800, margin: '0 0 0.4rem', color: 'var(--text-main)', letterSpacing: '-0.5px' },
+    subtitle: { color: 'var(--text-muted)', fontSize: 14, margin: 0, fontWeight: 500 },
+    roleLabel: { textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, marginBottom: '1rem', fontWeight: 600 },
     roleGrid: { display: 'flex', flexDirection: 'column', gap: 10 },
     roleCard: {
-        background: '#fff', border: '1.5px solid #e5e7eb', borderRadius: 14, padding: '14px 16px',
+        background:'var(--card-bg)', border: '1.5px solid #e5e7eb', borderRadius: 14, padding: '14px 16px',
         cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14,
         textAlign: 'left', transition: 'all 0.15s', width: '100%',
     },
     roleEmoji: { fontSize: 28, minWidth: 40, textAlign: 'center' },
-    roleCardLabel: { fontWeight: 700, fontSize: 15, display: 'block', color: '#111827' },
-    roleCardDesc: { fontSize: 12, color: '#6b7280', display: 'block', marginTop: 2, fontWeight: 500 },
+    roleCardLabel: { fontWeight: 700, fontSize: 15, display: 'block', color: 'var(--text-main)' },
+    roleCardDesc: { fontSize: 12, color: 'var(--text-muted)', display: 'block', marginTop: 2, fontWeight: 500 },
     roleBadge: {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10,
@@ -235,10 +235,10 @@ const styles: Record<string, React.CSSProperties> = {
         padding: '10px 14px', fontSize: 13, color: '#dc2626', fontWeight: 500,
     },
     fieldWrapper: { display: 'flex', flexDirection: 'column', gap: 6 },
-    label: { fontSize: 13, fontWeight: 600, color: '#374151' },
+    label: { fontSize: 13, fontWeight: 600, color: 'var(--text-main)' },
     input: {
-        background: '#f9fafb', border: '1.5px solid #e5e7eb', borderRadius: 10,
-        padding: '11px 14px', fontSize: 14, color: '#111827', outline: 'none',
+        background: 'var(--page-bg)', border: '1.5px solid #e5e7eb', borderRadius: 10,
+        padding: '11px 14px', fontSize: 14, color: 'var(--text-main)', outline: 'none',
         width: '100%', boxSizing: 'border-box', transition: 'border-color 0.15s',
         fontFamily: "'Inter', sans-serif", fontWeight: 500,
     },
@@ -249,21 +249,21 @@ const styles: Record<string, React.CSSProperties> = {
     },
     submitBtn: {
         background: '#2563eb', border: 'none', borderRadius: 12, padding: '12px',
-        fontSize: 15, fontWeight: 700, color: '#fff',
+        fontSize: 15, fontWeight: 700, color:'var(--card-bg)',
         cursor: 'pointer', transition: 'all 0.15s', marginTop: 4,
         boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
     },
     demoSection: {
         marginTop: '1.5rem', textAlign: 'center', padding: '16px',
-        background: '#f9fafb', borderRadius: 14, border: '1px solid #e5e7eb',
+        background: 'var(--page-bg)', borderRadius: 14, border: '1px solid #e5e7eb',
     },
-    demoTitle: { margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em' },
+    demoTitle: { margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.05em' },
     demoBtnRow: { display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 8 },
     demoBtn: {
-        padding: '6px 14px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff',
-        fontSize: 12, fontWeight: 600, cursor: 'pointer', color: '#374151', transition: 'all 0.15s',
+        padding: '6px 14px', borderRadius: 8, border: '1px solid #e5e7eb', background:'var(--card-bg)',
+        fontSize: 12, fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)', transition: 'all 0.15s',
     },
-    demoHint: { margin: 0, fontSize: 11, color: '#9ca3af', fontWeight: 500 },
+    demoHint: { margin: 0, fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 },
 };
 
 export default LoginPage;

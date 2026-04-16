@@ -1,3 +1,35 @@
 🚀 Academix API & Socket Server running at http://localhost:5000
    Environment: development
 MongoDB Connected: 127.0.0.1
+[Socket.IO] New client connected: WoKfDBVHwUVCEIqlAAAB
+[Socket.IO] User 69d25b6383896c66584edc21 joined room user_69d25b6383896c66584edc21
+[Socket.IO] Client disconnected: WoKfDBVHwUVCEIqlAAAB
+[Socket.IO] New client connected: 40rb-Lef6PYYq_JFAAAD
+[Socket.IO] User 69d25b6383896c66584edc1b joined room user_69d25b6383896c66584edc1b
+[Socket.IO] Client disconnected: 40rb-Lef6PYYq_JFAAAD
+[Socket.IO] New client connected: _gAodaLC7nHJnLLrAAAF
+[Socket.IO] User 69d25b6383896c66584edc19 joined room user_69d25b6383896c66584edc19
+[Socket.IO] Client disconnected: _gAodaLC7nHJnLLrAAAF
+[Socket.IO] New client connected: zepcuxZ_0b-dEvX4AAAH
+[Socket.IO] Client disconnected: zepcuxZ_0b-dEvX4AAAH
+[Socket.IO] New client connected: LW31mtofaWqt_NRvAAAJ
+[Socket.IO] User 69d25b6383896c66584edc19 joined room user_69d25b6383896c66584edc19
+[Socket.IO] Client disconnected: LW31mtofaWqt_NRvAAAJ
+[Socket.IO] New client connected: X9eTYhN2oZeXBk6CAAAM
+[Socket.IO] User 69d25b6383896c66584edc19 joined room user_69d25b6383896c66584edc19
+[Socket.IO] Client disconnected: X9eTYhN2oZeXBk6CAAAM
+[Socket.IO] New client connected: tmX8hr9dX9BkZzaaAAAP
+[Socket.IO] User 69d25b6383896c66584edc19 joined room user_69d25b6383896c66584edc19
+[Socket.IO] Client disconnected: tmX8hr9dX9BkZzaaAAAP
+[Socket.IO] New client connected: fLNbLVA4sqnEnegxAAAR
+[Socket.IO] User 69d25b6383896c66584edc21 joined room user_69d25b6383896c66584edc21
+[Socket.IO] Client disconnected: fLNbLVA4sqnEnegxAAAR
+[Socket.IO] New client connected: hBwiFEnDJDhHBoJ4AAAT
+[Socket.IO] User 69d25b6383896c66584edc1b joined room user_69d25b6383896c66584edc1b
+[Socket.IO] Client disconnected: hBwiFEnDJDhHBoJ4AAAT
+[Socket.IO] New client connected: 031I0XfpDCfeTldXAAAV
+[Socket.IO] User 69d25b6383896c66584edc19 joined room user_69d25b6383896c66584edc19
+[Socket.IO] Client disconnected: 031I0XfpDCfeTldXAAAV
+[Socket.IO] New client connected: hhoKcgVt3vO-Hz-6AAAX
+[Socket.IO] User 69d25b6383896c66584edc21 joined room user_69d25b6383896c66584edc21
+[Socket.IO] Client disconnected: hhoKcgVt3vO-Hz-6AAAX
