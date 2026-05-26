@@ -47,7 +47,7 @@ const QuizAttemptPage: React.FC = () => {
         try {
             await submitQuiz(accessToken, id, answers);
             alert('Quiz submitted successfully!');
-            navigate('/student/quizzes'); // Return to dashboard
+            navigate('/student/quizzes', { state: { tab: 'history' } });
         } catch (e: any) {
             alert(e.message || 'Error occurred while submitting.');
             navigate('/student/quizzes');

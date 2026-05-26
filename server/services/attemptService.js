@@ -94,7 +94,7 @@ const getMyAttempts = async (userId) => {
     if (!student) throw _bad('Only students can fetch their attempts.');
 
     return QuizAttempt.find({ student: student._id })
-        .populate('quiz', 'title course timeLimitMinutes')
+        .populate('quiz', 'title course timeLimitMinutes questions')
         .sort({ startTime: -1 });
 };
 

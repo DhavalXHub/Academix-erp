@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import api from '@/services/api';
 import { fetchTeachingCourses } from '@/services/courseService';
 import {
     fetchMaterials, uploadMaterial, deleteMaterial,
@@ -12,11 +14,13 @@ import type { Course } from '@/services/courseService';
 import MaterialCard from '@/components/MaterialCard';
 import AssignmentCard from '@/components/AssignmentCard';
 import SubmissionTable from '@/components/SubmissionTable';
+import { updateCourseSyllabus } from '@/services/facultyAddonsService';
 
-type Tab = 'materials' | 'assignments' | 'grading';
+type Tab = 'materials' | 'assignments' | 'grading' | 'syllabus';
 
 const FacultyCoursePage: React.FC = () => {
     const { accessToken } = useAuth();
+    const { courseId } = useParams();
     const [courses, setCourses] = useState<Course[]>([]);
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
     const [activeTab, setActiveTab] = useState<Tab>('materials');
@@ -26,6 +30,8 @@ const FacultyCoursePage: React.FC = () => {
     const [assignments, setAssignments] = useState<Assignment[]>([]);
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [gradingAssignment, setGradingAssignment] = useState<Assignment | null>(null);
+    const [syllabusUnits, setSyllabusUnits] = useState<any[]>([]);
+    const [syllabusProgress, setSyllabusProgress] = useState(0);
 
     // Form State
     const [showMaterialForm, setShowMaterialForm] = useState(false);
@@ -46,8 +52,19 @@ const FacultyCoursePage: React.FC = () => {
 
     useEffect(() => {
         if (!accessToken) return;
-        fetchTeachingCourses(accessToken).then(res => setCourses(res.courses));
-    }, [accessToken]);
+        fetchTeachingCourses(accessToken).then(res => {
+            const fetched = res.courses || [];
+            setCourses(fetched);
+            if (courseId) {
+                const preselected = fetched.find((c: any) => c._id === courseId);
+                if (preselected) {
+                    setSelectedCourse(preselected);
+                    setSyllabusUnits((preselected as any).syllabusUnits || []);
+                    setSyllabusProgress((preselected as any).syllabusProgress || 0);
+                }
+            }
+        });
+    }, [accessToken, courseId]);
 
     useEffect(() => {
         if (!accessToken || !selectedCourse) return;
@@ -64,6 +81,13 @@ const FacultyCoursePage: React.FC = () => {
             } else if (activeTab === 'assignments') {
                 const res = await fetchAssignments(accessToken, selectedCourse._id);
                 setAssignments(res.assignments);
+            } else if (activeTab === 'syllabus') {
+                const res = await api.get(`/courses/${selectedCourse._id}`, accessToken);
+                const freshCourse = res.data?.course || res.course;
+                if (freshCourse) {
+                    setSyllabusUnits(freshCourse.syllabusUnits || []);
+                    setSyllabusProgress(freshCourse.syllabusProgress || 0);
+                }
             }
         } catch (e) { console.error(e); } finally { setIsLoading(false); }
     };
@@ -110,6 +134,28 @@ const FacultyCoursePage: React.FC = () => {
         setSubmissions(prev => prev.map(s => s._id === subId ? { ...s, marksAwarded: marks, feedback } : s));
     };
 
+    const handleToggleSyllabusUnit = async (idx: number) => {
+        if (!accessToken || !selectedCourse) return;
+        const updatedUnits = syllabusUnits.map((unit, i) => {
+            if (i === idx) {
+                return { ...unit, isCompleted: !unit.isCompleted };
+            }
+            return unit;
+        });
+
+        const completedCount = updatedUnits.filter(u => u.isCompleted).length;
+        const nextProgress = Math.round((completedCount / updatedUnits.length) * 100);
+
+        setSyllabusUnits(updatedUnits);
+        setSyllabusProgress(nextProgress);
+
+        try {
+            await updateCourseSyllabus(accessToken, selectedCourse._id, updatedUnits);
+        } catch (e) {
+            console.error('Failed to sync syllabus progress to DB:', e);
+        }
+    };
+
     return (
         <div style={styles.page}>
             <div style={styles.header}>
@@ -139,7 +185,7 @@ const FacultyCoursePage: React.FC = () => {
             {selectedCourse && (
                 <>
                     <div style={styles.tabsMenu}>
-                        {(['materials', 'assignments', 'grading'] as Tab[]).map(tab => (
+                        {(['materials', 'assignments', 'grading', 'syllabus'] as Tab[]).map(tab => (
                             <button
                                 key={tab}
                                 style={activeTab === tab ? styles.activeTab : styles.tab}
@@ -264,6 +310,57 @@ const FacultyCoursePage: React.FC = () => {
                                 />
                             </div>
                         )}
+
+                        {/* ── SYLLABUS TAB ── */}
+                        {!isLoading && activeTab === 'syllabus' && (
+                            <div style={styles.syllabusContainer}>
+                                <div style={styles.progressSection}>
+                                    <div style={styles.progressLabels}>
+                                        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)' }}>Syllabus Coverage</span>
+                                        <strong style={{ fontSize: 14, color: 'var(--primary)' }}>{syllabusProgress}% Done</strong>
+                                    </div>
+                                    <div style={styles.progressBarBg}>
+                                        <div style={{ ...styles.progressBarFill, width: `${syllabusProgress}%` }} />
+                                    </div>
+                                </div>
+
+                                <div style={styles.unitsList}>
+                                    {syllabusUnits.map((unit, idx) => (
+                                        <div 
+                                            key={idx} 
+                                            style={{
+                                                ...styles.unitItem,
+                                                background: unit.isCompleted ? '#f0fdf4' : '#fafbfc',
+                                                borderColor: unit.isCompleted ? '#bbf7d0' : '#e2e8f0',
+                                            }}
+                                        >
+                                            <input 
+                                                type="checkbox" 
+                                                style={styles.checkbox}
+                                                checked={unit.isCompleted} 
+                                                onChange={() => handleToggleSyllabusUnit(idx)}
+                                            />
+                                            <div style={styles.unitDetails}>
+                                                <h4 style={{
+                                                    ...styles.unitTitle,
+                                                    textDecoration: unit.isCompleted ? 'line-through' : 'none',
+                                                    color: unit.isCompleted ? '#166534' : 'var(--text-main)',
+                                                }}>
+                                                    {unit.title}
+                                                </h4>
+                                                <span style={{
+                                                    ...styles.unitBadge,
+                                                    background: unit.isCompleted ? '#dcfce7' : '#f1f5f9',
+                                                    color: unit.isCompleted ? '#166534' : '#475569',
+                                                }}>
+                                                    {unit.isCompleted ? 'Completed' : 'Planned'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </>
             )}
@@ -300,6 +397,18 @@ const styles: Record<string, React.CSSProperties> = {
     listGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' },
     listGridActive: { display: 'flex', flexDirection: 'column', gap: '1.5rem' },
     empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
+    
+    syllabusContainer: { padding: '1rem 0' },
+    progressSection: { background: '#f8fafc', padding: 20, borderRadius: 12, border: '1px solid #e2e8f0', marginBottom: 24 },
+    progressLabels: { display: 'flex', justifyContent: 'space-between', marginBottom: 8, alignItems: 'center' },
+    progressBarBg: { width: '100%', height: 10, background: '#e2e8f0', borderRadius: 999, overflow: 'hidden' },
+    progressBarFill: { height: '100%', background: 'var(--primary)', borderRadius: 999, transition: 'width 0.4s ease' },
+    unitsList: { display: 'flex', flexDirection: 'column', gap: 12 },
+    unitItem: { display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 12, border: '1px solid', transition: 'all 0.2s' },
+    checkbox: { width: 18, height: 18, cursor: 'pointer', accentColor: 'var(--primary)' },
+    unitDetails: { flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
+    unitTitle: { margin: 0, fontSize: 14, fontWeight: 700 },
+    unitBadge: { fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 4, letterSpacing: '0.05em' },
 };
 
 export default FacultyCoursePage;

@@ -6,3 +6,6 @@ export const fetchNotifications = (token: string): Promise<{ notifications: Noti
 
 export const markAsRead = (token: string, notificationId: string): Promise<{ notification: Notification }> =>
     api.put(`/notifications/${notificationId}/read`, {}, token);
+
+export const markAllNotificationsRead = (token: string): Promise<{ success: boolean }> =>
+    api.put('/notifications/mark-all-read', {}, token);

@@ -5,13 +5,14 @@
 
 require('dotenv').config();
 const mongoose = require('./config/db');
+const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 const Student = require('./models/Student');
 const Faculty = require('./models/Faculty');
 const Course = require('./models/Course');
 const Enrollment = require('./models/Enrollment');
 const Timetable = require('./models/Timetable');
-const Attendance = require('./models/Attendance');
+const AttendanceRecord = require('./models/AttendanceRecord');
 const Marks = require('./models/Marks');
 const Assignment = require('./models/Assignment');
 const Submission = require('./models/Submission');
@@ -34,7 +35,7 @@ const seedDatabase = async () => {
             Course.deleteMany({}),
             Enrollment.deleteMany({}),
             Timetable.deleteMany({}),
-            Attendance.deleteMany({}),
+            AttendanceRecord.deleteMany({}),
             Marks.deleteMany({}),
             Assignment.deleteMany({}),
             Submission.deleteMany({}),
@@ -59,15 +60,18 @@ const seedDatabase = async () => {
 
         // === 2. CREATE FACULTY USERS & PROFILES ===
         const facultyData = [
+            { name: 'Dr. John Smith', email: 'john.smith@academix.edu', department: 'Computer Science', specialization: 'Data Science' },
             { name: 'Dr. Rajesh Kumar', email: 'rajesh.kumar@academix.edu', department: 'Computer Science', specialization: 'Data Science' },
             { name: 'Prof. Priya Singh', email: 'priya.singh@academix.edu', department: 'Mathematics', specialization: 'Algebra' },
             { name: 'Dr. Amit Sharma', email: 'amit.sharma@academix.edu', department: 'Physics', specialization: 'Quantum Mechanics' },
         ];
 
+        // insertMany bypasses pre-save hooks, so we must hash passwords manually
+        const hashedPassword = await bcrypt.hash('password123', 10);
         const facultyUsers = await User.insertMany(
             facultyData.map(f => ({
                 email: f.email,
-                password: 'password123',
+                password: hashedPassword,
                 name: f.name,
                 role: 'faculty',
                 isEmailVerified: true,
@@ -83,11 +87,13 @@ const seedDatabase = async () => {
                 department: facultyData[idx].department,
                 specialization: facultyData[idx].specialization,
                 qualification: 'PhD',
+                designation: 'Professor',
+                employeeId: `EMP-${2025}-${idx + 1}`,
                 telephoneNumber: '555-' + (1000 + idx),
                 isActive: true,
             }))
         );
-        console.log('✓ Created 3 faculty members');
+        console.log(`✓ Created ${faculties.length} faculty members`);
 
         // === 3. CREATE STUDENT USERS & PROFILES ===
         const departments = ['Computer Science', 'Mathematics', 'Physics'];
@@ -115,6 +121,7 @@ const seedDatabase = async () => {
                 rollNumber: `${dept.substring(0, 3).toUpperCase()}${2025}${String(i + 1).padStart(3, '0')}`,
                 department: dept,
                 semester: 6,
+                batchYear: 2025,
             });
 
             studentUsers.push(user);
@@ -140,7 +147,7 @@ const seedDatabase = async () => {
                 department: c.department,
                 semester: c.semester,
                 description: `A comprehensive course on ${c.title}`,
-                primaryFaculty: faculties[idx % 3]._id,
+                primaryFaculty: faculties[idx % faculties.length]._id,
                 isActive: true,
                 academicYear: '2025-2026',
             }))
@@ -177,7 +184,7 @@ const seedDatabase = async () => {
         const timetableEntries = [];
         for (let i = 0; i < courses.length; i++) {
             const course = courses[i];
-            const faculty = faculties[i % 3];
+            const faculty = faculties[i % faculties.length];
             const day = daysOfWeek[i % 5];
             const slot = timeSlots[Math.floor(i / 5) % 3];
 
@@ -200,25 +207,26 @@ const seedDatabase = async () => {
         const attendanceRecords = [];
         const today = new Date();
         for (let daysAgo = 10; daysAgo >= 0; daysAgo--) {
-            for (const course of courses) {
-                for (let i = 0; i < 5; i++) {
-                    const date = new Date(today);
-                    date.setDate(date.getDate() - daysAgo);
+            for (let i = 0; i < courses.length; i++) {
+                const course = courses[i];
+                const date = new Date(today);
+                date.setDate(date.getDate() - daysAgo);
 
-                    const relevantEnrollments = enrollments.filter(e => e.course.toString() === course._id.toString());
-                    for (const enrollment of relevantEnrollments) {
-                        attendanceRecords.push({
-                            student: enrollment.student,
-                            course: course._id,
-                            faculty: course.primaryFaculty,
-                            date,
-                            status: Math.random() > 0.1 ? 'Present' : 'Absent',
-                        });
-                    }
+                const relevantEnrollments = enrollments.filter(e => e.course.toString() === course._id.toString());
+                if (relevantEnrollments.length > 0) {
+                    attendanceRecords.push({
+                        course: course._id,
+                        faculty: faculties[i % faculties.length]._id, // Use Faculty reference
+                        date,
+                        records: relevantEnrollments.map(e => ({
+                            student: e.student,
+                            status: Math.random() > 0.1 ? 'present' : 'absent'
+                        }))
+                    });
                 }
             }
         }
-        await Attendance.insertMany(attendanceRecords);
+        await AttendanceRecord.insertMany(attendanceRecords);
         console.log(`✓ Created ${attendanceRecords.length} attendance records`);
 
         // === 8. CREATE MARKS ===
@@ -231,7 +239,7 @@ const seedDatabase = async () => {
                     for (const examType of examTypes) {
                         marks.push({
                             student: student._id,
-                            course: course._id,
+                            subject: course._id,
                             examType,
                             score: Math.floor(Math.random() * 80) + 20,
                             maxScore: 100,
@@ -248,6 +256,7 @@ const seedDatabase = async () => {
         for (const course of courses) {
             assignments.push({
                 course: course._id,
+                faculty: course.primaryFaculty,
                 title: `Assignment 1: ${course.title}`,
                 description: `Complete the assignment on ${course.title}`,
                 dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
@@ -279,16 +288,16 @@ const seedDatabase = async () => {
         const quizzes = await Quiz.insertMany(
             courses.map(course => ({
                 course: course._id,
+                faculty: course.primaryFaculty,
                 title: `Quiz 1: ${course.title}`,
                 description: `Quick assessment on ${course.title}`,
-                duration: 30,
-                totalMarks: 20,
+                timeLimitMinutes: 30,
                 questions: [
-                    { text: 'Question 1?', marks: 5, options: ['A', 'B', 'C', 'D'], correctAnswer: 0 },
-                    { text: 'Question 2?', marks: 5, options: ['A', 'B', 'C', 'D'], correctAnswer: 1 },
-                    { text: 'Question 3?', marks: 10, options: ['A', 'B', 'C', 'D'], correctAnswer: 2 },
+                    { text: 'Question 1?', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 0 },
+                    { text: 'Question 2?', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 1 },
+                    { text: 'Question 3?', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 2 },
                 ],
-                isPublished: true,
+                isActive: true,
             }))
         );
         console.log('✓ Created 6 quizzes');
@@ -298,12 +307,24 @@ const seedDatabase = async () => {
         for (const quiz of quizzes) {
             const courseEnrollments = enrollments.filter(e => e.course.toString() === quiz.course.toString());
             for (const enrollment of courseEnrollments.slice(0, 8)) {
+                // We need the User._id for the student, which is studentProfile.user
+                const studentProfile = students.find(s => s._id.toString() === enrollment.student.toString());
+                const answersMap = {};
+                if (quiz.questions && quiz.questions.length >= 3) {
+                    answersMap[quiz.questions[0].questionId] = 0;
+                    answersMap[quiz.questions[1].questionId] = 1;
+                    answersMap[quiz.questions[2].questionId] = 2;
+                }
+                
+                const pastDate = new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000);
+
                 quizAttempts.push({
                     quiz: quiz._id,
                     student: enrollment.student,
-                    score: Math.floor(Math.random() * 20),
-                    answers: [0, 1, 2],
-                    completedAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
+                    score: Math.floor(Math.random() * quiz.questions.length),
+                    answers: answersMap,
+                    startTime: new Date(pastDate.getTime() - 30 * 60000),
+                    endTime: pastDate,
                 });
             }
         }
@@ -313,17 +334,16 @@ const seedDatabase = async () => {
         // === 13. CREATE INVOICES ===
         const invoices = [];
         for (const student of students) {
-            const totalAmount = 5000 + Math.random() * 5000;
-            const amountPaid = [0, totalAmount * 0.5, totalAmount][Math.floor(Math.random() * 3)];
-            const status = amountPaid === 0 ? 'pending' : amountPaid === totalAmount ? 'paid_full' : 'paid_partial';
+            const amountDue = 5000 + Math.random() * 5000;
+            const amountPaid = [0, amountDue * 0.5, amountDue][Math.floor(Math.random() * 3)];
+            const status = amountPaid === 0 ? 'pending' : amountPaid === amountDue ? 'paid_full' : 'paid_partial';
 
             invoices.push({
-                student: student._id,
-                academicYear: '2025-2026',
-                semester: 6,
-                totalAmount,
+                student: student.user, // Invoice.js references User
+                amountDue,
                 amountPaid,
                 status,
+                type: 'tuition',
                 description: 'Semester fees',
                 dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             });
@@ -333,12 +353,14 @@ const seedDatabase = async () => {
 
         // === 14. CREATE PAYMENTS ===
         const payments = [];
-        const paymentMethods = ['credit_card', 'bank_transfer', 'check'];
+        const paymentMethods = ['credit_card', 'bank_transfer'];
         for (const invoice of invoiceDocs) {
             if (invoice.amountPaid > 0) {
+                // Find corresponding Student profile
+                const studentProfile = students.find(s => s.user.toString() === invoice.student.toString());
                 payments.push({
                     invoice: invoice._id,
-                    student: invoice.student,
+                    student: studentProfile._id, // Payment.js references Student
                     amount: invoice.amountPaid,
                     paymentDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
                     transactionId: `TXN-${Date.now()}-${Math.random().toString(36).substring(7)}`,
@@ -376,7 +398,7 @@ const seedDatabase = async () => {
                 recipient: student.user,
                 title: 'Assignment Submitted',
                 message: 'Your assignment has been submitted successfully.',
-                type: 'assignment',
+                type: 'assignment_created',
                 isRead: false,
             });
         }
@@ -386,7 +408,7 @@ const seedDatabase = async () => {
         console.log('\n✅ Sample Data Imported Successfully!');
         console.log('📊 Created:');
         console.log('   • 1 Admin');
-        console.log('   • 3 Faculty members');
+        console.log(`   • ${faculties.length} Faculty members`);
         console.log('   • 30 Students across 3 departments');
         console.log('   • 6 Courses');
         console.log('   • 60 Enrollments');

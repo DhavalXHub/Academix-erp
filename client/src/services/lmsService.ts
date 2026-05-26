@@ -48,8 +48,11 @@ export const deleteMaterial = (token: string, id: string): Promise<void> =>
 export const fetchAssignments = (token: string, courseId: string): Promise<{ assignments: Assignment[] }> =>
     api.get(`/assignments/course/${courseId}`, token);
 
-export const createAssignment = (token: string, data: Partial<Assignment>): Promise<{ assignment: Assignment }> =>
-    api.post('/assignments', data as Record<string, unknown>, token);
+export const createAssignment = (token: string, data: Record<string, unknown>): Promise<{ assignment: Assignment }> =>
+    api.post('/assignments', data, token);
+
+export const updateAssignment = (token: string, id: string, data: Partial<Assignment>): Promise<{ assignment: Assignment }> =>
+    api.put(`/assignments/${id}`, data as Record<string, unknown>, token);
 
 export const deleteAssignment = (token: string, id: string): Promise<void> =>
     api.delete(`/assignments/${id}`, token);
@@ -60,6 +63,9 @@ export const fetchSubmissions = (token: string, assignmentId: string): Promise<{
 
 export const fetchMySubmission = (token: string, assignmentId: string): Promise<{ submission: Submission | null }> =>
     api.get(`/submissions/my/${assignmentId}`, token);
+
+export const fetchAllMySubmissions = (token: string): Promise<{ submissions: Submission[] }> =>
+    api.get(`/submissions/my`, token);
 
 export const submitAssignment = (token: string, assignmentId: string, fileUrl: string): Promise<{ submission: Submission }> =>
     api.post('/submissions', { assignmentId, fileUrl }, token);

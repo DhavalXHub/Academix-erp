@@ -12,7 +12,7 @@ const ROLES: RoleOption[] = [
 
 const DEMO_CREDS: Record<UserRole, { email: string; password: string }> = {
     student: { email: 'student1@academix.edu', password: 'password123' },
-    faculty: { email: 'faculty1@academix.edu', password: 'password123' },
+    faculty: { email: 'john.smith@academix.edu', password: 'password123' },
     admin: { email: 'admin@academix.edu', password: 'password123' },
 };
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchMyEnrollments, Course } from '@/services/courseService';
 import { fetchQuizzes, fetchMyAttempts, startQuiz, Quiz, QuizAttempt } from '@/services/quizService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import QuizResultCard from '@/components/QuizResultCard';
 
 const StudentQuizPage: React.FC = () => {
@@ -15,9 +15,10 @@ const StudentQuizPage: React.FC = () => {
     const [quizzes, setQuizzes] = useState<Quiz[]>([]);
     const [myAttempts, setMyAttempts] = useState<QuizAttempt[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const location = useLocation();
     
     // UI Tabs: 'available' vs 'history'
-    const [tab, setTab] = useState<'available' | 'history'>('available');
+    const [tab, setTab] = useState<'available' | 'history'>(location.state?.tab || 'available');
 
     // Init
     useEffect(() => {

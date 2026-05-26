@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { BookOpen, Calendar, CheckSquare, MessageSquare, CreditCard, User, LogOut, LayoutDashboard, Home, FileText } from 'lucide-react';
+import { BookOpen, Calendar, CheckSquare, MessageSquare, CreditCard, User, LogOut, LayoutDashboard, Home, FileText, FileCheck2, Megaphone } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 
 const StudentLayout: React.FC = () => {
@@ -15,10 +15,13 @@ const StudentLayout: React.FC = () => {
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/student/dashboard' },
+        { icon: Megaphone, label: 'Announcements', path: '/student/announcements' },
         { icon: BookOpen, label: 'Courses', path: '/student/courses' },
         { icon: CheckSquare, label: 'Attendance', path: '/student/attendance' },
         { icon: FileText, label: 'Assignments', path: '/student/assignments' },
         { icon: Calendar, label: 'Quizzes', path: '/student/quizzes' },
+        { icon: FileCheck2, label: 'Results', path: '/student/results' },
+        { icon: Calendar, label: 'Calendar', path: '/student/calendar' },
         { icon: MessageSquare, label: 'Messages', path: '/student/messages' },
         { icon: CreditCard, label: 'Fees & Dues', path: '/student/fees' },
         { icon: User, label: 'Profile', path: '/student/profile' },

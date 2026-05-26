@@ -12,10 +12,9 @@ const _notFound = (msg) => Object.assign(new Error(msg), { code: 'NOT_FOUND', st
 const getQuizzesByCourse = async (userId, userRole, courseId) => {
     // Basic access check
     if (userRole === 'faculty') {
-        const faculty = await Faculty.findOne({ user: userId });
-        if (!faculty) throw _bad('Faculty profile not found');
         const course = await Course.findById(courseId);
-        if (!course || course.primaryFaculty.toString() !== faculty._id.toString()) {
+        // primaryFaculty stores User._id — compare directly
+        if (!course || !course.primaryFaculty || course.primaryFaculty.toString() !== userId.toString()) {
             throw _bad('Not authorized to view quizzes for this course.');
         }
         return Quiz.find({ course: courseId }).sort({ createdAt: -1 });
@@ -38,17 +37,18 @@ const getQuizzesByCourse = async (userId, userRole, courseId) => {
 };
 
 const createQuiz = async (userId, data) => {
-    const faculty = await Faculty.findOne({ user: userId });
-    if (!faculty) throw _bad('Only faculty can create quizzes');
-
     const course = await Course.findById(data.courseId);
-    if (!course || course.primaryFaculty.toString() !== faculty._id.toString()) {
+    // primaryFaculty stores User._id — compare directly
+    if (!course || !course.primaryFaculty || course.primaryFaculty.toString() !== userId.toString()) {
         throw _bad('Not authorized to create quizzes for this course.');
     }
 
+    const faculty = await Faculty.findOne({ user: userId });
+    const facultyRef = faculty?._id || userId;
+
     const quiz = await Quiz.create({
         course: data.courseId,
-        faculty: faculty._id,
+        faculty: facultyRef,
         title: data.title,
         description: data.description || '',
         timeLimitMinutes: data.timeLimitMinutes,

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSocket } from '@/contexts/SocketContext';
 import {
     createNotice,
     deleteNotice,
@@ -14,7 +15,8 @@ const CATEGORIES: NoticeCategory[] = ['Urgent', 'Academic', 'Event', 'General'];
 const AUDIENCES: NoticeAudience[] = ['all', 'student', 'faculty'];
 
 const AdminAnnouncementsPage: React.FC = () => {
-    const { accessToken } = useAuth();
+    const { accessToken, user } = useAuth();
+    const { socket } = useSocket();
     const [notices, setNotices] = useState<Notice[]>([]);
     const [category, setCategory] = useState<string>('all');
     const [isLoading, setIsLoading] = useState(true);
@@ -52,6 +54,21 @@ const AdminAnnouncementsPage: React.FC = () => {
         load();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [accessToken, category]);
+
+    // Setup socket listener for real-time announcement additions/updates
+    useEffect(() => {
+        if (!socket) return;
+        
+        const handleNewAnnouncement = () => {
+            load();
+        };
+        
+        socket.on('new_announcement', handleNewAnnouncement);
+        return () => {
+            socket.off('new_announcement', handleNewAnnouncement);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socket]);
 
     const openCreate = () => {
         setEditing(null);
@@ -130,9 +147,11 @@ const AdminAnnouncementsPage: React.FC = () => {
                         {stats.total} posts • {stats.urgent} urgent
                     </p>
                 </div>
-                <button style={styles.primaryBtn} onClick={openCreate}>
-                    + New Announcement
-                </button>
+                {(user?.role === 'admin' || user?.role === 'faculty') && (
+                    <button style={styles.primaryBtn} onClick={openCreate}>
+                        + New Announcement
+                    </button>
+                )}
             </div>
 
             <div style={styles.filters}>
@@ -167,8 +186,14 @@ const AdminAnnouncementsPage: React.FC = () => {
                                     Posted by: {(n.postedBy as any)?.name || '—'}
                                 </div>
                                 <div style={{ display: 'flex', gap: 8 }}>
-                                    <button style={styles.secondaryBtn} onClick={() => openEdit(n)}>Edit</button>
-                                    <button style={styles.dangerBtn} onClick={() => handleDelete(n)}>Delete</button>
+                                    {(user?.role === 'admin' || (user?.role === 'faculty' && (
+                                        typeof n.postedBy === 'object' ? (n.postedBy as any)?._id === user?.id : n.postedBy === user?.id
+                                    ))) && (
+                                        <button style={styles.secondaryBtn} onClick={() => openEdit(n)}>Edit</button>
+                                    )}
+                                    {user?.role === 'admin' && (
+                                        <button style={styles.dangerBtn} onClick={() => handleDelete(n)}>Delete</button>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -240,7 +265,7 @@ const styles: Record<string, React.CSSProperties> = {
     subtitle: { fontSize: 14, color: '#64748b', margin: '6px 0 0' },
     filters: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 },
     label: { fontSize: 13, fontWeight: 800, color: 'var(--text-main)' },
-    select: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background:'var(--card-bg)', fontSize: 14 },
+    select: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background:'var(--card-bg)', fontSize: 14, color: 'var(--text-main)' },
 
     state: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 14 },
@@ -263,9 +288,8 @@ const styles: Record<string, React.CSSProperties> = {
     overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 },
     modal: { width: '100%', maxWidth: 680, background:'var(--card-bg)', borderRadius: 14, border: '1px solid #e5e7eb', boxShadow: '0 25px 60px rgba(0,0,0,0.2)', padding: 16 },
     modalTitle: { margin: 0, fontSize: 18, fontWeight: 900, color: 'var(--text-main)' },
-    input: { width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: 10, fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' },
+    input: { width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: 10, fontSize: 14, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', background: 'var(--page-bg)', color: 'var(--text-main)' },
     cancelBtn: { padding: '10px 14px', borderRadius: 10, border: '1px solid #d1d5db', background:'var(--card-bg)', color: 'var(--text-main)', fontWeight: 900, cursor: 'pointer' },
 };
 
 export default AdminAnnouncementsPage;
-

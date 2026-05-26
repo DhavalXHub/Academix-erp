@@ -43,7 +43,7 @@ const courseSchema = new mongoose.Schema(
         },
         primaryFaculty: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
+            ref: 'Faculty',
             default: null,
         },
         isActive: {
@@ -54,6 +54,30 @@ const courseSchema = new mongoose.Schema(
             type: Number,
             default: 60,
         },
+        syllabusProgress: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 100,
+        },
+        syllabusUnits: {
+            type: [
+                {
+                    title: String,
+                    isCompleted: {
+                        type: Boolean,
+                        default: false,
+                    },
+                }
+            ],
+            default: [
+                { title: 'Unit 1: Introduction & Basic Concepts', isCompleted: false },
+                { title: 'Unit 2: Core Methodology & Frameworks', isCompleted: false },
+                { title: 'Unit 3: Advanced Implementation Techniques', isCompleted: false },
+                { title: 'Unit 4: Case Studies & Optimization Protocols', isCompleted: false },
+                { title: 'Unit 5: Integration, Deployment & Capstone Reviews', isCompleted: false }
+            ]
+        }
     },
     { timestamps: true }
 );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SocketProvider } from '@/contexts/SocketContext';
@@ -10,46 +10,68 @@ import FacultyLayout from '@/components/layouts/FacultyLayout';
 import AdminLayout from '@/components/layouts/AdminLayout';
 
 // Shared Pages
-import LandingPage from '@/pages/LandingPage';
-import LoginPage from '@/pages/LoginPage';
-import PricingPage from '@/pages/PricingPage';
-import ProfilePage from '@/pages/ProfilePage';
+const LandingPage = lazy(() => import('@/pages/LandingPage'));
+const AdmissionsApplyPage = lazy(() => import('@/pages/AdmissionsApplyPage'));
+const LoginPage = lazy(() => import('@/pages/LoginPage'));
+const PricingPage = lazy(() => import('@/pages/PricingPage'));
+const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+const AcademicCalendarPage = lazy(() => import('@/pages/common/AcademicCalendarPage'));
 
 // Student Pages
-import StudentDashboard from '@/pages/student/StudentDashboard';
-import StudentCoursesPage from '@/pages/student/StudentCoursesPage';
-import StudentAttendancePage from '@/pages/student/StudentAttendancePage';
-import StudentQuizPage from '@/pages/student/StudentQuizPage';
-import StudentFeesPage from '@/pages/student/StudentFeesPage';
-import StudentMessagesPage from '@/pages/student/StudentMessagesPage';
-import StudentAssignmentsPage from '@/pages/student/StudentAssignmentsPage';
+const StudentDashboard = lazy(() => import('@/pages/student/StudentDashboard'));
+const StudentCoursesPage = lazy(() => import('@/pages/student/StudentCoursesPage'));
+const StudentAttendancePage = lazy(() => import('@/pages/student/StudentAttendancePage'));
+const StudentQuizPage = lazy(() => import('@/pages/student/StudentQuizPage'));
+const StudentFeesPage = lazy(() => import('@/pages/student/StudentFeesPage'));
+const StudentMessagesPage = lazy(() => import('@/pages/student/StudentMessagesPage'));
+const StudentAssignmentsPage = lazy(() => import('@/pages/student/StudentAssignmentsPage'));
+const QuizAttemptPage = lazy(() => import('@/pages/student/QuizAttemptPage'));
+const StudentResultsPage = lazy(() => import('@/pages/student/StudentResultsPage'));
 
 // Faculty Pages
-import FacultyDashboard from '@/pages/faculty/FacultyDashboard';
-import FacultyCoursesPage from '@/pages/faculty/FacultyCoursesPage';
-import FacultyAttendancePage from '@/pages/faculty/FacultyAttendancePage';
-import FacultyAssignmentsPage from '@/pages/faculty/FacultyAssignmentsPage';
-import FacultyQuizPage from '@/pages/faculty/FacultyQuizPage';
-import FacultyQuizAttemptsPage from '@/pages/faculty/FacultyQuizAttemptsPage';
+const FacultyDashboard = lazy(() => import('@/pages/faculty/FacultyDashboard'));
+const FacultyCoursesPage = lazy(() => import('@/pages/faculty/FacultyCoursesPage'));
+const FacultyCoursePage = lazy(() => import('@/pages/faculty/FacultyCoursePage'));
+const FacultyAttendancePage = lazy(() => import('@/pages/faculty/FacultyAttendancePage'));
+const FacultyAssignmentsPage = lazy(() => import('@/pages/faculty/FacultyAssignmentsPage'));
+const FacultyQuizPage = lazy(() => import('@/pages/faculty/FacultyQuizPage'));
+const FacultyQuizAttemptsPage = lazy(() => import('@/pages/faculty/FacultyQuizAttemptsPage'));
+const FacultyGradebookPage = lazy(() => import('@/pages/faculty/FacultyGradebookPage'));
+const FacultyLeavesPage = lazy(() => import('@/pages/faculty/FacultyLeavesPage'));
+const FacultyDoubtsPage = lazy(() => import('@/pages/faculty/FacultyDoubtsPage'));
+const FacultyMentorshipPage = lazy(() => import('@/pages/faculty/FacultyMentorshipPage'));
 
 // Admin Pages
-import AdminDashboard from '@/pages/admin/AdminDashboard';
-import AdminUsersPage from '@/pages/admin/AdminUsersPage';
-import AdminCoursesPage from '@/pages/admin/AdminCoursesPage';
-import AdminFinancePage from '@/pages/admin/AdminFinancePage';
-import AdminAnalyticsPage from '@/pages/admin/AdminAnalyticsPage';
-import AdminAnnouncementsPage from '@/pages/admin/AdminAnnouncementsPage';
+const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'));
+const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
+const AdminCoursesPage = lazy(() => import('@/pages/admin/AdminCoursesPage'));
+const AdminFinancePage = lazy(() => import('@/pages/admin/AdminFinancePage'));
+const AdminAnalyticsPage = lazy(() => import('@/pages/admin/AdminAnalyticsPage'));
+const AdminAnnouncementsPage = lazy(() => import('@/pages/admin/AdminAnnouncementsPage'));
+const AdminAuditLogsPage = lazy(() => import('@/pages/admin/AdminAuditLogsPage'));
+const AdminFoundationPage = lazy(() => import('@/pages/admin/AdminFoundationPage'));
+const AdminTimetablePage = lazy(() => import('@/pages/admin/AdminTimetablePage'));
+const AdminAdmissionsPage = lazy(() => import('@/pages/admin/AdminAdmissionsPage'));
 
-import MessagesPage from '@/pages/common/MessagesPage';
+const MessagesPage = lazy(() => import('@/pages/common/MessagesPage'));
+const ResultsManagementPage = lazy(() => import('@/pages/common/ResultsManagementPage'));
+
+const routeFallback = (
+    <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', color: 'var(--text-muted)' }}>
+        Loading...
+    </div>
+);
 
 const App: React.FC = () => {
     return (
         <BrowserRouter>
             <AuthProvider>
                 <SocketProvider>
+                <Suspense fallback={routeFallback}>
                 <Routes>
                     {/* Public Route */}
                     <Route path="/" element={<LandingPage />} />
+                    <Route path="/admissions/apply" element={<AdmissionsApplyPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/pricing" element={<PricingPage />} />
 
@@ -58,10 +80,14 @@ const App: React.FC = () => {
                         <Route element={<StudentLayout />}>
                             <Route index element={<Navigate to="/student/dashboard" replace />} />
                             <Route path="dashboard" element={<StudentDashboard />} />
+                            <Route path="announcements" element={<AdminAnnouncementsPage />} />
                             <Route path="courses" element={<StudentCoursesPage />} />
                             <Route path="attendance" element={<StudentAttendancePage />} />
                             <Route path="assignments" element={<StudentAssignmentsPage />} />
                             <Route path="quizzes" element={<StudentQuizPage />} />
+                            <Route path="quizzes/attempt/:id" element={<QuizAttemptPage />} />
+                            <Route path="results" element={<StudentResultsPage />} />
+                            <Route path="calendar" element={<AcademicCalendarPage />} />
                             <Route path="fees" element={<StudentFeesPage />} />
                             <Route path="messages" element={<StudentMessagesPage />} />
                             <Route path="profile" element={<ProfilePage />} />
@@ -73,11 +99,19 @@ const App: React.FC = () => {
                         <Route element={<FacultyLayout />}>
                             <Route index element={<Navigate to="/faculty/dashboard" replace />} />
                             <Route path="dashboard" element={<FacultyDashboard />} />
+                            <Route path="announcements" element={<AdminAnnouncementsPage />} />
                             <Route path="courses" element={<FacultyCoursesPage />} />
+                            <Route path="courses/:courseId" element={<FacultyCoursePage />} />
                             <Route path="attendance" element={<FacultyAttendancePage />} />
                             <Route path="assignments" element={<FacultyAssignmentsPage />} />
                             <Route path="quizzes" element={<FacultyQuizPage />} />
                             <Route path="quizzes/:quizId/attempts" element={<FacultyQuizAttemptsPage />} />
+                            <Route path="gradebook" element={<FacultyGradebookPage />} />
+                            <Route path="results" element={<ResultsManagementPage />} />
+                            <Route path="leaves" element={<FacultyLeavesPage />} />
+                            <Route path="doubts" element={<FacultyDoubtsPage />} />
+                            <Route path="mentorship" element={<FacultyMentorshipPage />} />
+                            <Route path="calendar" element={<AcademicCalendarPage />} />
                             <Route path="messages" element={<MessagesPage />} />
                             <Route path="profile" element={<ProfilePage />} />
                         </Route>
@@ -90,9 +124,15 @@ const App: React.FC = () => {
                             <Route path="dashboard" element={<AdminDashboard />} />
                             <Route path="users" element={<AdminUsersPage />} />
                             <Route path="courses" element={<AdminCoursesPage />} />
+                            <Route path="foundation" element={<AdminFoundationPage />} />
+                            <Route path="admissions" element={<AdminAdmissionsPage />} />
+                            <Route path="timetable" element={<AdminTimetablePage />} />
+                            <Route path="results" element={<ResultsManagementPage />} />
                             <Route path="finance" element={<AdminFinancePage />} />
                             <Route path="analytics" element={<AdminAnalyticsPage />} />
                             <Route path="announcements" element={<AdminAnnouncementsPage />} />
+                            <Route path="calendar" element={<AcademicCalendarPage />} />
+                            <Route path="audit-logs" element={<AdminAuditLogsPage />} />
                             <Route path="messages" element={<MessagesPage />} />
                             <Route path="profile" element={<ProfilePage />} />
                         </Route>
@@ -101,6 +141,7 @@ const App: React.FC = () => {
                     {/* Catch All - 404 */}
                     <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>
+                </Suspense>
                 </SocketProvider>
             </AuthProvider>
         </BrowserRouter>

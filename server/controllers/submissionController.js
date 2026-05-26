@@ -30,6 +30,13 @@ const getMySubmission = async (req, res) => {
     } catch (e) { return err(res, e); }
 };
 
+const getAllMySubmissions = async (req, res) => {
+    try {
+        const submissions = await submissionService.getAllMySubmissions(req.user.id);
+        return ok(res, 200, { submissions });
+    } catch (e) { return err(res, e); }
+};
+
 const gradeSubmission = async (req, res) => {
     try {
         const { marksAwarded, feedback } = req.body;
@@ -41,4 +48,4 @@ const gradeSubmission = async (req, res) => {
     } catch (e) { return err(res, e); }
 };
 
-module.exports = { submitAssignment, getSubmissionsForAssignment, getMySubmission, gradeSubmission };
+module.exports = { submitAssignment, getSubmissionsForAssignment, getMySubmission, getAllMySubmissions, gradeSubmission };

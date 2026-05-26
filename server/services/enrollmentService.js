@@ -101,10 +101,8 @@ const getMyCourses = async (userId) => {
         .sort({ createdAt: -1 });
 };
 
-/**
- * Get all courses taught by the currently logged-in faculty member.
- */
 const getMyTaughtCourses = async (userId) => {
+    // primaryFaculty stores User._id
     const courses = await Course.find({ primaryFaculty: userId, isActive: true })
         .sort({ semester: 1, code: 1 });
 

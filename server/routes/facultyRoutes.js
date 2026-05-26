@@ -1,9 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const Faculty = require('../models/Faculty');
 const Student = require('../models/Student');
 const Subject = require('../models/Subject');
 const { protect, authorize } = require('../middleware/authMiddleware');
+
+// @desc    Get ALL faculty profiles (for admin dropdowns — assigns faculty to courses)
+// @route   GET /api/v1/faculty
+router.get('/', protect, authorize('admin', 'faculty'), async (req, res) => {
+    try {
+        const faculties = await Faculty.find({})
+            .populate('user', 'name email')
+            .sort({ lastName: 1 });
+        // Shape: { _id: Faculty._id, name, email, department } — what CourseFormModal expects
+        const shaped = faculties.map(f => ({
+            _id: f._id,
+            name: f.user?.name || `${f.firstName} ${f.lastName}`,
+            email: f.user?.email || f.email,
+            department: f.department,
+            designation: f.designation,
+        }));
+        res.json({ success: true, data: { faculties: shaped } });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: { message: 'Server Error' } });
+    }
+});
 
 // @desc    Get all students (for faculty use - attendance marking, grading)
 // @route   GET /api/faculty/students

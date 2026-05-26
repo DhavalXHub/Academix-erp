@@ -38,12 +38,16 @@ const submitAssignment = async (userId, assignmentId, fileUrl) => {
 
 // Faculty fetching all submissions for their assignment
 const getSubmissionsForAssignment = async (userId, assignmentId) => {
-    const faculty = await Faculty.findOne({ user: userId });
-    if (!faculty) throw _bad('Only faculty can access this.');
-
     const assignment = await Assignment.findById(assignmentId);
     if (!assignment) throw _notFound('Assignment not found.');
-    if (assignment.faculty.toString() !== faculty._id.toString()) {
+
+    // assignment.faculty stores Faculty._id or User._id (see assignmentService)
+    // Check ownership: try Faculty profile first, fall back to direct userId comparison
+    const faculty = await Faculty.findOne({ user: userId });
+    const facultyRef = faculty?._id?.toString();
+    const assignFacRef = assignment.faculty?.toString();
+
+    if (assignFacRef !== facultyRef && assignFacRef !== userId.toString()) {
         throw _bad('You are not authorized to view these submissions.');
     }
 
@@ -66,14 +70,16 @@ const getMySubmission = async (userId, assignmentId) => {
 
 // Faculty grades a submission
 const gradeSubmission = async (userId, submissionId, marksAwarded, feedback) => {
-    const faculty = await Faculty.findOne({ user: userId });
-    if (!faculty) throw _bad('Only faculty can access this.');
-
     const submission = await Submission.findById(submissionId).populate('assignment');
     if (!submission) throw _notFound('Submission not found.');
-    
-    if (submission.assignment.faculty.toString() !== faculty._id.toString()) {
-         throw _bad('You are not authorized to grade this submission.');
+
+    // Check ownership via Faculty profile or direct User._id
+    const faculty = await Faculty.findOne({ user: userId });
+    const facultyRef = faculty?._id?.toString();
+    const assignFacRef = submission.assignment?.faculty?.toString();
+
+    if (assignFacRef !== facultyRef && assignFacRef !== userId.toString()) {
+        throw _bad('You are not authorized to grade this submission.');
     }
 
     if (marksAwarded > submission.assignment.maxMarks) {
@@ -84,16 +90,37 @@ const gradeSubmission = async (userId, submissionId, marksAwarded, feedback) => 
     submission.feedback = feedback || '';
     await submission.save();
 
-    return submission.populate({
+    await submission.populate({
         path: 'student',
         select: 'rollNumber user',
         populate: { path: 'user', select: 'name' }
     });
+
+    const { createDirectNotification } = require('./notificationService');
+    const studentUserId = submission.student.user._id || submission.student.user;
+    await createDirectNotification(studentUserId, 'submission_graded', `Your submission for ${submission.assignment.title} was graded: ${marksAwarded} marks.`, '/student/assignments');
+
+    return submission;
+};
+
+// Student fetching all their submissions
+const getAllMySubmissions = async (userId) => {
+    const student = await Student.findOne({ user: userId });
+    if (!student) throw _bad('Student profile not found.');
+
+    return Submission.find({ student: student._id })
+        .populate({
+            path: 'assignment',
+            select: 'title maxMarks dueDate course description',
+            populate: { path: 'course', select: 'code title' }
+        })
+        .sort({ submittedAt: -1 });
 };
 
 module.exports = {
     submitAssignment,
     getSubmissionsForAssignment,
     getMySubmission,
+    getAllMySubmissions,
     gradeSubmission,
 };

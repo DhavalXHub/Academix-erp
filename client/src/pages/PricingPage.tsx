@@ -164,7 +164,7 @@ const PricingPage: React.FC = () => {
                 <div className="lp-cta-inner">
                     <h2>Ready to get started?</h2>
                     <p className="lp-cta-sub">Join institutions that have modernized their campus with Academix ERP.</p>
-                    <Link to="/login" className="lp-btn-var(--card-bg)">Enter the Platform →</Link>
+                    <Link to="/login" className="lp-btn-light">Enter the Platform →</Link>
                 </div>
             </section>
 

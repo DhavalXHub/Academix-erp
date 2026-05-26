@@ -17,4 +17,11 @@ const markNotificationRead = async (req, res) => {
     } catch (e) { return err(res, e); }
 };
 
-module.exports = { getNotifications, markNotificationRead };
+const markAllNotificationsRead = async (req, res) => {
+    try {
+        await notificationService.markAllRead(req.user.id);
+        return ok(res, 200, {}, 'All notifications marked as read.');
+    } catch (e) { return err(res, e); }
+};
+
+module.exports = { getNotifications, markNotificationRead, markAllNotificationsRead };

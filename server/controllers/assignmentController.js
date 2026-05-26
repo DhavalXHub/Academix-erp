@@ -23,6 +23,13 @@ const createAssignment = async (req, res) => {
     } catch (e) { return err(res, e); }
 };
 
+const updateAssignment = async (req, res) => {
+    try {
+        const assignment = await assignmentService.updateAssignment(req.user.id, req.params.id, req.body);
+        return ok(res, 200, { assignment }, 'Assignment updated successfully.');
+    } catch (e) { return err(res, e); }
+};
+
 const deleteAssignment = async (req, res) => {
     try {
         await assignmentService.deleteAssignment(req.user.id, req.params.id);
@@ -30,4 +37,4 @@ const deleteAssignment = async (req, res) => {
     } catch (e) { return err(res, e); }
 };
 
-module.exports = { getAssignmentsByCourse, createAssignment, deleteAssignment };
+module.exports = { getAssignmentsByCourse, createAssignment, updateAssignment, deleteAssignment };

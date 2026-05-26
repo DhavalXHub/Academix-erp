@@ -5,6 +5,8 @@ export interface StudentAnalytics {
     assignmentAverage: number;
     quizAverage: number;
     overallScore: number;
+    enrolledCourses?: { code: string; name: string; progress: number; color: string; icon: string }[];
+    upcomingTasks?: { id: string | number; type: string; title: string; course: string; due: string; priority: string; icon: string }[];
 }
 
 export interface FacultyAnalytics {

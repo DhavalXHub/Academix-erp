@@ -21,6 +21,13 @@ const getConversation = async (req, res) => {
     } catch (e) { return err(res, e); }
 };
 
+const getConversationList = async (req, res) => {
+    try {
+        const conversations = await messageService.getConversationList(req.user.id);
+        return ok(res, 200, { conversations });
+    } catch (e) { return err(res, e); }
+};
+
 const markMessageRead = async (req, res) => {
     try {
         const message = await messageService.markAsRead(req.user.id, req.params.id);
@@ -42,4 +49,4 @@ const getUnreadCounts = async (req, res) => {
     } catch (e) { return err(res, e); }
 };
 
-module.exports = { sendMessage, getConversation, markMessageRead, markConversationRead, getUnreadCounts };
+module.exports = { sendMessage, getConversation, getConversationList, markMessageRead, markConversationRead, getUnreadCounts };

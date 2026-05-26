@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import { getUnreadCounts } from '@/services/messageService';
+import { API_BASE_URL } from '@/services/api';
+import { fetchMyCoursesFaculty, fetchMyEnrollments } from '@/services/courseService';
 
 export interface Notification {
     _id: string;
@@ -21,6 +23,25 @@ export interface Message {
     createdAt: string;
 }
 
+export interface ConversationUpdate {
+    userId: string;
+    name: string;
+    email: string;
+    role: string;
+    lastMessage: string;
+    lastMessageAt: string;
+    lastMessageFromMe: boolean;
+    unreadDelta: number;
+}
+
+export interface MessageToast {
+    id: string;
+    senderName: string;
+    senderId: string;
+    content: string;
+    timestamp: string;
+}
+
 interface SocketContextData {
     socket: Socket | null;
     notifications: Notification[];
@@ -29,6 +50,9 @@ interface SocketContextData {
     unreadMessagesByUser: Record<string, number>;
     typingByUser: Record<string, boolean>;
     setUnreadMessagesByUser: React.Dispatch<React.SetStateAction<Record<string, number>>>;
+    conversationUpdates: ConversationUpdate[];
+    messageToasts: MessageToast[];
+    dismissToast: (id: string) => void;
 }
 
 const SocketContext = createContext<SocketContextData>({
@@ -39,6 +63,9 @@ const SocketContext = createContext<SocketContextData>({
     unreadMessagesByUser: {},
     typingByUser: {},
     setUnreadMessagesByUser: () => {},
+    conversationUpdates: [],
+    messageToasts: [],
+    dismissToast: () => {},
 });
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -47,9 +74,15 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadMessagesByUser, setUnreadMessagesByUser] = useState<Record<string, number>>({});
     const [typingByUser, setTypingByUser] = useState<Record<string, boolean>>({});
+    const [conversationUpdates, setConversationUpdates] = useState<ConversationUpdate[]>([]);
+    const [messageToasts, setMessageToasts] = useState<MessageToast[]>([]);
+
+    const dismissToast = useCallback((id: string) => {
+        setMessageToasts(prev => prev.filter(t => t.id !== id));
+    }, []);
 
     useEffect(() => {
-        if (!user) {
+        if (!user || !accessToken) {
             if (socket) {
                 socket.disconnect();
                 setSocket(null);
@@ -57,31 +90,84 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             return;
         }
 
-        // Initialize connection
-        const newSocket = io(import.meta.env.VITE_API_BASE_URL?.replace('/api/v1', '') || 'http://localhost:5000', {
+        const newSocket = io(API_BASE_URL.replace('/api/v1', ''), {
             withCredentials: true,
+            auth: { token: accessToken }
         });
 
         newSocket.on('connect', () => {
-             console.log('Connected to socket server');
-             // Join personal room
-             newSocket.emit('connectUser', user.id);
+            newSocket.emit('connectUser', user.id);
+
+            if (user.role === 'student') {
+                fetchMyEnrollments(accessToken)
+                    .then(res => {
+                        res.enrollments.forEach(e => {
+                            if (e.course?._id) newSocket.emit('joinCourse', e.course._id);
+                        });
+                    })
+                    .catch(() => {});
+            } else if (user.role === 'faculty') {
+                fetchMyCoursesFaculty(accessToken)
+                    .then(res => {
+                        res.courses.forEach(c => newSocket.emit('joinCourse', c._id));
+                    })
+                    .catch(() => {});
+            }
         });
 
         newSocket.on('newNotification', (notif: Notification) => {
             setNotifications(prev => [notif, ...prev]);
         });
 
+        newSocket.on('new_announcement', (announcement: any) => {
+            const notif: Notification = {
+                _id: 'ann_' + Date.now(),
+                type: 'announcement',
+                message: `New Announcement: ${announcement.title}`,
+                linkAction: '/student/dashboard',
+                isRead: false,
+                createdAt: new Date().toISOString()
+            };
+            setNotifications(prev => [notif, ...prev]);
+        });
+
+        newSocket.on('courses_changed', (payload: any) => {
+            window.dispatchEvent(new CustomEvent('academix:courses_changed', { detail: payload }));
+        });
+
         newSocket.on('receiveMessage', (msg: Message) => {
             const senderId = typeof msg.sender === 'string' ? msg.sender : msg.sender?._id;
             const recipientId = typeof msg.recipient === 'string' ? msg.recipient : msg.recipient?._id;
-            // Only count if it's for me
+            const senderName = typeof msg.sender === 'object' ? msg.sender?.name : 'Someone';
+
             if (recipientId && user?.id && recipientId === user.id && senderId) {
+                // Update unread badge count
                 setUnreadMessagesByUser(prev => ({
                     ...prev,
                     [senderId]: (prev[senderId] || 0) + 1,
                 }));
+
+                // Show toast notification
+                const toastId = `toast_${Date.now()}_${Math.random()}`;
+                const toast: MessageToast = {
+                    id: toastId,
+                    senderName: senderName || 'Someone',
+                    senderId,
+                    content: msg.content,
+                    timestamp: msg.createdAt,
+                };
+                setMessageToasts(prev => [toast, ...prev.slice(0, 2)]); // max 3 toasts
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => dismissToast(toastId), 5000);
             }
+        });
+
+        // Handle real-time conversation list updates (bubble to top)
+        newSocket.on('conversationUpdated', (update: ConversationUpdate) => {
+            setConversationUpdates(prev => {
+                const existing = prev.filter(c => String(c.userId) !== String(update.userId));
+                return [update, ...existing];
+            });
         });
 
         newSocket.on('typing', ({ fromUserId }: { fromUserId: string }) => {
@@ -98,9 +184,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return () => {
             newSocket.disconnect();
         };
-    }, [user]);
+    }, [user, accessToken]);
 
-    // Initial unread counts snapshot (from DB)
+    // Initial unread counts from DB
     useEffect(() => {
         if (!accessToken || !user) return;
         getUnreadCounts(accessToken)
@@ -119,6 +205,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             unreadMessagesByUser,
             typingByUser,
             setUnreadMessagesByUser,
+            conversationUpdates,
+            messageToasts,
+            dismissToast,
         }}>
             {children}
         </SocketContext.Provider>

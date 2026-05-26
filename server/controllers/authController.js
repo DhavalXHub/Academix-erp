@@ -26,6 +26,17 @@ const setRefreshTokenCookie = (res, token) => {
     });
 };
 
+const setCsrfCookie = (res) => {
+    const token = require('crypto').randomBytes(32).toString('hex');
+    res.cookie('academix_csrf', token, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return token;
+};
+
 // ── Standardized Response Helpers ────────────────────────────────────────────
 const sendSuccess = (res, statusCode, data, message = 'Success') => {
     return res.status(statusCode).json({ success: true, message, data, error: null });
@@ -70,6 +81,7 @@ const loginUser = async (req, res) => {
         // Set the refresh token as a secure cookie on the response
         // Cookie format must match refreshToken() expectations: "<userId>:<token>"
         setRefreshTokenCookie(res, `${user._id}:${refreshToken}`);
+        setCsrfCookie(res);
 
         return sendSuccess(res, 200, {
             accessToken,
@@ -170,6 +182,7 @@ const refreshToken = async (req, res) => {
         await saveRefreshToken(user._id, newRefreshToken);
 
         setRefreshTokenCookie(res, `${user._id}:${newRefreshToken}`);
+        setCsrfCookie(res);
 
         return sendSuccess(res, 200, { accessToken: newAccessToken }, 'Token refreshed.');
     } catch (err) {
@@ -192,6 +205,10 @@ const logoutUser = async (req, res) => {
 
         res.clearCookie('academix_refresh', {
             httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+        });
+        res.clearCookie('academix_csrf', {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
         });

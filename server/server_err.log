@@ -1,0 +1,8 @@
+[AUTH] loginUser error: Error: secretOrPrivateKey must have a value
+    at module.exports [as sign] (D:\Academix\node_modules\jsonwebtoken\sign.js:111:20)
+    at generateAccessToken (D:\Academix\server\services\authService.js:13:16)
+    at loginUser (D:\Academix\server\controllers\authController.js:64:29)
+[AUTH] loginUser error: Error: secretOrPrivateKey must have a value
+    at module.exports [as sign] (D:\Academix\node_modules\jsonwebtoken\sign.js:111:20)
+    at generateAccessToken (D:\Academix\server\services\authService.js:13:16)
+    at loginUser (D:\Academix\server\controllers\authController.js:64:29)

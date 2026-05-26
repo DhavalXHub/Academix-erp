@@ -3,7 +3,7 @@ const router = express.Router();
 const { protect, authorize } = require('../middleware/authMiddleware');
 const {
     getAllCourses, getMyCourses, getCourseById,
-    createCourse, updateCourse, deleteCourse, getCourseRoster,
+    createCourse, updateCourse, deleteCourse, getCourseRoster, reactivateCourse,
 } = require('../controllers/courseController');
 
 // Public-ish listing (any authenticated user can browse courses)
@@ -19,6 +19,9 @@ router.route('/:id')
     .get(protect, getCourseById)
     .put(protect, authorize('admin'), updateCourse)
     .delete(protect, authorize('admin'), deleteCourse);
+
+// Reactivate a deactivated course
+router.patch('/:id/reactivate', protect, authorize('admin'), reactivateCourse);
 
 // Roster: Admin and Faculty can view who is enrolled
 router.get('/:id/roster', protect, authorize('admin', 'faculty'), getCourseRoster);

@@ -6,6 +6,7 @@
  */
 
 import axios, { AxiosInstance } from 'axios';
+import { clearAccessToken, getAccessToken, setAccessToken } from './tokenStore';
 
 const API_BASE_URL =
     (import.meta as any).env?.VITE_API_BASE_URL ||
@@ -23,6 +24,13 @@ const client: AxiosInstance = axios.create({
     headers: { 'Content-Type': 'application/json' },
 });
 
+const readCookie = (name: string): string | null => {
+    if (typeof document === 'undefined') return null;
+    const prefix = `${name}=`;
+    const item = document.cookie.split('; ').find(part => part.startsWith(prefix));
+    return item ? decodeURIComponent(item.slice(prefix.length)) : null;
+};
+
 const unwrap = <T>(envelope: ApiEnvelope<T>): T => {
     if ((envelope as any)?.success) return (envelope as any).data as T;
     const msg = (envelope as any)?.error?.message || (envelope as any)?.message || 'Request failed.';
@@ -39,12 +47,19 @@ const resolvePending = (token: string | null) => {
 };
 
 client.interceptors.request.use((config) => {
-    // If caller didn't supply Authorization, fall back to localStorage token.
+    // If caller didn't supply Authorization, use the in-memory access token.
     const hasAuthHeader = !!(config.headers as any)?.Authorization;
     if (!hasAuthHeader) {
-        const token = window.localStorage.getItem(ACCESS_TOKEN_KEY);
+        const token = getAccessToken();
         if (token) {
             (config.headers as any) = { ...(config.headers as any), Authorization: `Bearer ${token}` };
+        }
+    }
+    const method = String(config.method || 'get').toUpperCase();
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+        const csrf = readCookie('academix_csrf');
+        if (csrf) {
+            (config.headers as any) = { ...(config.headers as any), 'X-CSRF-Token': csrf };
         }
     }
     return config;
@@ -89,14 +104,14 @@ client.interceptors.response.use(
         try {
             const refreshRes = await client.post<ApiEnvelope<{ accessToken: string }>>('/auth/refresh', {});
             const newToken = unwrap(refreshRes.data).accessToken;
-            window.localStorage.setItem(ACCESS_TOKEN_KEY, newToken);
+            setAccessToken(newToken);
             resolvePending(newToken);
 
             originalRequest._retry = true;
             originalRequest.headers = { ...(originalRequest.headers || {}), Authorization: `Bearer ${newToken}` };
             return client(originalRequest);
         } catch (refreshErr) {
-            window.localStorage.removeItem(ACCESS_TOKEN_KEY);
+            clearAccessToken();
             resolvePending(null);
             throw refreshErr;
         } finally {
@@ -137,6 +152,17 @@ const api = {
 
     delete: async <T = any>(endpoint: string, token?: string | null): Promise<T> => {
         const res = await client.delete<ApiEnvelope<T>>(endpoint, {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+        return unwrap(res.data);
+    },
+
+    patch: async <T = any>(
+        endpoint: string,
+        body: Record<string, unknown> = {},
+        token?: string | null
+    ): Promise<T> => {
+        const res = await client.patch<ApiEnvelope<T>>(endpoint, body, {
             headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
         return unwrap(res.data);

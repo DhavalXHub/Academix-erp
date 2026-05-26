@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import CourseCard from '@/components/CourseCard';
 import { fetchTeachingCourses, fetchCourseRoster } from '@/services/courseService';
@@ -6,6 +7,7 @@ import type { Course, Enrollment } from '@/services/courseService';
 
 const FacultyCoursesPage: React.FC = () => {
     const { accessToken } = useAuth();
+    const navigate = useNavigate();
     const [courses, setCourses] = useState<Course[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [rosterData, setRosterData] = useState<Enrollment[]>([]);
@@ -25,6 +27,19 @@ const FacultyCoursesPage: React.FC = () => {
             }
         };
         load();
+    }, [accessToken]);
+
+    // Auto-refresh when admin changes course data (Socket.IO → custom browser event)
+    useEffect(() => {
+        if (!accessToken) return;
+        const handler = async () => {
+            try {
+                const res = await fetchTeachingCourses(accessToken);
+                setCourses(res.courses);
+            } catch (_) {}
+        };
+        window.addEventListener('academix:courses_changed', handler);
+        return () => window.removeEventListener('academix:courses_changed', handler);
     }, [accessToken]);
 
     const handleViewRoster = async (course: Course) => {
@@ -61,9 +76,14 @@ const FacultyCoursesPage: React.FC = () => {
                             course={course}
                             showRosterCount
                             actionSlot={
-                                <button style={styles.btnRoster} onClick={() => handleViewRoster(course)}>
-                                    View Student Roster →
-                                </button>
+                                <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                                    <button style={{ ...styles.btnRoster, flex: 1 }} onClick={() => handleViewRoster(course)}>
+                                        Roster
+                                    </button>
+                                    <button style={styles.btnManage} onClick={() => navigate(`/faculty/courses/${course._id}`)}>
+                                        Manage LMS & Syllabus →
+                                    </button>
+                                </div>
                             }
                         />
                     ))}
@@ -125,6 +145,7 @@ const styles: Record<string, React.CSSProperties> = {
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' },
     empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
     btnRoster: { width: '100%', padding: '9px 0', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' },
+    btnManage: { flex: 1.5, padding: '9px 12px', background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', textAlign: 'center' },
     
     // Modal
     overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16 },

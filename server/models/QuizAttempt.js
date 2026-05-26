@@ -8,7 +8,7 @@ const quizAttemptSchema = new mongoose.Schema({
     },
     student: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Student',
         required: true
     },
     // Map questionId -> selectedOptionIndex

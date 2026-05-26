@@ -35,6 +35,14 @@ const assignmentSchema = new mongoose.Schema(
             type: String,
             default: null, // Optional assignment prompt/file
         },
+        notified1Day: {
+            type: Boolean,
+            default: false,
+        },
+        notified1Hour: {
+            type: Boolean,
+            default: false,
+        },
     },
     { timestamps: true }
 );

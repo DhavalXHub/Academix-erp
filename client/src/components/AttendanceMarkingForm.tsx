@@ -7,25 +7,29 @@ interface AttendanceMarkingFormProps {
     date: string;
     roster: Enrollment[];
     isSubmitting: boolean;
+    initialStatuses?: Record<string, AttendanceStatus>;
     onSubmit: (records: MarkAttendanceRecord[]) => void;
     onCancel: () => void;
 }
 
 const AttendanceMarkingForm: React.FC<AttendanceMarkingFormProps> = ({
-    courseId, date, roster, isSubmitting, onSubmit, onCancel
+    courseId, date, roster, isSubmitting, initialStatuses, onSubmit, onCancel
 }) => {
     // Map student ID -> 'present' | 'absent' | 'late' | 'excused'
     const [statuses, setStatuses] = useState<Record<string, AttendanceStatus>>({});
 
     useEffect(() => {
-        // Default everyone to present initially
-        const initials: Record<string, AttendanceStatus> = {};
-        roster.forEach(enr => {
-            const stId = (enr as any).student._id;
-            initials[stId] = 'present';
-        });
-        setStatuses(initials);
-    }, [roster]);
+        if (initialStatuses && Object.keys(initialStatuses).length > 0) {
+            setStatuses(initialStatuses);
+        } else {
+            const initials: Record<string, AttendanceStatus> = {};
+            roster.forEach(enr => {
+                const stId = (enr as any).student._id;
+                initials[stId] = 'present';
+            });
+            setStatuses(initials);
+        }
+    }, [roster, initialStatuses]);
 
     const handleSetAll = (status: AttendanceStatus) => {
         const updated: Record<string, AttendanceStatus> = {};

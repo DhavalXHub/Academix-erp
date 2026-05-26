@@ -653,7 +653,7 @@
   font-weight: 500;
   line-height: 1.6;
 }
-.lp-btn-var(--card-bg) {
+.lp-btn-light {
   display: inline-block;
   padding: 1rem 2.5rem;
   background: var(--card-bg);
@@ -666,9 +666,30 @@
   transition: all 0.25s;
   letter-spacing: -0.2px;
 }
-.lp-btn-var(--card-bg):hover {
+.lp-btn-light:hover {
   transform: translateY(-3px);
   box-shadow: 0 30px 60px rgba(0,0,0,0.35);
+}
+.lp-cta-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.lp-btn-ghost {
+  display: inline-block;
+  padding: 1rem 2rem;
+  color: var(--card-bg);
+  font-weight: 800;
+  font-size: 1rem;
+  border-radius: 14px;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.35);
+  transition: all 0.25s;
+}
+.lp-btn-ghost:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateY(-3px);
 }
 
 /* ---------- Footer ---------- */

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchTeachingCourses, fetchCourseRoster } from '@/services/courseService';
 import { markAttendance, fetchCourseAttendance } from '@/services/attendanceService';
@@ -18,6 +18,19 @@ const FacultyAttendancePage: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoadingRoster, setIsLoadingRoster] = useState(false);
     const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+    const initialStatuses = useMemo(() => {
+        if (!analytics || !analytics.sessions || !date) return undefined;
+        const session = analytics.sessions.find(s => s.date.split('T')[0] === date);
+        if (!session) return undefined;
+
+        const map: Record<string, any> = {};
+        session.records.forEach(r => {
+            const stId = typeof r.student === 'string' ? r.student : r.student?._id;
+            if (stId) map[stId] = r.status;
+        });
+        return map;
+    }, [analytics, date]);
 
     const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
         setToast({ msg, type });
@@ -137,6 +150,7 @@ const FacultyAttendancePage: React.FC = () => {
                                 date={date}
                                 roster={roster}
                                 isSubmitting={isSubmitting}
+                                initialStatuses={initialStatuses}
                                 onSubmit={handleSubmit}
                                 onCancel={() => setDate(new Date().toISOString().split('T')[0])}
                             />

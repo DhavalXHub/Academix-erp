@@ -7,6 +7,11 @@ import React, {
     useEffect,
 } from 'react';
 import api, { ACCESS_TOKEN_KEY, client } from '@/services/api';
+import {
+    clearAccessToken as clearStoredAccessToken,
+    getAccessToken as getStoredAccessToken,
+    setAccessToken as setStoredAccessToken,
+} from '@/services/tokenStore';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -50,20 +55,19 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    // NOTE: accessToken is persisted in localStorage to keep users logged in across refresh.
-    // Refresh token remains HTTP-only cookie (server-side).
     const [accessToken, setAccessTokenState] = useState<string | null>(null);
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const setAccessToken = useCallback((token: string) => {
         setAccessTokenState(token);
-        window.localStorage.setItem(ACCESS_TOKEN_KEY, token);
+        setStoredAccessToken(token);
     }, []);
 
     const clearSession = useCallback(() => {
         setAccessTokenState(null);
         setUser(null);
+        clearStoredAccessToken();
         window.localStorage.removeItem(ACCESS_TOKEN_KEY);
     }, []);
 
@@ -74,13 +78,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     /**
      * autoLogin() runs once on startup:
-     * - if localStorage has an accessToken: try /auth/me
-     * - else (or if token invalid/expired): try /auth/refresh (cookie) then /auth/me
+     * - if memory has an accessToken: try /auth/me
+     * - else try /auth/refresh using the HTTP-only refresh cookie
      */
     const autoLogin = useCallback(async () => {
         setIsLoading(true);
         try {
-            const stored = window.localStorage.getItem(ACCESS_TOKEN_KEY);
+            window.localStorage.removeItem(ACCESS_TOKEN_KEY);
+            const stored = getStoredAccessToken();
             if (stored) {
                 setAccessTokenState(stored);
                 try {
@@ -96,7 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const newToken: string | undefined = refreshRes?.data?.data?.accessToken;
             if (!newToken) throw new Error('Refresh did not return access token.');
 
-            window.localStorage.setItem(ACCESS_TOKEN_KEY, newToken);
+            setStoredAccessToken(newToken);
             setAccessTokenState(newToken);
             await fetchMe(newToken);
         } catch {
@@ -110,6 +115,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         autoLogin();
     }, [autoLogin]);
 
+    useEffect(() => {
+        const syncToken = (event: Event) => {
+            const token = (event as CustomEvent<{ token: string | null }>).detail?.token || null;
+            setAccessTokenState(token);
+        };
+        window.addEventListener('academix:access-token', syncToken);
+        return () => window.removeEventListener('academix:access-token', syncToken);
+    }, []);
+
     /**
      * Authenticates the user and stores the access token in React state.
      * The refresh token is stored automatically in an HTTP-Only cookie by the server.
@@ -122,7 +136,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 { email, password, role } as unknown as Record<string, unknown>
             );
             setAccessTokenState(res.accessToken);
-            window.localStorage.setItem(ACCESS_TOKEN_KEY, res.accessToken);
+            setStoredAccessToken(res.accessToken);
             setUser(res.user);
         } finally {
             setIsLoading(false);

@@ -33,7 +33,7 @@ const getStudentAnalytics = async (userId) => {
             }
         }
     ]);
-    const attendancePercentage = attendanceStats.length > 0 ? (attendanceStats[0].present / attendanceStats[0].totalClasses) * 100 : 100;
+    const attendancePercentage = attendanceStats.length > 0 && attendanceStats[0].totalClasses > 0 ? (attendanceStats[0].present / attendanceStats[0].totalClasses) * 100 : 0;
 
     // 2. Assignment Average
     const submissions = await Submission.find({ student: studentId }).populate('assignment', 'maxMarks');
@@ -45,7 +45,7 @@ const getStudentAnalytics = async (userId) => {
             totalMaxMarks += sub.assignment.maxMarks;
         }
     });
-    const assignmentAverage = totalMaxMarks > 0 ? (totalMarksEarned / totalMaxMarks) * 100 : 100;
+    const assignmentAverage = totalMaxMarks > 0 ? (totalMarksEarned / totalMaxMarks) * 100 : 0;
 
     // 3. Quiz Average
     const quizAttempts = await QuizAttempt.aggregate([
@@ -68,25 +68,77 @@ const getStudentAnalytics = async (userId) => {
         quizEarned += attempt.score;
         quizMax += totalQuizMarks;
     });
-    const quizAverage = quizMax > 0 ? (quizEarned / quizMax) * 100 : 100;
+    const quizAverage = quizMax > 0 ? (quizEarned / quizMax) * 100 : 0;
 
     // 4. Overall Score (Weighted roughly)
     const overallScore = (attendancePercentage * 0.2) + (assignmentAverage * 0.4) + (quizAverage * 0.4);
+
+    // 5. Enrolled Courses
+    const enrollments = await Enrollment.find({ student: studentId, status: 'enrolled' })
+        .populate('course', 'code title');
+    
+    const enrolledCourses = enrollments.map((e, index) => {
+        const colors = ['var(--primary)', '#0ea5e9', '#10b981', '#f59e0b', '#8b5cf6'];
+        const icons = ['💻', '📐', '⚛️', '📚', '🧪'];
+        return {
+            code: e.course.code,
+            name: e.course.title,
+            progress: Math.round(overallScore), // Approximation for now
+            color: colors[index % colors.length],
+            icon: icons[index % icons.length]
+        };
+    });
+
+    // 6. Upcoming Tasks
+    const enrolledCourseIds = enrollments.map(e => e.course._id);
+    const now = new Date();
+    
+    const upcomingAssignments = await Assignment.find({ 
+        course: { $in: enrolledCourseIds },
+        dueDate: { $gte: now }
+    }).populate('course', 'code').limit(5).sort({ dueDate: 1 });
+
+    const upcomingQuizzes = await Quiz.find({
+        course: { $in: enrolledCourseIds },
+        isActive: true
+    }).populate('course', 'code').limit(5).sort({ createdAt: -1 });
+
+    const upcomingTasks = [
+        ...upcomingAssignments.map(a => ({
+            id: a._id.toString(),
+            type: 'assignment',
+            title: a.title,
+            course: a.course.code,
+            due: new Date(a.dueDate).toLocaleDateString(),
+            priority: 'high',
+            icon: '📝'
+        })),
+        ...upcomingQuizzes.map(q => ({
+            id: q._id.toString(),
+            type: 'quiz',
+            title: q.title,
+            course: q.course.code,
+            due: 'Active Now',
+            priority: 'medium',
+            icon: '🧪'
+        }))
+    ].slice(0, 5); // Return top 5 tasks
 
     return {
         attendancePercentage: Math.round(attendancePercentage),
         assignmentAverage: Math.round(assignmentAverage),
         quizAverage: Math.round(quizAverage),
-        overallScore: Math.round(overallScore)
+        overallScore: Math.round(overallScore),
+        enrolledCourses,
+        upcomingTasks
     };
 };
 
 const getFacultyAnalytics = async (userId, courseId) => {
-    const faculty = await Faculty.findOne({ user: userId });
-    if (!faculty) throw _notFound('Faculty not found.');
-
     const course = await Course.findById(courseId);
-    if (!course || course.primaryFaculty.toString() !== faculty._id.toString()) {
+    if (!course) throw _bad('Course not found.');
+    // primaryFaculty stores User._id
+    if (!course.primaryFaculty || course.primaryFaculty.toString() !== userId.toString()) {
         throw _bad('Not authorized to view analytics for this course.');
     }
 

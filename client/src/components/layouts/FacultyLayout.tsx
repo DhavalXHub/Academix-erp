@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { LayoutDashboard, BookOpen, CheckSquare, Edit3, Calendar, MessageSquare, User, LogOut, Home } from 'lucide-react';
+import { LayoutDashboard, BookOpen, CheckSquare, Edit3, Calendar, MessageSquare, User, LogOut, Home, FileCheck2, Megaphone, HelpCircle, Briefcase, Users } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 
 const FacultyLayout: React.FC = () => {
@@ -15,10 +15,17 @@ const FacultyLayout: React.FC = () => {
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/faculty/dashboard' },
+        { icon: Megaphone, label: 'Announcements', path: '/faculty/announcements' },
         { icon: BookOpen, label: 'Courses', path: '/faculty/courses' },
         { icon: CheckSquare, label: 'Attendance', path: '/faculty/attendance' },
         { icon: Edit3, label: 'Assignments', path: '/faculty/assignments' },
         { icon: Calendar, label: 'Quizzes', path: '/faculty/quizzes' },
+        { icon: LayoutDashboard, label: 'Gradebook', path: '/faculty/gradebook' },
+        { icon: FileCheck2, label: 'Results', path: '/faculty/results' },
+        { icon: Briefcase, label: 'Leave Requests', path: '/faculty/leaves' },
+        { icon: HelpCircle, label: 'Doubt Solver', path: '/faculty/doubts' },
+        { icon: Users, label: 'Mentorship', path: '/faculty/mentorship' },
+        { icon: Calendar, label: 'Calendar', path: '/faculty/calendar' },
         { icon: MessageSquare, label: 'Messages', path: '/faculty/messages' },
         { icon: User, label: 'Profile', path: '/faculty/profile' },
     ];
@@ -83,7 +90,7 @@ const styles: Record<string, React.CSSProperties> = {
         display: 'inline-block', marginTop: 6, fontSize: 10, fontWeight: 700,
         color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em',
     },
-    nav: { flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 2 },
+    nav: { flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto' },
     navLink: {
         display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
         borderRadius: 10, color: 'var(--text-muted)', textDecoration: 'none',

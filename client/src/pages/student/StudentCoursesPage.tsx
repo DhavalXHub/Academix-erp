@@ -41,6 +41,13 @@ const StudentCoursesPage: React.FC = () => {
 
     useEffect(() => { loadData(); }, [accessToken]);
 
+    // Admin changed a course — auto-refresh so students immediately see the update
+    useEffect(() => {
+        const handler = () => loadData();
+        window.addEventListener('academix:courses_changed', handler);
+        return () => window.removeEventListener('academix:courses_changed', handler);
+    }, [accessToken]);
+
     const handleAction = async (courseId: string, action: 'enroll' | 'drop', enrollmentId?: string) => {
         if (!accessToken) return;
         setIsActioning(p => ({ ...p, [courseId]: true }));

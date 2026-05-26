@@ -5,11 +5,13 @@ const {
     submitAssignment,
     getSubmissionsForAssignment,
     getMySubmission,
+    getAllMySubmissions,
     gradeSubmission,
 } = require('../controllers/submissionController');
 
 // Students submit and fetch their own submissions
 router.post('/', protect, authorize('student'), submitAssignment);
+router.get('/my', protect, authorize('student'), getAllMySubmissions);
 router.get('/my/:assignmentId', protect, authorize('student'), getMySubmission);
 
 // Faculty view all submissions and grade them

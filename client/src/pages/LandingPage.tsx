@@ -127,7 +127,10 @@ const LandingPage: React.FC = () => {
                 <div className="lp-cta-inner">
                     <h2>Ready to transform your campus?</h2>
                     <p className="lp-cta-sub">Join forward-thinking universities running their administration effortlessly with Academix ERP.</p>
-                    <Link to="/login" className="lp-btn-var(--card-bg)">Enter the Platform →</Link>
+                    <div className="lp-cta-actions">
+                        <Link to="/admissions/apply" className="lp-btn-light">Apply for Admission</Link>
+                        <Link to="/login" className="lp-btn-ghost">Enter the Platform</Link>
+                    </div>
                 </div>
             </section>
 

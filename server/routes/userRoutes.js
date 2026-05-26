@@ -10,11 +10,11 @@ const {
     deactivateUser,
 } = require('../controllers/userController');
 
-// @route  GET  /api/v1/users          → list all (admin + faculty can view)
+// @route  GET  /api/v1/users          → list all (admin + faculty + student can view)
 // @route  POST /api/v1/users          → create new user (admin only)
 router
     .route('/')
-    .get(protect, authorize('admin', 'faculty'), getAllUsers)
+    .get(protect, authorize('admin', 'faculty', 'student'), getAllUsers)
     .post(protect, authorize('admin'), createUser);
 
 // @route  GET    /api/v1/users/:id    → single user with profile (admin)

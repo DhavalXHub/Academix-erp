@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Users, Book, DollarSign, BarChart2, MessageSquare, Settings, LogOut, Megaphone, Home } from 'lucide-react';
+import { Users, Book, DollarSign, BarChart2, MessageSquare, Settings, LogOut, Megaphone, Home, CalendarDays, ShieldCheck, Building2, CalendarClock, FileCheck2, ClipboardList } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 
 const AdminLayout: React.FC = () => {
@@ -16,10 +16,16 @@ const AdminLayout: React.FC = () => {
     const navItems = [
         { icon: BarChart2, label: 'Dashboard', path: '/admin/dashboard' },
         { icon: Users, label: 'Users', path: '/admin/users' },
+        { icon: Building2, label: 'Foundation', path: '/admin/foundation' },
+        { icon: ClipboardList, label: 'Admissions', path: '/admin/admissions' },
         { icon: Book, label: 'Courses', path: '/admin/courses' },
+        { icon: CalendarClock, label: 'Timetable', path: '/admin/timetable' },
+        { icon: FileCheck2, label: 'Results', path: '/admin/results' },
         { icon: DollarSign, label: 'Finance', path: '/admin/finance' },
         { icon: BarChart2, label: 'Analytics', path: '/admin/analytics' },
         { icon: Megaphone, label: 'Announcements', path: '/admin/announcements' },
+        { icon: CalendarDays, label: 'Calendar', path: '/admin/calendar' },
+        { icon: ShieldCheck, label: 'Audit Logs', path: '/admin/audit-logs' },
         { icon: MessageSquare, label: 'Messages', path: '/admin/messages' },
         { icon: Settings, label: 'Settings', path: '/admin/profile' },
     ];

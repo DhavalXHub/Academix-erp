@@ -64,7 +64,30 @@ router.post('/', protect, authorize('faculty', 'admin'), async (req, res) => {
         });
 
         await notice.populate('postedBy', 'name role');
+
+        // Broadcast via Socket.IO (legacy — for real-time page refresh)
+        try {
+            const { getIO } = require('../socketServer');
+            getIO().emit('new_announcement', notice);
+        } catch (e) {
+            console.error('Socket error emitting announcement:', e);
+        }
+
+        // Create per-user DB notifications + emit to personal rooms
+        try {
+            const { broadcastAnnouncement } = require('../services/notificationService');
+            await broadcastAnnouncement(
+                title,
+                content,
+                targetAudience || 'all',
+                notice.postedBy?.name || 'Admin'
+            );
+        } catch (e) {
+            console.error('Error broadcasting announcement notification:', e.message);
+        }
+
         return ok(res, 201, { notice }, 'Announcement created.');
+
     } catch (error) {
         console.error(error);
         return fail(res, 500, 'Server Error', 'SERVER_ERROR');

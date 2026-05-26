@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search, Bell, ChevronDown, User, Settings, LogOut, Home, X } from 'lucide-react';
+import { Search, ChevronDown, User, Settings, LogOut, Home, X, Bell } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import NotificationBell from './NotificationBell';
 
 /* ─────────────────────────────────────────────
    Mock Notifications (dummy data)
@@ -210,48 +211,7 @@ const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
                 <ThemeToggle />
 
                 {/* ──── Notification Bell ──── */}
-                <div ref={notifRef} style={{ position: 'relative' }}>
-                    <NotifButton
-                        unreadCount={unreadCount}
-                        active={showNotifications}
-                        onClick={() => { setShowNotifications(v => !v); setShowProfile(false); }}
-                    />
-
-                    {showNotifications && (
-                        <div style={s.notifDropdown}>
-                            {/* Header */}
-                            <div style={s.dropdownHeader}>
-                                <span style={s.dropdownTitle}>
-                                    Notifications
-                                    {unreadCount > 0 && (
-                                        <span style={s.unreadPill}>{unreadCount} new</span>
-                                    )}
-                                </span>
-                                {unreadCount > 0 && (
-                                    <button style={s.markAllBtn} onClick={markAllRead}>
-                                        Mark all read
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* Items */}
-                            <div style={s.notifList}>
-                                {notifications.map(n => (
-                                    <NotifItem key={n.id} n={n} onRead={() => markOneRead(n.id)} />
-                                ))}
-                            </div>
-
-                            {/* Footer */}
-                            <div style={s.dropdownFooter}>
-                                <span style={s.dropdownFooterText}>
-                                    {unreadCount === 0
-                                        ? '🎉 You\'re all caught up!'
-                                        : `${notifications.length} total notifications`}
-                                </span>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                <NotificationBell />
 
                 {/* ──── Profile Dropdown ──── */}
                 <div ref={profileRef} style={{ position: 'relative' }}>

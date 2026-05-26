@@ -10,6 +10,13 @@ const _notFound = (msg = 'Course not found.') =>
 const _conflict = (msg) =>
     Object.assign(new Error(msg), { code: 'CONFLICT', status: 409 });
 
+// Reusable populate config: Faculty → User name/email
+const FACULTY_POPULATE = {
+    path: 'primaryFaculty',
+    select: 'firstName lastName email department designation user',
+    populate: { path: 'user', select: 'name email' },
+};
+
 // ── Course CRUD ───────────────────────────────────────────────────────────────
 
 /**
@@ -30,7 +37,7 @@ const getAllCourses = async ({ search, department, semester, isActive, page = 1,
     const skip = (page - 1) * limit;
     const [courses, total] = await Promise.all([
         Course.find(query)
-            .populate('primaryFaculty', 'name email')
+            .populate(FACULTY_POPULATE)
             .sort({ department: 1, semester: 1, code: 1 })
             .skip(skip)
             .limit(Number(limit)),
@@ -47,18 +54,17 @@ const getAllCourses = async ({ search, department, semester, isActive, page = 1,
  * Get a single course by ID with populated faculty info.
  */
 const getCourseById = async (id) => {
-    const course = await Course.findById(id)
-        .populate('primaryFaculty', 'name email');
+    const course = await Course.findById(id).populate(FACULTY_POPULATE);
     if (!course) throw _notFound();
     return course;
 };
 
 /**
- * Get all courses taught by a specific faculty member.
+ * Get all courses taught by a specific faculty member (by Faculty._id).
  */
 const getCoursesByFaculty = async (facultyId) => {
     return Course.find({ primaryFaculty: facultyId, isActive: true })
-        .populate('primaryFaculty', 'name email')
+        .populate(FACULTY_POPULATE)
         .sort({ semester: 1, code: 1 });
 };
 
@@ -66,34 +72,34 @@ const getCoursesByFaculty = async (facultyId) => {
  * Create a new course. Code must be globally unique.
  */
 const createCourse = async (data) => {
-    const existing = await Course.findOne({ code: data.code.toUpperCase() });
-    if (existing) throw _conflict(`A course with code '${data.code.toUpperCase()}' already exists.`);
-    return Course.create(data);
+    const code = data.code?.toUpperCase();
+    const existing = await Course.findOne({ code });
+    if (existing) throw _conflict(`A course with code '${code}' already exists.`);
+    const course = await Course.create({ ...data, code });
+    return Course.findById(course._id).populate(FACULTY_POPULATE);
 };
 
 /**
  * Update course fields. Admin only.
  */
 const updateCourse = async (id, updates) => {
-    const course = await Course.findByIdAndUpdate(id, updates, { new: true, runValidators: true })
-        .populate('primaryFaculty', 'name email');
+    // Prevent changing the course code via update
+    const safeUpdates = { ...updates };
+    delete safeUpdates.code;
+
+    const course = await Course.findByIdAndUpdate(id, safeUpdates, { new: true, runValidators: true })
+        .populate(FACULTY_POPULATE);
     if (!course) throw _notFound();
     return course;
 };
 
 /**
- * Soft-delete a course (set isActive: false).
- * Cannot delete a course that has active enrollments.
+ * Soft-delete (deactivate) a course. Sets isActive: false.
+ * Students remain enrolled but course won't appear in active listings.
  */
 const deleteCourse = async (id) => {
-    const activeEnrollments = await Enrollment.countDocuments({ course: id, status: 'enrolled' });
-    if (activeEnrollments > 0) {
-        throw Object.assign(
-            new Error(`Cannot delete course — ${activeEnrollments} students are currently enrolled.`),
-            { code: 'HAS_ENROLLMENTS', status: 400 }
-        );
-    }
-    const course = await Course.findByIdAndUpdate(id, { isActive: false }, { new: true });
+    const course = await Course.findByIdAndUpdate(id, { isActive: false }, { new: true })
+        .populate(FACULTY_POPULATE);
     if (!course) throw _notFound();
     return course;
 };
@@ -105,7 +111,7 @@ const getCourseRoster = async (courseId) => {
     const enrollments = await Enrollment.find({ course: courseId, status: 'enrolled' })
         .populate({
             path: 'student',
-            select: 'rollNumber department semester batchYear',
+            select: 'rollNumber department semester batchYear firstName lastName email',
             populate: { path: 'user', select: 'name email' },
         })
         .sort({ createdAt: -1 });

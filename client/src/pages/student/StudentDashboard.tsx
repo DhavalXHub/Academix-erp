@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchStudentAnalytics, StudentAnalytics } from '@/services/analyticsService';
+import Skeleton from '@/components/Skeleton';
 
 /* ─────────────────────────────────────────────
    Fallback / dummy data used when API is empty
@@ -406,9 +407,34 @@ const StudentDashboard: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div style={s.loaderWrap}>
-                <div style={s.spinner} />
-                <p style={s.loaderText}>Loading your dashboard…</p>
+            <div style={s.page}>
+                <div style={s.header}>
+                    <div>
+                        <Skeleton width={120} height={16} style={{ marginBottom: 4 }} />
+                        <Skeleton width={200} height={32} style={{ marginBottom: 8 }} />
+                        <Skeleton width={300} height={16} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                        <Skeleton width={100} height={18} />
+                        <Skeleton width={140} height={14} />
+                    </div>
+                </div>
+
+                <div style={s.statsGrid}>
+                    {[1, 2, 3, 4].map(i => (
+                        <Skeleton key={i} height={100} borderRadius={16} />
+                    ))}
+                </div>
+
+                <div style={s.row2}>
+                    <Skeleton height={350} borderRadius={20} />
+                    <Skeleton height={350} borderRadius={20} />
+                </div>
+
+                <div style={s.row3}>
+                    <Skeleton height={300} borderRadius={20} />
+                    <Skeleton height={300} borderRadius={20} />
+                </div>
             </div>
         );
     }
@@ -533,7 +559,7 @@ const StudentDashboard: React.FC = () => {
                 <div style={s.card}>
                     <h2 style={s.cardTitle}>Course Progress</h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                        {ENROLLED_COURSES.map(c => <CourseCard key={c.code} course={c} />)}
+                        {(data.enrolledCourses || ENROLLED_COURSES).map(c => <CourseCard key={c.code} course={c} />)}
                     </div>
                 </div>
 
@@ -545,11 +571,11 @@ const StudentDashboard: React.FC = () => {
                             background: '#ef444420', color: '#ef4444', borderRadius: 99,
                             padding: '2px 10px', fontSize: 11, fontWeight: 700,
                         }}>
-                            {UPCOMING_TASKS.length} pending
+                            {(data.upcomingTasks || UPCOMING_TASKS).length} pending
                         </span>
                     </div>
                     <div>
-                        {UPCOMING_TASKS.map(task => <TaskItem key={task.id} task={task} />)}
+                        {(data.upcomingTasks || UPCOMING_TASKS).map(task => <TaskItem key={task.id} task={task as any} />)}
                     </div>
                     <p style={{ margin: '14px 0 0', fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
                         * Live tasks will appear as faculty posts assignments and quizzes.

@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Notification } from '@/contexts/SocketContext';
 
 interface NotificationListProps {
@@ -7,6 +9,8 @@ interface NotificationListProps {
 }
 
 const NotificationList: React.FC<NotificationListProps> = ({ notifications, onMarkRead }) => {
+    const { user } = useAuth();
+
     if (notifications.length === 0) {
         return <div style={styles.empty}>No notifications right now.</div>;
     }
@@ -18,25 +22,36 @@ const NotificationList: React.FC<NotificationListProps> = ({ notifications, onMa
         } catch { return iso; }
     };
 
+    const getResolvedLink = (action: string) => {
+        if (!action || !user) return '';
+        if (action.startsWith('/student/') || action.startsWith('/faculty/') || action.startsWith('/admin/')) {
+            return action;
+        }
+        return `/${user.role}${action}`;
+    };
+
     return (
         <div style={styles.container}>
-            {notifications.map(n => (
-                <div key={n._id} style={n.isRead ? styles.itemRead : styles.itemUnread}>
-                    <div style={styles.content}>
-                        <div style={styles.header}>
-                            <span style={styles.typeBadge(n.type)}>{n.type.replace('_', ' ')}</span>
-                            <span style={styles.time}>{formatTime(n.createdAt)}</span>
+            {notifications.map(n => {
+                const resolvedLink = getResolvedLink(n.linkAction);
+                return (
+                    <div key={n._id} style={n.isRead ? styles.itemRead : styles.itemUnread}>
+                        <div style={styles.content}>
+                            <div style={styles.header}>
+                                <span style={styles.typeBadge(n.type)}>{n.type.replace('_', ' ')}</span>
+                                <span style={styles.time}>{formatTime(n.createdAt)}</span>
+                            </div>
+                            <p style={styles.message}>{n.message}</p>
+                            {resolvedLink && (
+                                <Link to={resolvedLink} style={styles.link}>View Details</Link>
+                            )}
                         </div>
-                        <p style={styles.message}>{n.message}</p>
-                        {n.linkAction && (
-                            <a href={n.linkAction} style={styles.link}>View Details</a>
+                        {!n.isRead && (
+                            <button onClick={() => onMarkRead(n._id)} style={styles.readBtn}>✓</button>
                         )}
                     </div>
-                    {!n.isRead && (
-                        <button onClick={() => onMarkRead(n._id)} style={styles.readBtn}>✓</button>
-                    )}
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 };
