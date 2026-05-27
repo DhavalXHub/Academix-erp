@@ -15,8 +15,18 @@ const validateEnv = () => {
 const getAllowedOrigins = () => {
     const raw = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
     const origins = raw.split(',').map((origin) => origin.trim()).filter(Boolean);
-    if (process.env.NODE_ENV !== 'production' && origins.includes('http://localhost:5173') && !origins.includes('http://127.0.0.1:5173')) {
-        origins.push('http://127.0.0.1:5173');
+    if (process.env.NODE_ENV !== 'production') {
+        // Add common dev variations
+        if (origins.includes('http://localhost:5173') && !origins.includes('http://127.0.0.1:5173')) {
+            origins.push('http://127.0.0.1:5173');
+        }
+        // Support both Vite dev ports (5173 and 5174)
+        if (!origins.includes('http://localhost:5174')) {
+            origins.push('http://localhost:5174');
+        }
+        if (!origins.includes('http://127.0.0.1:5174')) {
+            origins.push('http://127.0.0.1:5174');
+        }
     }
     return origins;
 };
