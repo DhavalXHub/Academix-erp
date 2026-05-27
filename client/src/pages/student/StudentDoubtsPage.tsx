@@ -77,7 +77,7 @@ const StudentDoubtsPage: React.FC = () => {
 
     const handleCreateDoubt = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedCourseId || !title.trim() || !description.trim()) {
+        if (!selectedCourseId || !title.trim() || !description.trim() || !accessToken) {
             return showToast('Please complete all form fields.', false);
         }
         
@@ -103,7 +103,7 @@ const StudentDoubtsPage: React.FC = () => {
 
     const handleSendReply = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!replyMsg.trim() || !selectedDoubt) return;
+        if (!replyMsg.trim() || !selectedDoubt || !accessToken) return;
         
         setIsReplying(true);
         try {
@@ -120,6 +120,7 @@ const StudentDoubtsPage: React.FC = () => {
     };
 
     const handleToggleStatus = async (doubtId: string, currentStatus: 'open' | 'resolved') => {
+        if (!accessToken) return;
         const nextStatus = currentStatus === 'open' ? 'resolved' : 'open';
         try {
             const res = await updateDoubtStatus(accessToken, doubtId, nextStatus);

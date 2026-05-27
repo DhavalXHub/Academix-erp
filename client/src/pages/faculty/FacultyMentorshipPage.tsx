@@ -91,7 +91,7 @@ const FacultyMentorshipPage: React.FC = () => {
 
     const handleAddNote = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newNote.trim() || !selectedMentee) return;
+        if (!newNote.trim() || !selectedMentee || !accessToken) return;
         setIsSavingNote(true);
         try {
             await recordMentorshipNote(accessToken, {

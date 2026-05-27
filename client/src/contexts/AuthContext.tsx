@@ -133,7 +133,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
             const res = await api.post<{ accessToken: string; user: AuthUser }>(
                 '/auth/login',
-                { email, password, role } as unknown as Record<string, unknown>
+                { email, password, role }
             );
             setAccessTokenState(res.accessToken);
             setStoredAccessToken(res.accessToken);

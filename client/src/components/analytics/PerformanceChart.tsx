@@ -1,8 +1,12 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
+interface PerformanceData {
+    [key: string]: string | number;
+}
+
 interface PerformanceChartProps {
-    data: any[]; // { title, completionRate } or similar
+    data: PerformanceData[];
     dataKey: string;
     nameKey: string;
     fillColor?: string;
@@ -26,9 +30,10 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({ data, dataKey, name
                         cursor={{ fill: 'rgba(0,0,0,0.05)' }}
                     />
                     <Bar dataKey={dataKey} radius={[4, 4, 0, 0]}>
-                        {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry[dataKey] < 50 ? '#ef4444' : fillColor} />
-                        ))}
+                        {data.map((entry, index) => {
+                            const value = typeof entry[dataKey] === 'number' ? entry[dataKey] : Number(entry[dataKey]);
+                            return <Cell key={`cell-${index}`} fill={value < 50 ? '#ef4444' : fillColor} />;
+                        })}
                     </Bar>
                 </BarChart>
             </ResponsiveContainer>

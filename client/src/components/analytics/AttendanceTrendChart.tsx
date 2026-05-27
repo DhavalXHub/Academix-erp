@@ -1,8 +1,15 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+interface AttendanceData {
+    date: string;
+    presentCount: number;
+    totalStudents: number;
+    [key: string]: string | number;
+}
+
 interface AttendanceTrendChartProps {
-    data: any[]; // Expecting exactly { date, presentCount, totalStudents }
+    data: AttendanceData[];
 }
 
 const AttendanceTrendChart: React.FC<AttendanceTrendChartProps> = ({ data }) => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Course, CreateCoursePayload } from '@/services/courseService';
+import type { Course, CreateCoursePayload, FacultyInfo } from '@/services/courseService';
 
 interface CourseFormModalProps {
     isOpen: boolean;
@@ -7,7 +7,7 @@ interface CourseFormModalProps {
     onSubmit: (data: CreateCoursePayload) => void;
     isSubmitting: boolean;
     editCourse?: Course | null;
-    faculties: any[];
+    faculties: FacultyInfo[];
 }
 
 const DEFAULT: CreateCoursePayload = {

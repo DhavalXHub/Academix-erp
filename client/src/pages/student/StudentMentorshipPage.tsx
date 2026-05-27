@@ -62,7 +62,7 @@ const StudentMentorshipPage: React.FC = () => {
 
     const handleProposeMeeting = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!advisor) return showToast('No assigned mentor to schedule a meeting with.', false);
+        if (!advisor || !accessToken) return showToast('No assigned mentor to schedule a meeting with.', false);
         if (!meetingTitle.trim() || !scheduledAt) return showToast('Please provide a title and date/time.', false);
 
         setIsSubmitting(true);
@@ -87,6 +87,7 @@ const StudentMentorshipPage: React.FC = () => {
     };
 
     const handleUpdateMeetingStatus = async (meetingId: string, status: 'approved' | 'declined' | 'completed') => {
+        if (!accessToken) return;
         try {
             await updateMentorshipMeetingStatus(accessToken, meetingId, status);
             showToast(`Meeting marked as ${status}.`);
