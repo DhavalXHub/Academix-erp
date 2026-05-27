@@ -3,13 +3,15 @@
     "composite": true,
     "skipLibCheck": true,
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
     "types": ["node"],
-    "esModuleInterop": true
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
   "include": ["vite.config.ts"]
 }

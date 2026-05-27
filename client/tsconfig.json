@@ -25,7 +25,6 @@
     "strictBindCallApply": false,
     "strictPropertyInitialization": false,
     "noImplicitThis": false,
-    "alwaysStrict": false,
 
     "noUnusedLocals": false,
     "noUnusedParameters": false,
