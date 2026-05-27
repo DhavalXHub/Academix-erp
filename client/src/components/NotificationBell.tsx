@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Bell } from 'lucide-react';
 import { useSocket } from '@/contexts/SocketContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchNotifications, markAsRead } from '@/services/notificationService';
+import { fetchNotifications, markAsRead, markAllNotificationsRead } from '@/services/notificationService';
 import NotificationList from './NotificationList';
 
 const NotificationBell: React.FC = () => {
@@ -44,7 +44,6 @@ const NotificationBell: React.FC = () => {
     const handleMarkAllRead = async () => {
         if (!accessToken) return;
         try {
-            const { markAllNotificationsRead } = await import('@/services/notificationService');
             await markAllNotificationsRead(accessToken);
             // Optimistic update
             setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));

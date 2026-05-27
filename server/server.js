@@ -1,5 +1,14 @@
-process.on('uncaughtException', err => require('fs').writeFileSync(__dirname + '/fatal.log', err.stack));
-process.on('unhandledRejection', err => require('fs').writeFileSync(__dirname + '/fatal.log', err.stack));
+process.on('uncaughtException', (err) => {
+    console.error('[FATAL] Uncaught Exception:', err);
+    try { require('fs').writeFileSync(__dirname + '/fatal.log', String(err.stack || err)); } catch (_) {}
+    process.exit(1);
+});
+process.on('unhandledRejection', (err) => {
+    console.error('[FATAL] Unhandled Rejection:', err);
+    try { require('fs').writeFileSync(__dirname + '/fatal.log', String(err?.stack || err)); } catch (_) {}
+    process.exit(1);
+});
+
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');

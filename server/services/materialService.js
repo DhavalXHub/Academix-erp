@@ -47,9 +47,8 @@ const uploadMaterialFile = async (userId, courseId, fileInfo, metadata) => {
         throw ApiError.forbidden('You are not assigned to this course.');
     }
 
-    const baseUrl = process.env.API_BASE_URL || 'http://localhost:5000';
     const relPath = `/uploads/materials/${fileInfo.filename}`;
-    const fileUrl = `${baseUrl}${relPath}`;
+    const fileUrl = relPath;
 
     const material = await CourseMaterial.create({
         course: courseId,

@@ -51,7 +51,18 @@ const securityHeaders = (req, res, next) => {
         .split(',')
         .map((origin) => origin.trim())
         .filter(Boolean);
-    const connectSources = ["'self'", 'http://localhost:5000', 'ws://localhost:5000', ...clientOrigins];
+
+    // Build connect-src dynamically: always allow 'self', plus derive ws/wss from client origins
+    const connectSources = ["'self'"];
+    clientOrigins.forEach((origin) => {
+        connectSources.push(origin);
+        // Derive WebSocket URL from each origin
+        connectSources.push(origin.replace(/^http/, 'ws'));
+    });
+    // In development, also allow localhost backend
+    if (process.env.NODE_ENV !== 'production') {
+        connectSources.push('http://localhost:5000', 'ws://localhost:5000', 'wss://localhost:5000');
+    }
 
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
@@ -65,9 +76,10 @@ const securityHeaders = (req, res, next) => {
         "frame-ancestors 'none'",
         "script-src 'self' 'unsafe-inline'",
         "style-src 'self' 'unsafe-inline'",
-        // Allow QR code image from external service + data URIs
+        // Allow QR code image from external service + data URIs + Google Fonts
         "img-src 'self' data: blob: https://api.qrserver.com https:",
-        `connect-src ${connectSources.join(' ')} wss://localhost:5000`,
+        "font-src 'self' https://fonts.gstatic.com",
+        `connect-src ${connectSources.join(' ')}`,
         // Allow media (camera stream)
         "media-src 'self' blob:",
     ].join('; '));
