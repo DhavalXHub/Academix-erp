@@ -35,6 +35,19 @@ const userSchema = new mongoose.Schema(
             type: Date,
             default: null,
         },
+        // Profile Personalization Fields
+        bio: { type: String, default: '' },
+        pronouns: { type: String, default: 'He/Him' },
+        skills: { type: [String], default: ['Systems Architecture', 'Node.js', 'React', 'MongoDB'] },
+        bannerGradient: { type: String, default: 'linear-gradient(135deg, #1e1b4b, #3b82f6)' },
+        accentColor: { type: String, default: '#2563EB' },
+        socials: { 
+            type: [{ platform: String, url: String, icon: String }],
+            default: [
+                { platform: 'GitHub', url: 'https://github.com', icon: '💻' },
+                { platform: 'LinkedIn', url: 'https://linkedin.com', icon: '🔗' }
+            ]
+        },
         // Stores the hashed refresh token for server-side validation & blacklisting
         refreshTokenHash: {
             type: String,

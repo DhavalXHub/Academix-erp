@@ -56,18 +56,23 @@ const securityHeaders = (req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    // Allow camera for QR scanning in student portal
+    res.setHeader('Permissions-Policy', 'camera=*, microphone=(), geolocation=()');
     res.setHeader('Content-Security-Policy', [
         "default-src 'self'",
         "base-uri 'self'",
         "object-src 'none'",
         "frame-ancestors 'none'",
-        "script-src 'self'",
+        "script-src 'self' 'unsafe-inline'",
         "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data: https:",
-        `connect-src ${connectSources.join(' ')}`,
+        // Allow QR code image from external service + data URIs
+        "img-src 'self' data: blob: https://api.qrserver.com https:",
+        `connect-src ${connectSources.join(' ')} wss://localhost:5000`,
+        // Allow media (camera stream)
+        "media-src 'self' blob:",
     ].join('; '));
     next();
+
 };
 
 const createRateLimiter = ({ windowMs = 60000, max = 120 } = {}) => {
@@ -95,6 +100,14 @@ const createRateLimiter = ({ windowMs = 60000, max = 120 } = {}) => {
     }
 
     return async (req, res, next) => {
+        if (
+            process.env.DISABLE_RATE_LIMIT === 'true' ||
+            process.env.NODE_ENV === 'development' ||
+            process.env.NODE_ENV === 'test'
+        ) {
+            return next();
+        }
+
         const now = Date.now();
         const key = req.ip || req.socket?.remoteAddress || 'unknown';
 
@@ -200,13 +213,55 @@ const notFound = (req, res) => {
 const errorHandler = (err, req, res, next) => {
     if (res.headersSent) return next(err);
 
-    const status = err.statusCode || err.status || (err.name === 'ValidationError' ? 400 : 500);
-    const code = err.code || (status >= 500 ? 'SERVER_ERROR' : 'REQUEST_ERROR');
-    const message = status >= 500 && process.env.NODE_ENV === 'production'
-        ? 'An internal server error occurred.'
-        : err.message || 'Server Error';
+    let status = err.statusCode || err.status || 500;
+    let code = err.code || 'SERVER_ERROR';
+    let message = err.message || 'An internal server error occurred.';
 
-    console.error(`[${req.requestId || 'no-request-id'}]`, err);
+    // Mongoose validation error
+    if (err.name === 'ValidationError') {
+        status = 400;
+        code = 'VALIDATION_ERROR';
+        const messages = Object.values(err.errors).map(e => e.message);
+        message = messages.join('; ');
+    }
+
+    // Mongoose duplicate key error
+    if (err.code === 11000) {
+        status = 409;
+        code = 'DUPLICATE_KEY';
+        const field = Object.keys(err.keyValue || {}).join(', ');
+        message = `Duplicate value for field: ${field}`;
+    }
+
+    // Mongoose cast error (invalid ObjectId)
+    if (err.name === 'CastError') {
+        status = 400;
+        code = 'INVALID_ID';
+        message = `Invalid ${err.path}: ${err.value}`;
+    }
+
+    // JWT errors
+    if (err.name === 'JsonWebTokenError') {
+        status = 401;
+        code = 'INVALID_TOKEN';
+        message = 'Invalid token.';
+    }
+    if (err.name === 'TokenExpiredError') {
+        status = 401;
+        code = 'TOKEN_EXPIRED';
+        message = 'Token has expired.';
+    }
+
+    // Only log server errors, not expected operational errors
+    if (status >= 500) {
+        console.error(`[${req.requestId || 'no-request-id'}]`, err);
+    }
+
+    // Suppress internal details in production for 5xx
+    if (status >= 500 && process.env.NODE_ENV === 'production') {
+        message = 'An internal server error occurred.';
+    }
+
     sendError(res, status, code, message, req.requestId);
 };
 

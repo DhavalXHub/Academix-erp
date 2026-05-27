@@ -6,7 +6,10 @@ const Footer: React.FC = () => {
         <footer id="contact" className="lp-footer">
             <div className="lp-footer-inner">
                 <div>
-                    <span className="lp-footer-brand">Academix ERP</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                        <img src="/favicon.png?v=2" alt="Academix Logo" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+                        <span className="lp-footer-brand" style={{ margin: 0 }}>Academix ERP</span>
+                    </div>
                     <p className="lp-footer-tagline">
                         A modern, secure, and lightning-fast enterprise resource planning platform engineered specifically for scalable academic institutions.
                     </p>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { BookOpen, Calendar, CheckSquare, MessageSquare, CreditCard, User, LogOut, LayoutDashboard, Home, FileText, FileCheck2, Megaphone } from 'lucide-react';
+import { BookOpen, Calendar, CheckSquare, MessageSquare, CreditCard, User, LogOut, LayoutDashboard, Home, FileText, FileCheck2, Megaphone, HelpCircle, Users } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 
 const StudentLayout: React.FC = () => {
@@ -18,8 +18,11 @@ const StudentLayout: React.FC = () => {
         { icon: Megaphone, label: 'Announcements', path: '/student/announcements' },
         { icon: BookOpen, label: 'Courses', path: '/student/courses' },
         { icon: CheckSquare, label: 'Attendance', path: '/student/attendance' },
+        { icon: CheckSquare, label: '📱 QR Attendance', path: '/student/qr-attendance' },
         { icon: FileText, label: 'Assignments', path: '/student/assignments' },
         { icon: Calendar, label: 'Quizzes', path: '/student/quizzes' },
+        { icon: HelpCircle, label: 'Doubt Solver', path: '/student/doubts' },
+        { icon: Users, label: 'Mentorship', path: '/student/mentorship' },
         { icon: FileCheck2, label: 'Results', path: '/student/results' },
         { icon: Calendar, label: 'Calendar', path: '/student/calendar' },
         { icon: MessageSquare, label: 'Messages', path: '/student/messages' },
@@ -32,7 +35,7 @@ const StudentLayout: React.FC = () => {
             <aside style={styles.sidebar}>
                 <div style={styles.brand}>
                     <Link to="/" style={styles.logoLink}>
-                        <span style={styles.logoIcon}>📘</span>
+                        <img src="/favicon.png?v=2" alt="Academix Logo" style={styles.logoIcon} />
                         <h2 style={styles.logoText}>Academix</h2>
                     </Link>
                     <span style={styles.roleTag}>Student Portal</span>
@@ -76,12 +79,12 @@ const StudentLayout: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     layout: { display: 'flex', minHeight: '100vh', background: 'var(--page-bg)', fontFamily: "'Inter', sans-serif" },
     sidebar: {
-        width: 240, background:'var(--card-bg)', borderRight: '1px solid #e5e7eb',
+        width: 240, background:'var(--card-bg)', borderRight: '1px solid var(--border-color)',
         display: 'flex', flexDirection: 'column',
     },
-    brand: { padding: '20px 20px 16px', borderBottom: '1px solid #f3f4f6' },
-    logoLink: { display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' },
-    logoIcon: { fontSize: 20 },
+    brand: { padding: '20px 20px 16px', borderBottom: '1px solid var(--border-color)' },
+    logoLink: { display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' },
+    logoIcon: { width: 32, height: 32, objectFit: 'contain' },
     logoText: { margin: 0, fontSize: 20, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' },
     roleTag: {
         display: 'inline-block', marginTop: 6, fontSize: 10, fontWeight: 700,
@@ -94,10 +97,10 @@ const styles: Record<string, React.CSSProperties> = {
         fontWeight: 500, fontSize: 13.5, transition: 'all 0.15s',
     },
     navLinkActive: {
-        background: '#eff6ff', color: '#2563eb', fontWeight: 600,
+        background: 'var(--active-menu-bg)', color: 'var(--primary)', fontWeight: 600,
     },
     sidebarFooter: {
-        padding: '16px 12px', borderTop: '1px solid #f3f4f6',
+        padding: '16px 12px', borderTop: '1px solid var(--border-color)',
         display: 'flex', flexDirection: 'column', gap: 4,
     },
     homeLink: {

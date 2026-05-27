@@ -8,7 +8,7 @@ const paymentSchema = new mongoose.Schema({
     },
     student: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Student',
+        ref: 'User', // Changed from 'Student' → 'User' to match Invoice.student ref
         required: true,
     },
     amount: {

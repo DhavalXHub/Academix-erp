@@ -10,12 +10,12 @@ import { clearAccessToken, getAccessToken, setAccessToken } from './tokenStore';
 
 const API_BASE_URL =
     (import.meta as any).env?.VITE_API_BASE_URL ||
-    'http://localhost:5000/api/v1';
+    '/api/v1';
 
 const ACCESS_TOKEN_KEY = 'academix_access_token';
 
 type ApiEnvelope<T> =
-    | { success: true; data: T }
+    | { success: true; data: T; meta?: Record<string, unknown>; message?: string }
     | { success: false; error?: { message?: string } };
 
 const client: AxiosInstance = axios.create({
@@ -32,7 +32,15 @@ const readCookie = (name: string): string | null => {
 };
 
 const unwrap = <T>(envelope: ApiEnvelope<T>): T => {
-    if ((envelope as any)?.success) return (envelope as any).data as T;
+    if ((envelope as any)?.success) {
+        const data = (envelope as any).data as T;
+        // Merge meta into data when present (for paginated responses)
+        const meta = (envelope as any).meta;
+        if (meta && typeof data === 'object' && data !== null) {
+            return { ...data, meta } as T;
+        }
+        return data;
+    }
     const msg = (envelope as any)?.error?.message || (envelope as any)?.message || 'Request failed.';
     throw new Error(msg);
 };

@@ -14,7 +14,7 @@ const Submission = require('./models/Submission');
 const Notice = require('./models/Notice');
 const connectDB = require('./config/db');
 
-dotenv.config();
+dotenv.config({ path: require('path').resolve(__dirname, '../.env') });
 connectDB();
 
 const importData = async () => {

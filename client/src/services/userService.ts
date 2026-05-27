@@ -10,6 +10,12 @@ export interface UserRecord {
     isActive: boolean;
     lastLogin: string | null;
     createdAt: string;
+    bio?: string;
+    pronouns?: string;
+    skills?: string[];
+    bannerGradient?: string;
+    accentColor?: string;
+    socials?: Array<{ platform: string; url: string; icon: string }>;
 }
 
 export interface UserListResponse {
@@ -80,3 +86,6 @@ export const updateMyProfile = (
     token: string,
     payload: Record<string, unknown>
 ): Promise<ProfileData> => api.put('/profile/me', payload, token);
+
+export const fetchPublicProfile = (token: string, userId: string): Promise<ProfileData> =>
+    api.get(`/profile/${userId}`, token);

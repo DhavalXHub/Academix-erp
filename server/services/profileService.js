@@ -30,7 +30,7 @@ const getMyProfile = async (userId, role) => {
  */
 const updateMyProfile = async (userId, role, updates) => {
     // Allowed base user fields (non-sensitive)
-    const BASE_ALLOWED = ['name'];
+    const BASE_ALLOWED = ['name', 'bio', 'pronouns', 'skills', 'bannerGradient', 'accentColor', 'socials'];
     const baseUpdates = Object.fromEntries(
         Object.entries(updates).filter(([key]) => BASE_ALLOWED.includes(key))
     );

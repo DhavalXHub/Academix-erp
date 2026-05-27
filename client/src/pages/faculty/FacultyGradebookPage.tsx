@@ -217,7 +217,7 @@ const FacultyGradebookPage: React.FC = () => {
         csvContent += 'Attendance %,Weighted Percentage,Grade\r\n';
 
         students.forEach(st => {
-            csvContent += `${st.rollNumber},${st.user?.name || 'Student'},`;
+            csvContent += `${st.rollNumber},${st?.name || 'Student'},`;
             assignments.forEach(a => {
                 const mark = gradesMap[`${st._id}-${a.title}`];
                 csvContent += `${mark !== undefined ? mark : '-'},`;
@@ -373,7 +373,7 @@ const FacultyGradebookPage: React.FC = () => {
                                     return (
                                         <tr key={st._id} style={styles.tr}>
                                             <td style={{ ...styles.td, position: 'sticky', left: 0, background: '#fff', zIndex: 5, borderRight: '1px solid #e5e7eb' }}>
-                                                <div style={styles.stName}>{st.user?.name || 'Unknown'}</div>
+                                                <div style={styles.stName}>{st?.name || 'Unknown'}</div>
                                                 <small style={styles.stRoll}>{st.rollNumber}</small>
                                             </td>
 

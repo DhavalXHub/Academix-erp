@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Course } from '@/services/courseService';
+import { getFacultyDisplayName, getDepartmentDisplayName } from '@/services/courseService';
 
 interface CourseCardProps {
     course: Course;
@@ -21,8 +22,9 @@ const DEPT_COLORS: Record<string, string> = {
 const deptColor = (dept: string) => DEPT_COLORS[dept] ?? 'var(--primary-light)';
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, actionSlot, showRosterCount }) => {
-    const color = deptColor(course.department);
-    const facultyName = course.primaryFaculty?.user?.name ?? 'TBA';
+    const deptName = getDepartmentDisplayName(course);
+    const color = deptColor(deptName);
+    const facultyName = getFacultyDisplayName(course);
 
     return (
         <div style={{ ...styles.card, borderTop: `4px solid ${color}` }}>
@@ -34,7 +36,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, actionSlot, showRosterC
 
             {/* Title */}
             <h3 style={styles.title}>{course.title}</h3>
-            <p style={styles.dept}>{course.department}</p>
+            <p style={styles.dept}>{deptName}</p>
 
             {/* Description */}
             {course.description && (

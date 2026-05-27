@@ -18,7 +18,7 @@ const {
 } = require('./middleware/opsMiddleware');
 
 // Load env vars
-dotenv.config();
+dotenv.config({ path: require('path').resolve(__dirname, '../.env') });
 validateEnv();
 
 // Connect to Database
@@ -66,6 +66,15 @@ app.get('/health', (req, res) => {
 // ── Static Files (React + Vite build output) ──────────────────────────────
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
+// ── Uploaded Files — served publicly with authentication awareness ─────────
+// Protected so only authenticated users can view the files (using query ?token=...)
+const { protect } = require('./middleware/authMiddleware');
+app.use('/uploads', protect, express.static(path.join(__dirname, '../uploads')));
+// If a file in /uploads is not found by static middleware, return 404 instead of falling through to SPA fallback
+app.use('/uploads', (req, res) => {
+    res.status(404).json({ success: false, data: null, error: { code: 'NOT_FOUND', message: 'The requested file was not found on the server.' } });
+});
+
 // ── API Routes (v1) ────────────────────────────────────────────────────────
 app.use('/api/v1/auth', require('./routes/authRoutes'));
 app.use('/api/v1/users', require('./routes/userRoutes'));
@@ -76,6 +85,7 @@ app.use('/api/v1/foundation', require('./routes/foundationRoutes'));
 app.use('/api/v1/enrollments', require('./routes/enrollmentRoutes'));
 app.use('/api/v1/timetable', require('./routes/timetableRoutes'));
 app.use('/api/v1/attendance', require('./routes/attendanceRoutes'));
+app.use('/api/v1/qr-attendance', require('./routes/qrAttendanceRoutes'));
 app.use('/api/v1/materials', require('./routes/materialRoutes'));
 app.use('/api/v1/assignments', require('./routes/assignmentRoutes'));
 app.use('/api/v1/submissions', require('./routes/submissionRoutes'));
@@ -92,10 +102,12 @@ app.use('/api/v1/messages', require('./routes/messageRoutes'));
 app.use('/api/v1/notifications', require('./routes/notificationRoutes'));
 app.use('/api/v1/faculty', require('./routes/facultyRoutes'));
 app.use('/api/v1/announcements', require('./routes/announcementsRoutes'));
+app.use('/api/v1/course-announcements', require('./routes/courseAnnouncementRoutes'));
 app.use('/api/v1/admin', require('./routes/adminRoutes'));
 app.use('/api/v1/exams', require('./routes/examRoutes'));
 app.use('/api/v1/audit-logs', require('./routes/auditRoutes'));
 app.use('/api/v1/faculty-addons', require('./routes/facultyAddons'));
+app.use('/api/v1/academic-calendars', require('./routes/academicCalendarRoutes'));
 
 // ── Legacy /api/* alias (backward-compatible for old HTML frontend) ─────
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -105,6 +117,7 @@ app.use('/api/admissions', require('./routes/admissionRoutes'));
 app.use('/api/foundation', require('./routes/foundationRoutes'));
 app.use('/api/timetable', require('./routes/timetableRoutes'));
 app.use('/api/attendance', require('./routes/attendanceRoutes'));
+app.use('/api/qr-attendance', require('./routes/qrAttendanceRoutes'));
 app.use('/api/billing', require('./routes/billingRoutes'));
 app.use('/api/marks', require('./routes/marksRoutes'));
 app.use('/api/quizzes', require('./routes/quizRoutes'));

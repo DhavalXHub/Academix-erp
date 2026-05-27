@@ -190,8 +190,8 @@ const ResultsManagementPage: React.FC = () => {
                                     return (
                                         <tr key={enrollment._id}>
                                             <td style={styles.td}>
-                                                <strong>{student?.name || student?.user?.name || 'Student'}</strong>
-                                                <span style={styles.muted}>{student?.email || student?.user?.email || enrollment.academicYear}</span>
+                                                <strong>{student?.name || 'Student'}</strong>
+                                                <span style={styles.muted}>{student?.email || enrollment.academicYear}</span>
                                             </td>
                                             <td style={styles.td}><input style={styles.input} type="number" value={draft.score ?? existing?.score ?? ''} onChange={e => setStudentScore(student._id, 'score', e.target.value)} /></td>
                                             <td style={styles.td}><input style={styles.input} value={draft.grade ?? existing?.grade ?? ''} onChange={e => setStudentScore(student._id, 'grade', e.target.value)} /></td>

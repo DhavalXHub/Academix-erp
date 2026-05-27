@@ -21,18 +21,23 @@ const AcademicCalendarPage = lazy(() => import('@/pages/common/AcademicCalendarP
 const StudentDashboard = lazy(() => import('@/pages/student/StudentDashboard'));
 const StudentCoursesPage = lazy(() => import('@/pages/student/StudentCoursesPage'));
 const StudentAttendancePage = lazy(() => import('@/pages/student/StudentAttendancePage'));
+const StudentQRScannerPage = lazy(() => import('@/pages/student/StudentQRScannerPage'));
 const StudentQuizPage = lazy(() => import('@/pages/student/StudentQuizPage'));
 const StudentFeesPage = lazy(() => import('@/pages/student/StudentFeesPage'));
 const StudentMessagesPage = lazy(() => import('@/pages/student/StudentMessagesPage'));
 const StudentAssignmentsPage = lazy(() => import('@/pages/student/StudentAssignmentsPage'));
 const QuizAttemptPage = lazy(() => import('@/pages/student/QuizAttemptPage'));
 const StudentResultsPage = lazy(() => import('@/pages/student/StudentResultsPage'));
+const StudentCoursePage = lazy(() => import('@/pages/student/StudentCoursePage'));
+const StudentDoubtsPage = lazy(() => import('@/pages/student/StudentDoubtsPage'));
+const StudentMentorshipPage = lazy(() => import('@/pages/student/StudentMentorshipPage'));
 
 // Faculty Pages
 const FacultyDashboard = lazy(() => import('@/pages/faculty/FacultyDashboard'));
 const FacultyCoursesPage = lazy(() => import('@/pages/faculty/FacultyCoursesPage'));
 const FacultyCoursePage = lazy(() => import('@/pages/faculty/FacultyCoursePage'));
 const FacultyAttendancePage = lazy(() => import('@/pages/faculty/FacultyAttendancePage'));
+const FacultyQRAttendancePage = lazy(() => import('@/pages/faculty/FacultyQRAttendancePage'));
 const FacultyAssignmentsPage = lazy(() => import('@/pages/faculty/FacultyAssignmentsPage'));
 const FacultyQuizPage = lazy(() => import('@/pages/faculty/FacultyQuizPage'));
 const FacultyQuizAttemptsPage = lazy(() => import('@/pages/faculty/FacultyQuizAttemptsPage'));
@@ -82,15 +87,20 @@ const App: React.FC = () => {
                             <Route path="dashboard" element={<StudentDashboard />} />
                             <Route path="announcements" element={<AdminAnnouncementsPage />} />
                             <Route path="courses" element={<StudentCoursesPage />} />
+                            <Route path="courses/:courseId" element={<StudentCoursePage />} />
                             <Route path="attendance" element={<StudentAttendancePage />} />
+                            <Route path="qr-attendance" element={<StudentQRScannerPage />} />
                             <Route path="assignments" element={<StudentAssignmentsPage />} />
                             <Route path="quizzes" element={<StudentQuizPage />} />
                             <Route path="quizzes/attempt/:id" element={<QuizAttemptPage />} />
                             <Route path="results" element={<StudentResultsPage />} />
+                            <Route path="doubts" element={<StudentDoubtsPage />} />
+                            <Route path="mentorship" element={<StudentMentorshipPage />} />
                             <Route path="calendar" element={<AcademicCalendarPage />} />
                             <Route path="fees" element={<StudentFeesPage />} />
                             <Route path="messages" element={<StudentMessagesPage />} />
                             <Route path="profile" element={<ProfilePage />} />
+                            <Route path="profile/:userId" element={<ProfilePage />} />
                         </Route>
                     </Route>
 
@@ -103,6 +113,7 @@ const App: React.FC = () => {
                             <Route path="courses" element={<FacultyCoursesPage />} />
                             <Route path="courses/:courseId" element={<FacultyCoursePage />} />
                             <Route path="attendance" element={<FacultyAttendancePage />} />
+                            <Route path="qr-attendance" element={<FacultyQRAttendancePage />} />
                             <Route path="assignments" element={<FacultyAssignmentsPage />} />
                             <Route path="quizzes" element={<FacultyQuizPage />} />
                             <Route path="quizzes/:quizId/attempts" element={<FacultyQuizAttemptsPage />} />
@@ -114,6 +125,7 @@ const App: React.FC = () => {
                             <Route path="calendar" element={<AcademicCalendarPage />} />
                             <Route path="messages" element={<MessagesPage />} />
                             <Route path="profile" element={<ProfilePage />} />
+                            <Route path="profile/:userId" element={<ProfilePage />} />
                         </Route>
                     </Route>
 
@@ -135,6 +147,7 @@ const App: React.FC = () => {
                             <Route path="audit-logs" element={<AdminAuditLogsPage />} />
                             <Route path="messages" element={<MessagesPage />} />
                             <Route path="profile" element={<ProfilePage />} />
+                            <Route path="profile/:userId" element={<ProfilePage />} />
                         </Route>
                     </Route>
 

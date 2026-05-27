@@ -23,8 +23,8 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSu
         if (editCourse) {
             setForm({
                 code: editCourse.code, title: editCourse.title,
-                description: editCourse.description || '',
-                credits: editCourse.credits, department: editCourse.department,
+                credits: editCourse.credits,
+                department: typeof editCourse.department === 'object' && editCourse.department ? editCourse.department._id : (editCourse.department as string ?? ''),
                 semester: editCourse.semester,
                 primaryFaculty: editCourse.primaryFaculty?._id ?? '',
                 maxEnrollment: editCourse.maxEnrollment,

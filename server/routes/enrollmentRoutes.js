@@ -2,19 +2,20 @@ const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/authMiddleware');
 const {
-    enrollInCourse, dropCourse, getMyCourses, getTeachingCourses,
+    getMyCourses, getTeachingCourses,
 } = require('../controllers/enrollmentController');
 
-// Student: enroll in a course
-router.post('/', protect, authorize('student'), enrollInCourse);
+// ─────────────────────────────────────────────────────────────────────────────
+// NOTE: Student self-enrollment has been REMOVED.
+// Enrollment is now managed exclusively by the admin (via Admin Courses page).
+// The backend auto-enrollment logic in getMyCourses() automatically assigns
+// students to courses matching their department + semester from their profile.
+// ─────────────────────────────────────────────────────────────────────────────
 
-// Student: view all their enrolled courses
+// Student: view all automatically assigned courses
 router.get('/my-courses', protect, authorize('student'), getMyCourses);
 
 // Faculty: view all courses they teach (with enrollment counts)
 router.get('/teaching', protect, authorize('faculty'), getTeachingCourses);
-
-// Student: drop an enrolled course
-router.delete('/:id', protect, authorize('student'), dropCourse);
 
 module.exports = router;

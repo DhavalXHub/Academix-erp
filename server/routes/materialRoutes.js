@@ -1,17 +1,33 @@
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/authMiddleware');
+const { handleUploadSingle } = require('../middleware/uploadMiddleware');
 const {
     getMaterialsByCourse,
-    uploadMaterial,
+    uploadMaterialFile,
+    uploadMaterialLink,
+    updateMaterial,
     deleteMaterial,
+    trackDownload,
 } = require('../controllers/materialController');
 
-// Any authenticated user can potentially view materials (authorization happens in service)
+// ── Read ─────────────────────────────────────────────────────────────────────
+// Any authenticated user can view materials (service enforces enrollment/assignment check)
 router.get('/course/:courseId', protect, getMaterialsByCourse);
 
-// Only faculty can upload and delete materials
-router.post('/', protect, authorize('faculty'), uploadMaterial);
-router.delete('/:id', protect, authorize('faculty'), deleteMaterial);
+// ── Faculty: Upload real file (multipart/form-data) ───────────────────────────
+router.post('/upload', protect, authorize('faculty', 'admin'), handleUploadSingle, uploadMaterialFile);
+
+// ── Faculty: Add external link (JSON) ─────────────────────────────────────────
+router.post('/link', protect, authorize('faculty', 'admin'), uploadMaterialLink);
+
+// ── Faculty: Update metadata ───────────────────────────────────────────────────
+router.patch('/:id', protect, authorize('faculty', 'admin'), updateMaterial);
+
+// ── Faculty: Delete ───────────────────────────────────────────────────────────
+router.delete('/:id', protect, authorize('faculty', 'admin'), deleteMaterial);
+
+// ── Student: Track download ───────────────────────────────────────────────────
+router.post('/:id/download', protect, trackDownload);
 
 module.exports = router;

@@ -1,39 +1,44 @@
 const profileService = require('../services/profileService');
-
-const sendSuccess = (res, status, data, message = 'Success') =>
-    res.status(status).json({ success: true, message, data, error: null });
-
-const sendError = (res, status, message, code = 'ERROR') =>
-    res.status(status).json({ success: false, data: null, error: { code, message } });
+const asyncHandler = require('../utils/asyncHandler');
+const ApiResponse = require('../utils/ApiResponse');
 
 /**
  * @desc   Get current user's profile (user + role-specific document)
  * @route  GET /api/v1/profile/me
  * @access Private (any authenticated role)
  */
-const getMyProfile = async (req, res) => {
-    try {
-        const result = await profileService.getMyProfile(req.user.id, req.user.role);
-        return sendSuccess(res, 200, result);
-    } catch (err) {
-        console.error('[PROFILE] getMyProfile:', err);
-        return sendError(res, err.status || 500, err.message, err.code || 'SERVER_ERROR');
-    }
-};
+const getMyProfile = asyncHandler(async (req, res) => {
+    const result = await profileService.getMyProfile(req.user.id, req.user.role);
+    return ApiResponse.success(res, 200, result);
+});
 
 /**
  * @desc   Update current user's profile (name + role-specific fields)
  * @route  PUT /api/v1/profile/me
  * @access Private (any authenticated role)
  */
-const updateMyProfile = async (req, res) => {
-    try {
-        const result = await profileService.updateMyProfile(req.user.id, req.user.role, req.body);
-        return sendSuccess(res, 200, result, 'Profile updated successfully.');
-    } catch (err) {
-        console.error('[PROFILE] updateMyProfile:', err);
-        return sendError(res, err.status || 500, err.message, err.code || 'SERVER_ERROR');
-    }
-};
+const updateMyProfile = asyncHandler(async (req, res) => {
+    const result = await profileService.updateMyProfile(req.user.id, req.user.role, req.body);
+    return ApiResponse.success(res, 200, result, 'Profile updated successfully.');
+});
 
-module.exports = { getMyProfile, updateMyProfile };
+/**
+ * @desc   Get public profile of any user by ID
+ * @route  GET /api/v1/profile/:id
+ * @access Private
+ */
+const getPublicProfile = asyncHandler(async (req, res) => {
+    // Determine the role by fetching the user first
+    const User = require('../models/User');
+    const user = await User.findById(req.params.id);
+    if (!user) throw ApiError.notFound('User not found.');
+    
+    const result = await profileService.getMyProfile(req.params.id, user.role);
+    // Hide sensitive stuff from public result
+    if (result.user) {
+        result.user.email = result.user.email; // we might want to keep it
+    }
+    return ApiResponse.success(res, 200, result);
+});
+
+module.exports = { getMyProfile, updateMyProfile, getPublicProfile };

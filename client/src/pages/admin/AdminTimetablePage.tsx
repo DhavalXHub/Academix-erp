@@ -94,7 +94,7 @@ const AdminTimetablePage: React.FC = () => {
                 <form style={styles.panel} onSubmit={submit}>
                     <div style={styles.panelTitle}><Plus size={18} /> New Timetable Entry</div>
                     <Select label="Course" value={form.course} onChange={v => setForm({ ...form, course: v })} options={courses.map(c => ({ value: c._id, label: `${c.code} - ${c.title}` }))} />
-                    <Select label="Faculty" value={form.faculty} onChange={v => setForm({ ...form, faculty: v })} options={faculties.map(f => ({ value: f._id, label: f.user?.name || f.name || f.employeeId || f.email }))} />
+                    <Select label="Faculty" value={form.faculty} onChange={v => setForm({ ...form, faculty: v })} options={faculties.map(f => ({ value: f._id, label: f.name || f.email || f.employeeId }))} />
                     <Select label="Day" value={form.dayOfWeek} onChange={v => setForm({ ...form, dayOfWeek: v })} options={days.map(d => ({ value: d, label: d }))} />
                     <div style={styles.row}>
                         <Field label="Start" type="time" value={form.startTime} onChange={v => setForm({ ...form, startTime: v })} />
@@ -119,7 +119,7 @@ const AdminTimetablePage: React.FC = () => {
                                     <div>
                                         <strong>{entry.dayOfWeek} · {entry.startTime}-{entry.endTime}</strong>
                                         <span>{entry.course?.code} - {entry.course?.title}</span>
-                                        <small>{entry.faculty?.user?.name || entry.faculty?.employeeId || 'Faculty'} · {entry.classroom} · Semester {entry.semester}</small>
+                                        <small>{entry.faculty?.name || 'Faculty'} · {entry.classroom} · Semester {entry.semester}</small>
                                     </div>
                                     <button style={styles.deactivate} onClick={() => deactivate(entry)}>Deactivate</button>
                                 </div>

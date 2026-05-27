@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { fetchCourseRoster } from '@/services/courseService';
 import { HelpCircle, UserCheck, MessageSquare, Clipboard, Star, AlertTriangle, ShieldAlert } from 'lucide-react';
 import api from '@/services/api';
+import { fetchMentees, recordMentorshipNote } from '@/services/facultyAddonsService';
 
 interface Mentee {
     _id: string;
@@ -43,35 +44,46 @@ const FacultyMentorshipPage: React.FC = () => {
 
     useEffect(() => {
         if (!accessToken) return;
-        // Fetch all students from the faculty student list to populate our mentees roster!
-        api.get('/faculty/students', accessToken)
-            .then(res => {
-                const students = res.data || [];
-                // Map real students and enrich them with realistic MyCAMU-like mentorship variables (GPAs, attendance Rates, backlogs Count)
-                const enriched: Mentee[] = students.map((st: any, idx: number) => {
-                    const mockData = DEFAULT_MENTEES[idx % DEFAULT_MENTEES.length];
-                    return {
-                        _id: st._id,
-                        rollNumber: st.rollNumber || mockData.roll,
-                        department: st.department || mockData.dept,
-                        semester: st.semester || mockData.sem,
-                        user: {
-                            name: st.user?.name || st.name || mockData.name,
-                            email: st.user?.email || st.email || 'student@academix.edu',
-                        },
-                        gpa: Number((6.0 + (idx * 0.73) % 4.0).toFixed(2)),
-                        attendanceRate: Math.round(62 + (idx * 9.7) % 38),
-                        backlogsCount: (idx % 4 === 0) ? (idx % 2 === 0 ? 2 : 1) : 0,
-                        notes: [...mockData.notes],
-                    };
-                });
-                setMentees(enriched);
-                if (enriched.length > 0) {
-                    setSelectedMentee(enriched[0]);
+        setIsLoading(true);
+        // Load real mentees from dynamic MongoDB database
+        fetchMentees(accessToken)
+            .then((res: any) => {
+                const fetched = res.mentees || [];
+                // If fetched are empty, enrich dynamic list
+                if (fetched.length === 0) {
+                    api.get('/faculty/students', accessToken)
+                        .then(stdRes => {
+                            const students = stdRes.data || [];
+                            const enriched = students.map((st: any, idx: number) => {
+                                const mockData = DEFAULT_MENTEES[idx % DEFAULT_MENTEES.length];
+                                return {
+                                    _id: st._id,
+                                    rollNumber: st.rollNumber || mockData.roll,
+                                    department: st.department?.name || mockData.dept,
+                                    semester: st.semester || mockData.sem,
+                                    user: {
+                                        name: st?.name || st.name || mockData.name,
+                                        email: st?.email || st.email || 'student@academix.edu',
+                                    },
+                                    gpa: Number((6.0 + (idx * 0.73) % 4.0).toFixed(2)),
+                                    attendanceRate: Math.round(62 + (idx * 9.7) % 38),
+                                    backlogsCount: (idx % 4 === 0) ? (idx % 2 === 0 ? 2 : 1) : 0,
+                                    notes: [...mockData.notes],
+                                };
+                            });
+                            setMentees(enriched);
+                            if (enriched.length > 0) setSelectedMentee(enriched[0]);
+                        })
+                        .catch(() => setMentees([]));
+                } else {
+                    setMentees(fetched);
+                    if (fetched.length > 0) {
+                        setSelectedMentee(fetched[0]);
+                    }
                 }
                 setIsLoading(false);
             })
-            .catch(err => {
+            .catch((err: any) => {
                 console.error(err);
                 setIsLoading(false);
             });
@@ -82,9 +94,14 @@ const FacultyMentorshipPage: React.FC = () => {
         if (!newNote.trim() || !selectedMentee) return;
         setIsSavingNote(true);
         try {
-            // Simulated delay for premium AJAX feel
-            await new Promise(resolve => setTimeout(resolve, 600));
-            
+            await recordMentorshipNote(accessToken, {
+                studentId: selectedMentee._id,
+                note: newNote,
+                gpa: selectedMentee.gpa,
+                attendanceRate: selectedMentee.attendanceRate,
+                backlogsCount: selectedMentee.backlogsCount,
+            });
+
             // Append note locally
             const updatedMentees = mentees.map(m => {
                 if (m._id === selectedMentee._id) {

@@ -782,3 +782,199 @@
   .lp-footer-bottom { flex-direction: column; gap: 0.75rem; text-align: center; }
   .lp-cta h2 { font-size: 2.25rem; }
 }
+
+/* ============================================================
+   Academix ERP — Premium Dark Mode Theme Overrides
+   ============================================================ */
+.dark .lp-root {
+  color: var(--text-main);
+  background: var(--page-bg);
+}
+
+.dark .lp-nav {
+  background: rgba(17, 24, 39, 0.85);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dark .lp-nav-links a {
+  color: var(--text-muted);
+}
+
+.dark .lp-nav-links a:hover {
+  color: var(--primary-light);
+}
+
+.dark .lp-nav-cta {
+  background: var(--primary);
+  color: var(--text-inverse);
+}
+
+.dark .lp-nav-cta:hover {
+  background: var(--primary-light);
+}
+
+.dark .lp-hero {
+  background: linear-gradient(135deg, #0b0f19 0%, #111827 45%, #131929 100%);
+}
+
+.dark .lp-hero h1 {
+  color: var(--text-main);
+}
+
+.dark .lp-hero-sub {
+  color: var(--text-muted);
+}
+
+.dark .lp-btn-secondary {
+  background: var(--card-bg);
+  color: var(--text-main);
+  border-color: var(--border-color);
+}
+
+.dark .lp-btn-secondary:hover {
+  border-color: var(--primary);
+  background: var(--active-menu-bg);
+}
+
+.dark .lp-mockup-wrapper {
+  border-color: var(--border-color);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset;
+}
+
+.dark .lp-mockup-chrome {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dark .lp-chrome-url {
+  color: var(--text-muted);
+  background: var(--page-bg);
+}
+
+.dark .lp-mockup-body {
+  background: var(--page-bg);
+}
+
+.dark .lp-sidebar {
+  border-right-color: var(--border-color);
+  background: var(--card-bg);
+}
+
+.dark .lp-sidebar-item {
+  background: var(--border-color);
+}
+
+.dark .lp-sidebar-item.active {
+  background: var(--active-menu-bg);
+}
+
+.dark .lp-content-title {
+  background: var(--border-color);
+}
+
+.dark .lp-stat-card {
+  border-color: var(--border-color);
+  background: var(--card-bg);
+}
+
+.dark .lp-stat-label {
+  background: var(--border-color);
+}
+
+.dark .lp-stat-value {
+  background: var(--text-muted);
+}
+
+.dark .lp-chart-area {
+  border-color: var(--border-color);
+  background: var(--card-bg);
+}
+
+.dark .lp-chart-title {
+  background: var(--border-color);
+}
+
+.dark .lp-chart-legend {
+  background: var(--border-color);
+}
+
+.dark .lp-stats {
+  background: var(--card-bg);
+  border-top-color: var(--border-color);
+  border-bottom-color: var(--border-color);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.dark .lp-stat-number {
+  color: var(--text-main);
+}
+
+.dark .lp-stat-divider {
+  background: var(--border-color);
+}
+
+.dark .lp-features {
+  background: var(--page-bg);
+}
+
+.dark .lp-feature-card {
+  border-color: var(--border-color);
+  background: var(--card-bg);
+}
+
+.dark .lp-feature-icon {
+  background: var(--active-menu-bg);
+  border-color: var(--border-color);
+  color: var(--primary-light);
+}
+
+.dark .lp-feature-title {
+  color: var(--text-main);
+}
+
+.dark .lp-feature-desc {
+  color: var(--text-muted);
+}
+
+.dark .lp-process {
+  background: var(--card-bg);
+  border-top-color: var(--border-color);
+  border-bottom-color: var(--border-color);
+}
+
+.dark .lp-process-steps::before {
+  background: linear-gradient(to right, var(--border-color), var(--primary-dark), var(--border-color));
+}
+
+.dark .lp-step-num {
+  border-color: var(--border-color);
+  background: var(--card-bg);
+  color: var(--primary-light);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+
+.dark .lp-step-title {
+  color: var(--text-main);
+}
+
+.dark .lp-step-desc {
+  color: var(--text-muted);
+}
+
+.dark .lp-footer-tagline {
+  color: var(--text-muted);
+}
+
+.dark .lp-footer-col a {
+  color: var(--text-muted);
+}
+
+.dark .lp-footer-col a:hover {
+  color: var(--text-main);
+}
+
+.dark .lp-footer-bottom {
+  border-top-color: var(--border-color);
+  color: var(--text-muted);
+}
+

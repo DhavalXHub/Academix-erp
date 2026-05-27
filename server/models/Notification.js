@@ -17,6 +17,8 @@ const notificationSchema = new mongoose.Schema({
             'general',
             'submission_graded',
             'message',
+            'material_added',
+            'course_announcement',
         ],
         required: true,
     },

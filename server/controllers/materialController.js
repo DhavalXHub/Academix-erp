@@ -1,33 +1,68 @@
 const materialService = require('../services/materialService');
+const asyncHandler = require('../utils/asyncHandler');
+const ApiResponse = require('../utils/ApiResponse');
+const ApiError = require('../utils/ApiError');
 
-const ok = (res, code, data, msg = 'Success') =>
-    res.status(code).json({ success: true, message: msg, data, error: null });
-const err = (res, e) =>
-    res.status(e.status || 500).json({ success: false, data: null, error: { code: e.code || 'SERVER_ERROR', message: e.message } });
+// GET /api/v1/materials/course/:courseId
+const getMaterialsByCourse = asyncHandler(async (req, res) => {
+    const materials = await materialService.getMaterialsByCourse(
+        req.user.id, req.user.role, req.params.courseId
+    );
+    return ApiResponse.success(res, 200, { materials });
+});
 
-const getMaterialsByCourse = async (req, res) => {
-    try {
-        const materials = await materialService.getMaterialsByCourse(req.user.id, req.user.role, req.params.courseId);
-        return ok(res, 200, { materials });
-    } catch (e) { return err(res, e); }
+// POST /api/v1/materials/upload — multipart/form-data with real file
+const uploadMaterialFile = asyncHandler(async (req, res) => {
+    if (!req.file) throw ApiError.badRequest('No file uploaded.');
+    const { courseId, title, description, category, module: mod } = req.body;
+    if (!courseId) throw ApiError.badRequest('courseId is required.');
+
+    const material = await materialService.uploadMaterialFile(
+        req.user.id,
+        courseId,
+        req.file,
+        { title, description, category, module: mod }
+    );
+    return ApiResponse.success(res, 201, { material }, 'File uploaded successfully.');
+});
+
+// POST /api/v1/materials/link — external URL (JSON)
+const uploadMaterialLink = asyncHandler(async (req, res) => {
+    const { courseId, title, fileUrl, description, category, module: mod } = req.body;
+    if (!courseId || !title || !fileUrl) {
+        throw ApiError.badRequest('courseId, title, and fileUrl are required.');
+    }
+    const material = await materialService.uploadMaterialLink(
+        req.user.id,
+        courseId,
+        { title, fileUrl, description, category, module: mod }
+    );
+    return ApiResponse.success(res, 201, { material }, 'Link added successfully.');
+});
+
+// PATCH /api/v1/materials/:id
+const updateMaterial = asyncHandler(async (req, res) => {
+    const material = await materialService.updateMaterial(req.user.id, req.params.id, req.body);
+    return ApiResponse.success(res, 200, { material }, 'Material updated.');
+});
+
+// DELETE /api/v1/materials/:id
+const deleteMaterial = asyncHandler(async (req, res) => {
+    await materialService.deleteMaterial(req.user.id, req.user.role, req.params.id);
+    return ApiResponse.success(res, 200, null, 'Material deleted.');
+});
+
+// POST /api/v1/materials/:id/download
+const trackDownload = asyncHandler(async (req, res) => {
+    await materialService.trackDownload(req.params.id);
+    return ApiResponse.success(res, 200, null, 'Download tracked.');
+});
+
+module.exports = {
+    getMaterialsByCourse,
+    uploadMaterialFile,
+    uploadMaterialLink,
+    updateMaterial,
+    deleteMaterial,
+    trackDownload,
 };
-
-const uploadMaterial = async (req, res) => {
-    try {
-        const { courseId, title, description, fileUrl, type } = req.body;
-        if (!courseId || !title || !fileUrl) {
-            return res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'courseId, title, and fileUrl required.' } });
-        }
-        const material = await materialService.uploadMaterial(req.user.id, courseId, { title, description, fileUrl, type });
-        return ok(res, 201, { material }, 'Material uploaded successfully.');
-    } catch (e) { return err(res, e); }
-};
-
-const deleteMaterial = async (req, res) => {
-    try {
-        await materialService.deleteMaterial(req.user.id, req.params.id);
-        return ok(res, 200, null, 'Material deleted.');
-    } catch (e) { return err(res, e); }
-};
-
-module.exports = { getMaterialsByCourse, uploadMaterial, deleteMaterial };

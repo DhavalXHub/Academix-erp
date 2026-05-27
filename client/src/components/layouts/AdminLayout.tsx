@@ -35,7 +35,7 @@ const AdminLayout: React.FC = () => {
             <aside style={styles.sidebar}>
                 <div style={styles.brand}>
                     <Link to="/" style={styles.logoLink}>
-                        <span style={styles.logoIcon}>📘</span>
+                        <img src="/favicon.png?v=2" alt="Academix Logo" style={styles.logoIcon} />
                         <h2 style={styles.logoText}>Academix</h2>
                     </Link>
                     <span style={styles.roleTag}>Admin Console</span>
@@ -80,11 +80,11 @@ const styles: Record<string, React.CSSProperties> = {
     layout: { display: 'flex', minHeight: '100vh', background: 'var(--page-bg)', fontFamily: "'Inter', sans-serif" },
     sidebar: {
         width: 240, background:'var(--card-bg)', color: 'var(--text-main)',
-        display: 'flex', flexDirection: 'column', borderRight: '1px solid #e5e7eb',
+        display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border-color)',
     },
-    brand: { padding: '20px 20px 16px', borderBottom: '1px solid #f3f4f6' },
-    logoLink: { display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' },
-    logoIcon: { fontSize: 20 },
+    brand: { padding: '20px 20px 16px', borderBottom: '1px solid var(--border-color)' },
+    logoLink: { display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' },
+    logoIcon: { width: 32, height: 32, objectFit: 'contain' },
     logoText: { margin: 0, fontSize: 20, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' },
     roleTag: {
         display: 'inline-block', marginTop: 6, fontSize: 10, fontWeight: 700,
@@ -97,10 +97,10 @@ const styles: Record<string, React.CSSProperties> = {
         fontWeight: 500, fontSize: 13.5, transition: 'all 0.15s',
     },
     navLinkActive: {
-        background: '#eff6ff', color: '#2563eb', fontWeight: 600,
+        background: 'var(--active-menu-bg)', color: 'var(--primary)', fontWeight: 600,
     },
     sidebarFooter: {
-        padding: '16px 12px', borderTop: '1px solid #f3f4f6',
+        padding: '16px 12px', borderTop: '1px solid var(--border-color)',
         display: 'flex', flexDirection: 'column', gap: 4,
     },
     homeLink: {

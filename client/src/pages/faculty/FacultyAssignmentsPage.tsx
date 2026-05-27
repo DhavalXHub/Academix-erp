@@ -14,6 +14,12 @@ const emptyForm = { title: '', description: '', dueDate: '', maxMarks: 10, attac
 
 const FacultyAssignmentsPage: React.FC = () => {
     const { accessToken } = useAuth();
+
+    const getSecureUrl = (url: string) => {
+        if (!url || !url.includes('/uploads/')) return url;
+        const separator = url.includes('?') ? '&' : '?';
+        return `${url}${separator}token=${accessToken}`;
+    };
     const [courses, setCourses] = useState<Course[]>([]);
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -232,10 +238,10 @@ const FacultyAssignmentsPage: React.FC = () => {
                                         <div key={sub._id} style={s.subCard}>
                                             <div style={s.subTop}>
                                                 <div>
-                                                    <div style={s.aTitle}>{st?.user?.name || 'Student'}</div>
+                                                    <div style={s.aTitle}>{st?.name || 'Student'}</div>
                                                     <div style={s.aMeta}>{st?.rollNumber} • Submitted {new Date(sub.submittedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>
                                                     {sub.fileUrl && (
-                                                        <a href={sub.fileUrl as any} target="_blank" rel="noreferrer" style={s.link}>📎 View Submission</a>
+                                                        <a href={getSecureUrl(sub.fileUrl)} target="_blank" rel="noreferrer" style={s.link}>📎 View Submission</a>
                                                     )}
                                                 </div>
                                                 <div style={{ textAlign: 'right' }}>

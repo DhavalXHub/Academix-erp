@@ -76,7 +76,7 @@ const LoginPage: React.FC = () => {
                 {/* Header */}
                 <div style={styles.header}>
                     <div style={styles.logo}>
-                        <span style={{ fontSize: 24 }}>📘</span>
+                        <img src="/favicon.png?v=2" alt="Academix Logo" style={{ width: 36, height: 36, objectFit: 'contain' }} />
                         <span style={styles.logoText}>Academix</span>
                     </div>
                     <h1 style={styles.title}>Welcome back</h1>
@@ -183,7 +183,7 @@ const LoginPage: React.FC = () => {
 const styles: Record<string, React.CSSProperties> = {
     page: {
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: '#f0f4f8', fontFamily: "'Inter', 'Segoe UI', sans-serif",
+        background: 'var(--page-bg)', fontFamily: "'Inter', 'Segoe UI', sans-serif",
         position: 'relative', overflow: 'hidden', padding: '1rem',
     },
     bgCircle1: {
@@ -197,12 +197,12 @@ const styles: Record<string, React.CSSProperties> = {
     backBtn: {
         position: 'absolute', top: 24, left: 24, fontSize: 13, fontWeight: 600,
         color: 'var(--text-muted)', textDecoration: 'none', zIndex: 20,
-        padding: '8px 16px', borderRadius: 10, background:'var(--card-bg)', border: '1px solid #e5e7eb',
+        padding: '8px 16px', borderRadius: 10, background:'var(--card-bg)', border: '1px solid var(--border-color)',
         boxShadow: '0 1px 3px rgba(0,0,0,0.06)', transition: 'all 0.15s',
     },
     card: {
         background:'var(--card-bg)', borderRadius: 20, padding: '2.5rem', width: '100%', maxWidth: 440,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.12), 0 0 0 1px var(--border-color)',
         position: 'relative', zIndex: 10,
     },
     header: { textAlign: 'center', marginBottom: '2rem' },
@@ -213,7 +213,7 @@ const styles: Record<string, React.CSSProperties> = {
     roleLabel: { textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, marginBottom: '1rem', fontWeight: 600 },
     roleGrid: { display: 'flex', flexDirection: 'column', gap: 10 },
     roleCard: {
-        background:'var(--card-bg)', border: '1.5px solid #e5e7eb', borderRadius: 14, padding: '14px 16px',
+        background:'var(--card-bg)', border: '1.5px solid var(--border-color)', borderRadius: 14, padding: '14px 16px',
         cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14,
         textAlign: 'left', transition: 'all 0.15s', width: '100%',
     },
@@ -222,22 +222,22 @@ const styles: Record<string, React.CSSProperties> = {
     roleCardDesc: { fontSize: 12, color: 'var(--text-muted)', display: 'block', marginTop: 2, fontWeight: 500 },
     roleBadge: {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10,
-        padding: '10px 14px', fontSize: 14, fontWeight: 600, marginBottom: '1.25rem', color: '#1e40af',
+        background: 'var(--active-menu-bg)', border: '1px solid var(--border-color)', borderRadius: 10,
+        padding: '10px 14px', fontSize: 14, fontWeight: 600, marginBottom: '1.25rem', color: 'var(--primary)',
     },
     changeRole: {
-        background: 'none', border: 'none', color: '#2563eb',
+        background: 'none', border: 'none', color: 'var(--primary)',
         cursor: 'pointer', fontSize: 13, fontWeight: 600,
     },
     form: { display: 'flex', flexDirection: 'column', gap: 16 },
     errorBox: {
-        background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10,
-        padding: '10px 14px', fontSize: 13, color: '#dc2626', fontWeight: 500,
+        background: 'rgba(239, 68, 68, 0.12)', border: '1px solid var(--border-color)', borderRadius: 10,
+        padding: '10px 14px', fontSize: 13, color: '#ef4444', fontWeight: 500,
     },
     fieldWrapper: { display: 'flex', flexDirection: 'column', gap: 6 },
     label: { fontSize: 13, fontWeight: 600, color: 'var(--text-main)' },
     input: {
-        background: 'var(--page-bg)', border: '1.5px solid #e5e7eb', borderRadius: 10,
+        background: 'var(--page-bg)', border: '1.5px solid var(--border-color)', borderRadius: 10,
         padding: '11px 14px', fontSize: 14, color: 'var(--text-main)', outline: 'none',
         width: '100%', boxSizing: 'border-box', transition: 'border-color 0.15s',
         fontFamily: "'Inter', sans-serif", fontWeight: 500,
@@ -248,19 +248,19 @@ const styles: Record<string, React.CSSProperties> = {
         background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, lineHeight: 1,
     },
     submitBtn: {
-        background: '#2563eb', border: 'none', borderRadius: 12, padding: '12px',
+        background: 'var(--primary)', border: 'none', borderRadius: 12, padding: '12px',
         fontSize: 15, fontWeight: 700, color:'var(--card-bg)',
         cursor: 'pointer', transition: 'all 0.15s', marginTop: 4,
-        boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
+        boxShadow: '0 2px 8px rgba(var(--primary-rgb),0.3)',
     },
     demoSection: {
         marginTop: '1.5rem', textAlign: 'center', padding: '16px',
-        background: 'var(--page-bg)', borderRadius: 14, border: '1px solid #e5e7eb',
+        background: 'var(--page-bg)', borderRadius: 14, border: '1px solid var(--border-color)',
     },
     demoTitle: { margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.05em' },
     demoBtnRow: { display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 8 },
     demoBtn: {
-        padding: '6px 14px', borderRadius: 8, border: '1px solid #e5e7eb', background:'var(--card-bg)',
+        padding: '6px 14px', borderRadius: 8, border: '1px solid var(--border-color)', background:'var(--card-bg)',
         fontSize: 12, fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)', transition: 'all 0.15s',
     },
     demoHint: { margin: 0, fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 },

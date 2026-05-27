@@ -12,7 +12,7 @@ const timetableSchema = new mongoose.Schema({
     },
     faculty: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Faculty',
+        ref: 'User', // Changed from 'Faculty' → 'User' for consistency
         required: true,
     },
     dayOfWeek: {

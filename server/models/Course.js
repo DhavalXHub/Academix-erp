@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 
 /**
- * Course (upgraded Subject) model.
- * Replaces the thin Subject schema with proper references and validation.
- * NOTE: The legacy Subject model is kept for backward compatibility with AttendanceRoutes.
+ * Course model.
+ * Central academic entity linking faculty, students (via Enrollment), and content.
+ *
+ * IMPORTANT: primaryFaculty now references User._id (not Faculty._id) for
+ * consistency. The Faculty profile model stores extra metadata but the User _id
+ * is the canonical foreign key everywhere.
  */
 const courseSchema = new mongoose.Schema(
     {
@@ -31,9 +34,9 @@ const courseSchema = new mongoose.Schema(
             default: 4,
         },
         department: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Department',
             required: [true, 'Department is required'],
-            trim: true,
         },
         semester: {
             type: Number,
@@ -43,7 +46,7 @@ const courseSchema = new mongoose.Schema(
         },
         primaryFaculty: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Faculty',
+            ref: 'User', // Changed from 'Faculty' → 'User' for consistency
             default: null,
         },
         isActive: {

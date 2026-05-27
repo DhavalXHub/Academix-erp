@@ -86,7 +86,7 @@ const FacultyQuizAttemptsPage: React.FC = () => {
                                 return (
                                     <tr key={a._id} style={styles.tr}>
                                         <td style={styles.td}>{st.rollNumber}</td>
-                                        <td style={{ ...styles.td, color: 'var(--text-main)' }}>{st.user?.name}</td>
+                                        <td style={{ ...styles.td, color: 'var(--text-main)' }}>{st?.name || 'Student'}</td>
                                         <td style={styles.td}>
                                             <span style={isFinished ? styles.badgeDone : styles.badgeRunning}>
                                                 {isFinished ? 'Completed' : 'Running'}

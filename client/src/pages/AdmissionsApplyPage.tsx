@@ -52,7 +52,10 @@ const AdmissionsApplyPage: React.FC = () => {
     return (
         <div style={styles.page}>
             <header style={styles.header}>
-                <Link to="/" style={styles.logo}>Academix</Link>
+                <Link to="/" style={{ ...styles.logo, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <img src="/favicon.png?v=2" alt="Academix Logo" style={{ width: 34, height: 34, objectFit: 'contain' }} />
+                    <span>Academix</span>
+                </Link>
                 <Link to="/login" style={styles.login}>Portal Login</Link>
             </header>
 

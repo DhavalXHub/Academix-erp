@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
 
+/**
+ * CourseMaterial — Upgraded for real LMS file management.
+ * Supports actual uploaded files (via multer) AND external links.
+ */
 const courseMaterialSchema = new mongoose.Schema(
     {
         course: {
@@ -9,7 +13,7 @@ const courseMaterialSchema = new mongoose.Schema(
         },
         faculty: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Faculty',
+            ref: 'User',
             required: true,
         },
         title: {
@@ -22,14 +26,53 @@ const courseMaterialSchema = new mongoose.Schema(
             trim: true,
             default: '',
         },
+
+        // ── File Storage ──────────────────────────────────────────────
         fileUrl: {
             type: String,
-            required: true, // S3 or similar presigned URL
+            required: true, // Either a local /uploads/... path or an external URL
         },
-        type: {
+        fileName: {
             type: String,
-            enum: ['notes', 'ppt', 'video', 'other'],
+            default: '',
+        },
+        fileSize: {
+            type: Number, // bytes
+            default: 0,
+        },
+        mimeType: {
+            type: String,
+            default: '',
+        },
+        isExternalLink: {
+            type: Boolean,
+            default: false, // true = Google Drive / YouTube link
+        },
+
+        // ── LMS Organization ─────────────────────────────────────────
+        category: {
+            type: String,
+            enum: ['notes', 'slides', 'video', 'assignment_resource', 'lab_manual', 'reference', 'recording', 'other'],
             default: 'notes',
+        },
+        module: {
+            type: String,
+            default: 'General',
+            trim: true,
+        },
+        isPinned: {
+            type: Boolean,
+            default: false,
+        },
+        isVisible: {
+            type: Boolean,
+            default: true, // faculty can hide materials temporarily
+        },
+
+        // ── Analytics ────────────────────────────────────────────────
+        downloadCount: {
+            type: Number,
+            default: 0,
         },
         uploadedAt: {
             type: Date,
@@ -39,6 +82,9 @@ const courseMaterialSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-courseMaterialSchema.index({ course: 1, uploadedAt: -1 });
+// ── Indexes ───────────────────────────────────────────────────────────────────
+courseMaterialSchema.index({ course: 1, module: 1, uploadedAt: -1 });
+courseMaterialSchema.index({ course: 1, isPinned: -1, uploadedAt: -1 });
+courseMaterialSchema.index({ course: 1, isVisible: 1 });
 
 module.exports = mongoose.model('CourseMaterial', courseMaterialSchema);

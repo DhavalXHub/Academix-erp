@@ -1,56 +1,40 @@
 const express = require('express');
 const router = express.Router();
 const Invoice = require('../models/Invoice');
-const Student = require('../models/Student');
 const { protect, authorize } = require('../middleware/authMiddleware');
+const asyncHandler = require('../utils/asyncHandler');
+const ApiResponse = require('../utils/ApiResponse');
+const ApiError = require('../utils/ApiError');
 
 // @desc    Get Invoices for logged in student
 // @route   GET /api/billing/my
-router.get('/my', protect, authorize('student'), async (req, res) => {
-    try {
-        const student = await Student.findOne({ user: req.user.id });
-        if (!student) {
-            return res.status(404).json({ message: 'Student not found' });
-        }
-
-        const invoices = await Invoice.find({ student: student._id }).sort({ dueDate: 1 });
-        res.json(invoices);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-});
+// Invoice.student = User._id — query directly, no Student profile lookup needed
+router.get('/my', protect, authorize('student'), asyncHandler(async (req, res) => {
+    const invoices = await Invoice.find({ student: req.user.id }).sort({ dueDate: 1 });
+    return ApiResponse.success(res, 200, { invoices }, 'Invoices fetched.');
+}));
 
 // @desc    Pay an invoice
 // @route   POST /api/billing/pay/:id
-router.post('/pay/:id', protect, authorize('student'), async (req, res) => {
-    try {
-        const invoice = await Invoice.findById(req.params.id);
+router.post('/pay/:id', protect, authorize('student'), asyncHandler(async (req, res) => {
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice) throw ApiError.notFound('Invoice not found.');
 
-        if (!invoice) {
-            return res.status(404).json({ message: 'Invoice not found' });
-        }
-
-        // Check if invoice belongs to student
-        const student = await Student.findOne({ user: req.user.id });
-        if (invoice.student.toString() !== student._id.toString()) {
-            return res.status(401).json({ message: 'Not authorized' });
-        }
-
-        if (invoice.status === 'Paid') {
-            return res.status(400).json({ message: 'Invoice already paid' });
-        }
-
-        // Mock Payment Processing
-        invoice.status = 'Paid';
-        invoice.paidAt = Date.now();
-        await invoice.save();
-
-        res.json({ message: 'Payment Successful', invoice });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
+    // Invoice.student = User._id — compare directly
+    if (invoice.student.toString() !== req.user.id.toString()) {
+        throw ApiError.forbidden('Not authorized to pay this invoice.');
     }
-});
+
+    if (invoice.status === 'paid_full') {
+        throw ApiError.badRequest('Invoice already paid in full.');
+    }
+
+    // Mock Payment Processing
+    invoice.amountPaid = invoice.amountDue;
+    invoice.status = 'paid_full';
+    await invoice.save();
+
+    return ApiResponse.success(res, 200, { invoice }, 'Payment successful.');
+}));
 
 module.exports = router;

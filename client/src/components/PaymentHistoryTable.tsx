@@ -29,7 +29,7 @@ const PaymentHistoryTable: React.FC<PaymentHistoryTableProps> = ({ payments, isA
                         <tr key={p._id} style={styles.tr}>
                             <td style={styles.td}>{new Date(p.paymentDate).toLocaleDateString()}</td>
                             {isAdminView && (
-                                <td style={styles.td}>{p.student?.user?.name || 'N/A'}</td>
+                                <td style={styles.td}>{p.student?.name || 'N/A'}</td>
                             )}
                             <td style={styles.td}><span style={styles.txnId}>{p.transactionId}</span></td>
                             <td style={styles.td}>{p.method.replace('_', ' ').toUpperCase()}</td>

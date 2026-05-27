@@ -12,6 +12,12 @@ type StatusFilter = 'all' | 'pending' | 'submitted' | 'graded';
 
 const StudentAssignmentsPage: React.FC = () => {
     const { accessToken } = useAuth();
+
+    const getSecureUrl = (url: string) => {
+        if (!url || !url.includes('/uploads/')) return url;
+        const separator = url.includes('?') ? '&' : '?';
+        return `${url}${separator}token=${accessToken}`;
+    };
     const { notifications } = useSocket();
 
     const [courses, setCourses] = useState<Course[]>([]);
@@ -231,7 +237,7 @@ const StudentAssignmentsPage: React.FC = () => {
                                     <h3 style={{ ...s.cardTitle, marginBottom: 4 }}>{activeAssignment.title}</h3>
                                     <div style={s.aMeta}>Max: {activeAssignment.maxMarks} marks &nbsp;•&nbsp; Due: {new Date(activeAssignment.dueDate).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
                                     {(activeAssignment as any).attachmentUrl && (
-                                        <a href={(activeAssignment as any).attachmentUrl} target="_blank" rel="noreferrer" style={{ color: '#2563eb', fontSize: 13, display: 'block', marginTop: 6 }}>
+                                        <a href={getSecureUrl((activeAssignment as any).attachmentUrl)} target="_blank" rel="noreferrer" style={{ color: '#2563eb', fontSize: 13, display: 'block', marginTop: 6 }}>
                                             📎 View Assignment File
                                         </a>
                                     )}
@@ -270,7 +276,7 @@ const StudentAssignmentsPage: React.FC = () => {
                                             {new Date(mySubmission.submittedAt).toLocaleString('en-IN')}
                                         </div>
                                         {mySubmission.fileUrl && (
-                                            <a href={mySubmission.fileUrl as any} target="_blank" rel="noreferrer"
+                                            <a href={getSecureUrl(mySubmission.fileUrl)} target="_blank" rel="noreferrer"
                                                 style={{ display: 'inline-block', marginTop: 10, fontSize: 13, color: '#2563eb' }}>
                                                 📎 View your submission
                                             </a>

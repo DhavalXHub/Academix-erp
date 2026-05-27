@@ -59,18 +59,18 @@ const NotificationList: React.FC<NotificationListProps> = ({ notifications, onMa
 const styles: Record<string, any> = {
     empty: { padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: 14, fontStyle: 'italic' },
     container: { display: 'flex', flexDirection: 'column', maxHeight: 400, overflowY: 'auto' },
-    itemUnread: { display: 'flex', alignItems: 'flex-start', padding: '16px', borderBottom: '1px solid #e5e7eb', background: '#eff6ff', transition: 'background 0.2s' },
-    itemRead: { display: 'flex', alignItems: 'flex-start', padding: '16px', borderBottom: '1px solid #e5e7eb', background:'var(--card-bg)', opacity: 0.75 },
+    itemUnread: { display: 'flex', alignItems: 'flex-start', padding: '16px', borderBottom: '1px solid var(--border-color)', background: 'var(--active-menu-bg)', transition: 'background 0.2s' },
+    itemRead: { display: 'flex', alignItems: 'flex-start', padding: '16px', borderBottom: '1px solid var(--border-color)', background:'var(--card-bg)', opacity: 0.75 },
     content: { flex: 1 },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
     time: { fontSize: 11, color: 'var(--text-muted)' },
     message: { margin: 0, fontSize: 14, color: 'var(--text-main)', lineHeight: 1.4 },
     link: { display: 'inline-block', marginTop: 8, fontSize: 13, color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 },
-    readBtn: { marginLeft: 12, background: 'none', border: '1px solid #93c5fd', color: '#3b82f6', width: 24, height: 24, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 },
+    readBtn: { marginLeft: 12, background: 'none', border: '1px solid var(--border-color)', color: 'var(--primary)', width: 24, height: 24, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 },
     typeBadge: (type: string) => {
-        let bg = '#e0e7ff', col = 'var(--primary-dark)';
-        if (type.includes('quiz')) { bg = '#dcfce7'; col = '#15803d'; }
-        if (type.includes('assignment')) { bg = '#fee2e2'; col = '#b91c1c'; }
+        let bg = 'rgba(99, 102, 241, 0.15)', col = '#6366f1';
+        if (type.includes('quiz')) { bg = 'rgba(16, 185, 129, 0.15)'; col = '#10b981'; }
+        if (type.includes('assignment')) { bg = 'rgba(239, 68, 68, 0.15)'; col = '#ef4444'; }
         return { padding: '2px 8px', borderRadius: 99, background: bg, color: col, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' };
     }
 };

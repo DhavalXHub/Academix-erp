@@ -1,34 +1,31 @@
 const QuizAttempt = require('../models/QuizAttempt');
 const Quiz = require('../models/Quiz');
-const Student = require('../models/Student');
 const Enrollment = require('../models/Enrollment');
-const Faculty = require('../models/Faculty');
+const ApiError = require('../utils/ApiError');
 
-const _bad = (msg) => Object.assign(new Error(msg), { code: 'BAD_REQUEST', status: 400 });
-const _notFound = (msg) => Object.assign(new Error(msg), { code: 'NOT_FOUND', status: 404 });
-
+/**
+ * Start a quiz attempt.
+ * QuizAttempt.student = User._id, Enrollment.student = User._id.
+ * No Student profile lookup needed.
+ */
 const startQuiz = async (userId, quizId) => {
-    const student = await Student.findOne({ user: userId });
-    if (!student) throw _bad('Only students can attempt quizzes.');
-
     const quiz = await Quiz.findById(quizId);
-    if (!quiz || !quiz.isActive) throw _notFound('Active quiz not found.');
+    if (!quiz || !quiz.isActive) throw ApiError.notFound('Active quiz not found.');
 
-    const isEnrolled = await Enrollment.exists({ student: student._id, course: quiz.course, status: 'enrolled' });
-    if (!isEnrolled) throw _bad('You must be enrolled to take this quiz.');
+    // Enrollment check using User._id directly
+    const isEnrolled = await Enrollment.exists({ student: userId, course: quiz.course, status: 'enrolled' });
+    if (!isEnrolled) throw ApiError.forbidden('You must be enrolled to take this quiz.');
 
-    // Enforce 1 attempt
-    let attempt = await QuizAttempt.findOne({ quiz: quizId, student: student._id });
+    // Enforce 1 attempt per student
+    let attempt = await QuizAttempt.findOne({ quiz: quizId, student: userId });
     if (attempt) {
-        // If already completed
-        if (attempt.endTime) throw _bad('You have already completed this quiz.');
-        // If still active
-        return attempt; 
+        if (attempt.endTime) throw ApiError.badRequest('You have already completed this quiz.');
+        return attempt; // Resume in-progress attempt
     }
 
     attempt = await QuizAttempt.create({
         quiz: quizId,
-        student: student._id,
+        student: userId, // User._id
         startTime: Date.now(),
         endTime: null,
         answers: {},
@@ -38,41 +35,39 @@ const startQuiz = async (userId, quizId) => {
     return attempt;
 };
 
+/**
+ * Submit a quiz attempt with answers.
+ */
 const submitQuiz = async (userId, quizId, answers) => {
-    const student = await Student.findOne({ user: userId });
-    if (!student) throw _bad('Only students can submit quizzes.');
-
-    const attempt = await QuizAttempt.findOne({ quiz: quizId, student: student._id });
-    if (!attempt) throw _notFound('Active attempt not found. Please start the quiz first.');
-    if (attempt.endTime) throw _bad('Quiz has already been submitted.');
+    const attempt = await QuizAttempt.findOne({ quiz: quizId, student: userId });
+    if (!attempt) throw ApiError.notFound('Active attempt not found. Please start the quiz first.');
+    if (attempt.endTime) throw ApiError.badRequest('Quiz has already been submitted.');
 
     const quiz = await Quiz.findById(quizId);
-    if (!quiz) throw _notFound('Quiz not found.');
+    if (!quiz) throw ApiError.notFound('Quiz not found.');
 
-    // Check time limit with a small grace period (e.g. 1 minute)
+    // Check time limit with a small grace period (2 minutes)
     const now = Date.now();
     const elapsedTimeMin = (now - attempt.startTime.getTime()) / 60000;
     if (elapsedTimeMin > quiz.timeLimitMinutes + 2) {
-        // Force submit with no further answers recorded if they bypassed client timer
         attempt.endTime = now;
         await attempt.save();
-        throw _bad('Time limit exceeded. Your previous answers have been submitted automatically.');
+        throw ApiError.badRequest('Time limit exceeded. Your previous answers have been submitted automatically.');
     }
 
     // Calculate score
     let score = 0;
-    const recordedAnswers = { ...attempt.answers }; // Keep previous if they only sent partial, though client usually sends full state
-    
+    const recordedAnswers = {};
+
     // answers expected to be an object map: { questionId: selectedIndex }
     for (const [qId, selectedIdx] of Object.entries(answers)) {
         recordedAnswers[qId] = selectedIdx;
     }
 
     for (const q of quiz.questions) {
-        // Mongoose maps keys are strings, values are the type
         const answerVal = recordedAnswers[q._id.toString()];
         if (answerVal !== undefined && answerVal === q.correctOptionIndex) {
-            score += 1; // Assuming 1 mark per question for simplicity right now
+            score += 1;
         }
     }
 
@@ -89,31 +84,29 @@ const submitQuiz = async (userId, quizId, answers) => {
     };
 };
 
+/**
+ * Get all quiz attempts for the logged-in student.
+ */
 const getMyAttempts = async (userId) => {
-    const student = await Student.findOne({ user: userId });
-    if (!student) throw _bad('Only students can fetch their attempts.');
-
-    return QuizAttempt.find({ student: student._id })
+    return QuizAttempt.find({ student: userId }) // User._id directly
         .populate('quiz', 'title course timeLimitMinutes questions')
         .sort({ startTime: -1 });
 };
 
+/**
+ * Get all attempts for a specific quiz (faculty view).
+ * Quiz.faculty = User._id — compare directly.
+ */
 const getQuizAttemptsForFaculty = async (userId, quizId) => {
-    const faculty = await Faculty.findOne({ user: userId });
-    if (!faculty) throw _bad('Only faculty can view attempts.');
-
     const quiz = await Quiz.findById(quizId);
-    if (!quiz) throw _notFound('Quiz not found.');
-    if (quiz.faculty.toString() !== faculty._id.toString()) {
-        throw _bad('Unauthorized to view this quiz.');
+    if (!quiz) throw ApiError.notFound('Quiz not found.');
+    // Quiz.faculty = User._id — direct comparison
+    if (quiz.faculty.toString() !== userId.toString()) {
+        throw ApiError.forbidden('Unauthorized to view this quiz.');
     }
 
     return QuizAttempt.find({ quiz: quizId })
-        .populate({
-            path: 'student',
-            select: 'rollNumber user',
-            populate: { path: 'user', select: 'name email' }
-        })
+        .populate('student', 'name email') // User fields directly
         .sort({ score: -1 });
 };
 

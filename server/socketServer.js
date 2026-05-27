@@ -2,7 +2,6 @@ const { Server } = require('socket.io');
 const { getAllowedOrigins } = require('./config/env');
 const Course = require('./models/Course');
 const Enrollment = require('./models/Enrollment');
-const Faculty = require('./models/Faculty');
 
 let io;
 
@@ -43,12 +42,29 @@ const initSocket = (server) => {
             const userId = socket.user?.id;
             if (!userId) return;
             socket.join(`user_${userId}`);
+
+            // Join role-based room so admins/faculty/students get role-targeted events
+            if (socket.user.role) {
+                socket.join(`role_${socket.user.role}`);
+            }
         });
 
         socket.on('joinCourse', async (courseId) => {
             if (!courseId || !socket.user?.id) return;
             const isAllowed = await canJoinCourseRoom(socket.user, courseId);
             if (isAllowed) socket.join(`course_${courseId}`);
+        });
+
+        // Faculty joins a QR session room to receive real-time scan updates
+        socket.on('joinQRSession', async (sessionId) => {
+            if (!sessionId || !socket.user?.id) return;
+            if (socket.user.role === 'faculty' || socket.user.role === 'admin') {
+                socket.join(`qr_session_${sessionId}`);
+            }
+        });
+
+        socket.on('leaveQRSession', (sessionId) => {
+            if (sessionId) socket.leave(`qr_session_${sessionId}`);
         });
 
         // Typing indicator for 1:1 chats
@@ -68,6 +84,10 @@ const initSocket = (server) => {
     return io;
 };
 
+/**
+ * Check if a user is allowed to join a course's socket room.
+ * Since all refs are now User._id, no need to look up Faculty profile.
+ */
 const canJoinCourseRoom = async (user, courseId) => {
     if (user.role === 'admin') return true;
 
@@ -76,9 +96,8 @@ const canJoinCourseRoom = async (user, courseId) => {
     }
 
     if (user.role === 'faculty') {
-        const faculty = await Faculty.findOne({ user: user.id }).select('_id');
-        if (!faculty) return false;
-        return Boolean(await Course.exists({ _id: courseId, primaryFaculty: faculty._id, isActive: true }));
+        // primaryFaculty now stores User._id directly — no Faculty lookup needed
+        return Boolean(await Course.exists({ _id: courseId, primaryFaculty: user.id, isActive: true }));
     }
 
     return false;

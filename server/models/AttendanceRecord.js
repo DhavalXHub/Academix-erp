@@ -4,6 +4,10 @@ const mongoose = require('mongoose');
  * AttendanceRecord — Represents a single session's attendance for a specific course.
  * Contains an array of records for all enrolled students.
  * Prevents multiple attendance sessions for the same course on the same day.
+ *
+ * IMPORTANT: All user references (faculty, student) now point to the User model
+ * for consistency across the entire system. Profile data (Student/Faculty) is
+ * fetched separately when needed.
  */
 const attendanceRecordSchema = new mongoose.Schema(
     {
@@ -14,7 +18,7 @@ const attendanceRecordSchema = new mongoose.Schema(
         },
         faculty: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Faculty',
+            ref: 'User', // Changed from 'Faculty' → 'User' for consistency
             required: true,
         },
         date: {
@@ -25,7 +29,7 @@ const attendanceRecordSchema = new mongoose.Schema(
             {
                 student: {
                     type: mongoose.Schema.Types.ObjectId,
-                    ref: 'Student',
+                    ref: 'User', // Changed from 'Student' → 'User' for consistency
                     required: true,
                 },
                 status: {

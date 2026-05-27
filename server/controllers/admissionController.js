@@ -2,6 +2,7 @@ const AdmissionApplication = require('../models/AdmissionApplication');
 const Program = require('../models/Program');
 const Student = require('../models/Student');
 const User = require('../models/User');
+const Department = require('../models/Department');
 
 const ok = (res, status, data, message = 'Success', meta) => {
     res.status(status).json({ success: true, message, data, meta: meta || undefined, error: null, requestId: res.getHeader('X-Request-Id') });
@@ -231,10 +232,20 @@ const convertApplicationToStudent = async (req, res, next) => {
             role: 'student',
         });
 
+        const deptId = application.program?.department?._id || application.program?.department;
+        let finalDeptId = deptId;
+        if (!finalDeptId) {
+            const defaultDept = await Department.findOne();
+            if (!defaultDept) {
+                return fail(res, 400, 'NO_DEPARTMENTS', 'No departments found in the system. Please create a department first.');
+            }
+            finalDeptId = defaultDept._id;
+        }
+
         const student = await Student.create({
             user: user._id,
             rollNumber,
-            department: application.program?.department?.name || 'General',
+            department: finalDeptId,
             semester: 1,
             batchYear: year,
         });

@@ -1,19 +1,23 @@
 const User = require('../models/User');
 const Student = require('../models/Student');
 const Faculty = require('../models/Faculty');
+const ApiError = require('../utils/ApiError');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /**
- * Fetch the role-specific profile document populated with user info.
- * Returns null if no profile exists.
+ * Fetch the role-specific profile document populated with user info and department.
  */
 const _getProfileByUserId = async (userId, role) => {
     if (role === 'student') {
-        return Student.findOne({ user: userId }).populate('user', '-password -refreshTokenHash');
+        return Student.findOne({ user: userId })
+            .populate('user', '-password -refreshTokenHash')
+            .populate('department', 'name code');
     }
     if (role === 'faculty') {
-        return Faculty.findOne({ user: userId }).populate('user', '-password -refreshTokenHash');
+        return Faculty.findOne({ user: userId })
+            .populate('user', '-password -refreshTokenHash')
+            .populate('department', 'name code');
     }
     return null;
 };
@@ -22,7 +26,6 @@ const _getProfileByUserId = async (userId, role) => {
 
 /**
  * Get a paginated, filtered list of all users.
- * Supports query params: role, search (name/email), page, limit
  */
 const getAllUsers = async ({ role, search, page = 1, limit = 20 }) => {
     const query = {};
@@ -68,11 +71,11 @@ const getUserById = async (userId) => {
 
 /**
  * Create a new user and an associated role-specific profile.
- * Admin only action.
+ * Admin only action. Department is now an ObjectId.
  */
 const createUser = async ({ name, email, password, role, profileData = {} }) => {
     const existing = await User.findOne({ email });
-    if (existing) throw Object.assign(new Error('A user with this email already exists.'), { code: 'USER_EXISTS', status: 409 });
+    if (existing) throw ApiError.conflict('A user with this email already exists.');
 
     const user = await User.create({ name, email, password, role });
 
@@ -80,7 +83,7 @@ const createUser = async ({ name, email, password, role, profileData = {} }) => 
         await Student.create({
             user: user._id,
             rollNumber: profileData.rollNumber || 'STU' + Date.now(),
-            department: profileData.department || 'General',
+            department: profileData.department, // Must be a valid Department ObjectId
             semester: profileData.semester || 1,
             batchYear: profileData.batchYear || new Date().getFullYear(),
         });
@@ -88,7 +91,7 @@ const createUser = async ({ name, email, password, role, profileData = {} }) => 
         await Faculty.create({
             user: user._id,
             employeeId: profileData.employeeId || 'EMP' + Date.now(),
-            department: profileData.department || 'General',
+            department: profileData.department, // Must be a valid Department ObjectId
             designation: profileData.designation || 'Lecturer',
         });
     }
@@ -98,10 +101,8 @@ const createUser = async ({ name, email, password, role, profileData = {} }) => 
 
 /**
  * Update a user's core fields (name, email, role, isActive).
- * Admin only action.
  */
 const updateUser = async (userId, updates) => {
-    // Disallow password updates through this route — use dedicated change-password endpoint
     const ALLOWED_FIELDS = ['name', 'email', 'role', 'isActive'];
     const safeUpdates = Object.fromEntries(
         Object.entries(updates).filter(([key]) => ALLOWED_FIELDS.includes(key))
@@ -110,31 +111,31 @@ const updateUser = async (userId, updates) => {
     const user = await User.findByIdAndUpdate(userId, safeUpdates, { new: true, runValidators: true })
         .select('-password -refreshTokenHash');
 
-    if (!user) throw Object.assign(new Error('User not found.'), { code: 'USER_NOT_FOUND', status: 404 });
+    if (!user) throw ApiError.notFound('User not found.');
     return user;
 };
 
 /**
- * Soft-deactivate a user (sets isActive: false). Cannot deactivate own account.
- * For hard delete see deleteUser.
+ * Soft-deactivate a user.
  */
 const deactivateUser = async (userId, requestingUserId) => {
     if (String(userId) === String(requestingUserId)) {
-        throw Object.assign(new Error('You cannot deactivate your own account.'), { code: 'SELF_ACTION', status: 400 });
+        throw ApiError.badRequest('You cannot deactivate your own account.');
     }
     return updateUser(userId, { isActive: false });
 };
 
 /**
  * Hard delete a user and their associated profile.
+ * TODO: Phase 1C will add cascade hooks for enrollments, submissions, etc.
  */
 const deleteUser = async (userId, requestingUserId) => {
     if (String(userId) === String(requestingUserId)) {
-        throw Object.assign(new Error('You cannot delete your own account.'), { code: 'SELF_ACTION', status: 400 });
+        throw ApiError.badRequest('You cannot delete your own account.');
     }
 
     const user = await User.findById(userId);
-    if (!user) throw Object.assign(new Error('User not found.'), { code: 'USER_NOT_FOUND', status: 404 });
+    if (!user) throw ApiError.notFound('User not found.');
 
     // Delete role-specific profile document
     if (user.role === 'student') await Student.deleteOne({ user: userId });

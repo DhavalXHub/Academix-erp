@@ -20,7 +20,7 @@ const sectionSchema = new mongoose.Schema(
         },
         classAdvisor: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Faculty',
+            ref: 'User', // Changed from 'Faculty' → 'User' for consistency
             default: null,
         },
         room: {

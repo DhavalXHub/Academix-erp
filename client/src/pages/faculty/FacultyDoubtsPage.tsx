@@ -45,10 +45,10 @@ const FacultyDoubtsPage: React.FC = () => {
         setIsLoadingDoubts(true);
         try {
             const res = await fetchCourseDoubts(accessToken, courseId);
-            setDoubts(res.data.doubts || []);
+            setDoubts(res.doubts || []);
             // Update active selected doubt if open
             if (selectedDoubt) {
-                const refreshed = res.data.doubts.find(d => d._id === selectedDoubt._id);
+                const refreshed = res.doubts.find(d => d._id === selectedDoubt._id);
                 if (refreshed) setSelectedDoubt(refreshed);
             }
         } catch (e: any) {
@@ -73,7 +73,7 @@ const FacultyDoubtsPage: React.FC = () => {
         setIsReplying(true);
         try {
             const res = await replyToDoubt(accessToken, selectedDoubt._id, replyMsg);
-            setSelectedDoubt(res.data.doubt);
+            setSelectedDoubt(res.doubt);
             setReplyMsg('');
             showToast('✅ Reply sent!');
             if (selectedCourse) loadDoubts(selectedCourse._id);

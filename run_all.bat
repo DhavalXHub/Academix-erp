@@ -4,8 +4,8 @@ echo   Starting Academix ERP Application
 echo ========================================
 echo.
 
-echo [1/2] Starting Backend Server (port 5000)...
-start "Academix Backend" cmd /k "cd /d %~dp0 && node server/server.js"
+echo [1/2] Starting Backend Server with nodemon (port 5000)...
+start "Academix Backend" cmd /k "cd /d %~dp0 && npm run dev"
 
 echo [2/2] Starting Frontend Dev Server (port 5173)...
 start "Academix Frontend" cmd /k "cd /d %~dp0client && npm run dev"

@@ -8,7 +8,10 @@ const Navbar: React.FC = () => {
     return (
         <nav className="lp-nav">
             <div className="lp-nav-inner">
-                <Link to="/" className="lp-logo">Academix</Link>
+                <Link to="/" className="lp-logo" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <img src="/favicon.png?v=2" alt="Academix Logo" style={{ width: 34, height: 34, objectFit: 'contain' }} />
+                    <span>Academix</span>
+                </Link>
                 <ul className="lp-nav-links">
                     <li><a href="#features">Features</a></li>
                     <li

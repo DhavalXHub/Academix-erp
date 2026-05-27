@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
 
+/**
+ * QuizAttempt — records a student's attempt at a quiz.
+ * References User._id (not Student._id) for consistency.
+ */
 const quizAttemptSchema = new mongoose.Schema({
     quiz: {
         type: mongoose.Schema.Types.ObjectId,
@@ -8,7 +12,7 @@ const quizAttemptSchema = new mongoose.Schema({
     },
     student: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Student',
+        ref: 'User', // Changed from 'Student' → 'User' for consistency
         required: true
     },
     // Map questionId -> selectedOptionIndex
@@ -31,8 +35,7 @@ const quizAttemptSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Ensure one attempt per student per quiz (if we want to restrict to 1 attempt)
-// The prompt says "prevent multiple attempts if restricted" but doesn't explicitly mention a setting. Let's make it unique.
+// Ensure one attempt per student per quiz
 quizAttemptSchema.index({ quiz: 1, student: 1 }, { unique: true });
 
 module.exports = mongoose.model('QuizAttempt', quizAttemptSchema);

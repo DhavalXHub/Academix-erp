@@ -12,13 +12,19 @@ const sendError = (res, statusCode, message, code) => {
  */
 const protect = async (req, res, next) => {
     try {
+        let token;
         const authHeader = req.headers.authorization;
 
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.split(' ')[1];
+        } else if (req.query && req.query.token) {
+            token = req.query.token;
+        }
+
+        if (!token) {
             return sendError(res, 401, 'No access token provided.', 'NO_TOKEN');
         }
 
-        const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         // Attach lightweight user context (avoids a DB hit on every request)

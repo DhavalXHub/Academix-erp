@@ -1,43 +1,30 @@
 const invoiceService = require('../services/invoiceService');
+const asyncHandler = require('../utils/asyncHandler');
+const ApiResponse = require('../utils/ApiResponse');
 
-const ok = (res, code, data, msg = 'Success') => res.status(code).json({ success: true, message: msg, data, error: null });
-const err = (res, e) => res.status(e.status || 500).json({ success: false, data: null, error: { code: e.code || 'SERVER_ERROR', message: e.message } });
+const createInvoice = asyncHandler(async (req, res) => {
+    const invoice = await invoiceService.createInvoice(req.body);
+    return ApiResponse.success(res, 201, { invoice }, 'Invoice generated.');
+});
 
-const createInvoice = async (req, res) => {
-    try {
-        const invoice = await invoiceService.createInvoice(req.body);
-        return ok(res, 201, { invoice }, 'Invoice generated.');
-    } catch (e) { return err(res, e); }
-};
+const getAllInvoices = asyncHandler(async (req, res) => {
+    const invoices = await invoiceService.getAllInvoices();
+    return ApiResponse.success(res, 200, { invoices });
+});
 
-const getAllInvoices = async (req, res) => {
-    try {
-        const invoices = await invoiceService.getAllInvoices();
-        return ok(res, 200, { invoices });
-    } catch (e) { return err(res, e); }
-};
+const getInvoiceById = asyncHandler(async (req, res) => {
+    const invoice = await invoiceService.getInvoiceById(req.params.id);
+    return ApiResponse.success(res, 200, { invoice });
+});
 
-const getInvoiceById = async (req, res) => {
-    try {
-        const invoice = await invoiceService.getInvoiceById(req.params.id);
-        return ok(res, 200, { invoice });
-    } catch (e) { return err(res, e); }
-};
+const updateInvoice = asyncHandler(async (req, res) => {
+    const invoice = await invoiceService.updateInvoice(req.params.id, req.body);
+    return ApiResponse.success(res, 200, { invoice }, 'Invoice updated.');
+});
 
-const updateInvoice = async (req, res) => {
-    try {
-        const invoice = await invoiceService.updateInvoice(req.params.id, req.body);
-        return ok(res, 200, { invoice }, 'Invoice updated.');
-    } catch (e) { return err(res, e); }
-};
+const getMyInvoices = asyncHandler(async (req, res) => {
+    const invoices = await invoiceService.getMyInvoices(req.user.id);
+    return ApiResponse.success(res, 200, { invoices });
+});
 
-const getMyInvoices = async (req, res) => {
-    try {
-        const invoices = await invoiceService.getMyInvoices(req.user.id);
-        return ok(res, 200, { invoices });
-    } catch (e) { return err(res, e); }
-};
-
-module.exports = {
-    createInvoice, getAllInvoices, getInvoiceById, updateInvoice, getMyInvoices
-};
+module.exports = { createInvoice, getAllInvoices, getInvoiceById, updateInvoice, getMyInvoices };

@@ -21,7 +21,7 @@ const departmentSchema = new mongoose.Schema(
         },
         headOfDepartment: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Faculty',
+            ref: 'User', // Changed from 'Faculty' → 'User' for consistency
             default: null,
         },
         isActive: {

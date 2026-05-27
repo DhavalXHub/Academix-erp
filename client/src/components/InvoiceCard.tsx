@@ -30,9 +30,9 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({ invoice, onPay, isAdminView }
             </div>
             
             <div style={styles.body}>
-                {isAdminView && invoice.student?.user && (
+                {isAdminView && invoice.student && (
                     <p style={styles.studentInfo}>
-                        <strong>Student:</strong> {invoice.student.user.name} ({invoice.student.rollNumber})
+                        <strong>Student:</strong> {invoice.student.name || 'Unknown'} ({invoice.student.email || ''})
                     </p>
                 )}
                 {invoice.description && <p style={styles.desc}>{invoice.description}</p>}

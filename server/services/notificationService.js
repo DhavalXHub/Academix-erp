@@ -89,18 +89,30 @@ const broadcastAnnouncement = async (title, content, targetAudience = 'all', pos
     return inserted;
 };
 
-/**
- * Notify all students enrolled in a course.
- * Emits to personal user rooms (reliable — doesn't require course room membership).
- */
 const notifyCourseStudents = async (courseId, type, message, linkAction = '') => {
-    const enrollments = await Enrollment.find({ course: courseId, status: 'enrolled' })
-        .populate({ path: 'student', select: 'user' });
+    const Course = require('../models/Course');
+    const Student = require('../models/Student');
 
-    if (!enrollments.length) return;
+    const course = await Course.findById(courseId);
+    if (!course) return;
 
-    const notifDocs = enrollments.map(e => ({
-        recipient: e.student.user,
+    // Find all students whose department and semester match this course
+    const studentProfiles = await Student.find({
+        department: course.department,
+        semester: course.semester
+    });
+
+    const studentUserIdsSet = new Set(studentProfiles.map(s => s.user.toString()));
+
+    // Also look up any manual/legacy enrollments for this course
+    const enrollments = await Enrollment.find({ course: courseId, status: 'enrolled' });
+    enrollments.forEach(e => studentUserIdsSet.add(e.student.toString()));
+
+    const recipientIds = Array.from(studentUserIdsSet);
+    if (!recipientIds.length) return;
+
+    const notifDocs = recipientIds.map(uid => ({
+        recipient: uid,
         type,
         message,
         linkAction,
@@ -110,10 +122,9 @@ const notifyCourseStudents = async (courseId, type, message, linkAction = '') =>
 
     try {
         const io = getIO();
-        enrollments.forEach(e => {
-            const userId = e.student.user.toString();
-            const notif = inserted.find(n => n.recipient.toString() === userId);
-            if (notif) io.to(`user_${userId}`).emit('newNotification', notif);
+        recipientIds.forEach(uid => {
+            const notif = inserted.find(n => n.recipient.toString() === uid);
+            if (notif) io.to(`user_${uid}`).emit('newNotification', notif);
         });
     } catch (err) {
         console.error('[Notification] Socket course notify failed:', err.message);
@@ -123,7 +134,7 @@ const notifyCourseStudents = async (courseId, type, message, linkAction = '') =>
 };
 
 /**
- * Send deadline reminder notifications for assignments due in `hoursAhead` hours.
+ * Send deadline reminders for assignments due in `hoursAhead` hours.
  * Called by the cron scheduler.
  */
 const sendDeadlineReminders = async (hoursAhead) => {
@@ -157,8 +168,7 @@ const sendDeadlineReminders = async (hoursAhead) => {
 
     for (const assignment of assignments) {
         const courseId = assignment.course._id || assignment.course;
-        const enrollments = await Enrollment.find({ course: courseId, status: 'enrolled' })
-            .populate({ path: 'student', select: 'user' });
+        const enrollments = await Enrollment.find({ course: courseId, status: 'enrolled' });
 
         if (!enrollments.length) continue;
 
@@ -166,7 +176,7 @@ const sendDeadlineReminders = async (hoursAhead) => {
         const message = `⏰ Deadline Alert: "${assignment.title}" in ${courseName} is due in ${timeLabel}!`;
 
         const notifDocs = enrollments.map(e => ({
-            recipient: e.student.user,
+            recipient: e.student,
             type,
             message,
             linkAction: '/student/assignments',
@@ -177,7 +187,7 @@ const sendDeadlineReminders = async (hoursAhead) => {
         try {
             const io = getIO();
             enrollments.forEach(e => {
-                const userId = e.student.user.toString();
+                const userId = e.student.toString();
                 const notif = inserted.find(n => n.recipient.toString() === userId);
                 if (notif) io.to(`user_${userId}`).emit('newNotification', notif);
             });

@@ -28,7 +28,7 @@ const FacultyLeavesPage: React.FC = () => {
         setIsLoading(true);
         try {
             const res = await fetchMyLeaves(accessToken);
-            setLeaves(res.data.leaves || []);
+            setLeaves(res.leaves || []);
         } catch (e: any) {
             showToast(e.message || 'Failed to fetch leave history.', false);
         } finally {

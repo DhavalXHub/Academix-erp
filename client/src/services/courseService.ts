@@ -2,12 +2,21 @@ import api from './api';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+/**
+ * primaryFaculty is now populated directly from User model (not Faculty→User).
+ * department is now populated from Department model.
+ */
 export interface FacultyInfo {
     _id: string;
-    employeeId: string;
-    designation: string;
-    department: string;
-    user: { name: string; email: string };
+    name: string;
+    email: string;
+    role: string;
+}
+
+export interface DepartmentInfo {
+    _id: string;
+    name: string;
+    code: string;
 }
 
 export interface Course {
@@ -16,18 +25,21 @@ export interface Course {
     title: string;
     description: string;
     credits: number;
-    department: string;
+    department: DepartmentInfo | string;
     semester: number;
     primaryFaculty: FacultyInfo | null;
     isActive: boolean;
     maxEnrollment: number;
     enrolledCount?: number;
+    syllabusProgress?: number;
+    syllabusUnits?: { title: string; isCompleted: boolean }[];
     createdAt: string;
 }
 
 export interface Enrollment {
     _id: string;
     course: Course;
+    student?: FacultyInfo;
     academicYear: string;
     semester: number;
     status: 'enrolled' | 'dropped' | 'completed';
@@ -97,3 +109,25 @@ export const enrollInCourse = (token: string, courseId: string): Promise<{ enrol
 
 export const dropCourse = (token: string, enrollmentId: string): Promise<void> =>
     api.delete(`/enrollments/${enrollmentId}`, token);
+
+// ── Helper to extract faculty display name ────────────────────────────────────
+
+/**
+ * Utility to get faculty display name from the new flat User populate.
+ * Previously: course.primaryFaculty?.user?.name
+ * Now:        course.primaryFaculty?.name
+ */
+export const getFacultyDisplayName = (course: Course): string => {
+    if (!course.primaryFaculty) return 'Unassigned';
+    return course.primaryFaculty.name || course.primaryFaculty.email || 'Unknown';
+};
+
+/**
+ * Utility to get department display name from the new Department populate.
+ * Previously: course.department (string)
+ * Now:        course.department.name or course.department (string fallback)
+ */
+export const getDepartmentDisplayName = (course: Course): string => {
+    if (typeof course.department === 'string') return course.department;
+    return course.department?.name || 'Unknown';
+};

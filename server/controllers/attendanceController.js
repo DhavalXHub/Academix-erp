@@ -1,48 +1,30 @@
 const attendanceService = require('../services/attendanceService');
-
-const ok = (res, code, data, msg = 'Success') =>
-    res.status(code).json({ success: true, message: msg, data, error: null });
-const err = (res, e) =>
-    res.status(e.status || 500).json({ success: false, data: null, error: { code: e.code || 'SERVER_ERROR', message: e.message } });
+const asyncHandler = require('../utils/asyncHandler');
+const ApiResponse = require('../utils/ApiResponse');
+const ApiError = require('../utils/ApiError');
 
 // POST /api/v1/attendance/mark
-const markAttendance = async (req, res) => {
-    try {
-        const { courseId, date, records } = req.body;
-        if (!courseId || !date || !records || !Array.isArray(records)) {
-            return res.status(400).json({
-                success: false, data: null, error: { code: 'MISSING_FIELDS', message: 'courseId, date, and an array of records are required.' }
-            });
-        }
-        const attendance = await attendanceService.markAttendance(req.user.id, courseId, date, records);
-        return ok(res, 201, { attendance }, 'Attendance marked successfully.');
-    } catch (e) {
-        console.error(e);
-        return err(res, e);
+const markAttendance = asyncHandler(async (req, res) => {
+    const { courseId, date, records } = req.body;
+    if (!courseId || !date || !records || !Array.isArray(records)) {
+        throw ApiError.badRequest('courseId, date, and an array of records are required.', 'MISSING_FIELDS');
     }
-};
+    // req.user.id is User._id — matches AttendanceRecord.faculty ref (now User)
+    const attendance = await attendanceService.markAttendance(req.user.id, courseId, date, records);
+    return ApiResponse.success(res, 201, { attendance }, 'Attendance marked successfully.');
+});
 
 // GET /api/v1/attendance/my-records (Student)
-const getMyRecords = async (req, res) => {
-    try {
-        const data = await attendanceService.getStudentAttendance(req.user.id);
-        return ok(res, 200, data, 'Student attendance fetched.');
-    } catch (e) {
-        console.error(e);
-        return err(res, e);
-    }
-};
+const getMyRecords = asyncHandler(async (req, res) => {
+    const data = await attendanceService.getStudentAttendance(req.user.id);
+    return ApiResponse.success(res, 200, data, 'Student attendance fetched.');
+});
 
 // GET /api/v1/attendance/course/:courseId (Faculty/Admin)
-const getCourseAttendance = async (req, res) => {
-    try {
-        const data = await attendanceService.getCourseAttendance(req.params.courseId);
-        return ok(res, 200, data, 'Course attendance fetched.');
-    } catch (e) {
-        console.error(e);
-        return err(res, e);
-    }
-};
+const getCourseAttendance = asyncHandler(async (req, res) => {
+    const data = await attendanceService.getCourseAttendance(req.params.courseId);
+    return ApiResponse.success(res, 200, data, 'Course attendance fetched.');
+});
 
 module.exports = {
     markAttendance,

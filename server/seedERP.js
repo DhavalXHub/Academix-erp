@@ -1,14 +1,20 @@
 /**
- * Enhanced Academix ERP Seeder
- * Populates database with comprehensive demo data for all modules
+ * Academix ERP Seeder — v2
+ * Fully consistent with unified User._id references across all models.
+ * Department is now an ObjectId reference, not a string.
+ *
+ * Usage: node server/seedERP.js
  */
 
-require('dotenv').config();
-const mongoose = require('./config/db');
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+
+// Models
 const User = require('./models/User');
 const Student = require('./models/Student');
 const Faculty = require('./models/Faculty');
+const Department = require('./models/Department');
 const Course = require('./models/Course');
 const Enrollment = require('./models/Enrollment');
 const Timetable = require('./models/Timetable');
@@ -22,51 +28,73 @@ const Invoice = require('./models/Invoice');
 const Payment = require('./models/Payment');
 const Notification = require('./models/Notification');
 const Notice = require('./models/Notice');
+const InstitutionSettings = require('./models/InstitutionSettings');
+
+const connectDB = require('./config/db');
 
 const seedDatabase = async () => {
     try {
-        console.log('🌱 Starting Academix ERP Database Seed...\n');
+        console.log('🌱 Starting Academix ERP Database Seed (v2)...\n');
 
-        // Clear existing data
-        await Promise.all([
-            User.deleteMany({}),
-            Student.deleteMany({}),
-            Faculty.deleteMany({}),
-            Course.deleteMany({}),
-            Enrollment.deleteMany({}),
-            Timetable.deleteMany({}),
-            AttendanceRecord.deleteMany({}),
-            Marks.deleteMany({}),
-            Assignment.deleteMany({}),
-            Submission.deleteMany({}),
-            Quiz.deleteMany({}),
-            QuizAttempt.deleteMany({}),
-            Invoice.deleteMany({}),
-            Payment.deleteMany({}),
-            Notification.deleteMany({}),
-            Notice.deleteMany({}),
+        // Clear ALL collections
+        const collections = [
+            User, Student, Faculty, Department, Course, Enrollment,
+            Timetable, AttendanceRecord, Marks, Assignment, Submission,
+            Quiz, QuizAttempt, Invoice, Payment, Notification, Notice,
+            InstitutionSettings,
+        ];
+        await Promise.all(collections.map(M => M.deleteMany({})));
+        console.log('✓ Cleared all existing data');
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 1. INSTITUTION SETTINGS
+        // ═══════════════════════════════════════════════════════════════════
+        await InstitutionSettings.create({
+            name: 'Academix University',
+            code: 'ACX',
+            activeAcademicYear: '2025-2026',
+            attendanceThreshold: 75,
+            defaultCurrency: 'INR',
+            gradingScheme: 'marks',
+            contactEmail: 'info@academix.edu',
+            contactPhone: '+91-1234567890',
+            address: '123 University Road, Pune, Maharashtra',
+        });
+        console.log('✓ Created institution settings');
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 2. DEPARTMENTS (ObjectId-based, not strings)
+        // ═══════════════════════════════════════════════════════════════════
+        const departments = await Department.insertMany([
+            { code: 'CS', name: 'Computer Science', description: 'Department of Computer Science & Engineering' },
+            { code: 'MATH', name: 'Mathematics', description: 'Department of Mathematics & Statistics' },
+            { code: 'PHYS', name: 'Physics', description: 'Department of Physics & Applied Sciences' },
         ]);
-        console.log('✓ Cleared existing data');
+        const deptMap = {};
+        departments.forEach(d => { deptMap[d.code] = d._id; });
+        console.log(`✓ Created ${departments.length} departments`);
 
-        // === 1. CREATE ADMIN USER ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 3. ADMIN USER
+        // ═══════════════════════════════════════════════════════════════════
         const adminUser = await User.create({
             email: 'admin@academix.edu',
-            password: 'password123', // Will be hashed by pre-save hook
+            password: 'password123',
             name: 'Admin User',
             role: 'admin',
-            isEmailVerified: true,
         });
         console.log('✓ Created admin user');
 
-        // === 2. CREATE FACULTY USERS & PROFILES ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 4. FACULTY USERS & PROFILES
+        // ═══════════════════════════════════════════════════════════════════
         const facultyData = [
-            { name: 'Dr. John Smith', email: 'john.smith@academix.edu', department: 'Computer Science', specialization: 'Data Science' },
-            { name: 'Dr. Rajesh Kumar', email: 'rajesh.kumar@academix.edu', department: 'Computer Science', specialization: 'Data Science' },
-            { name: 'Prof. Priya Singh', email: 'priya.singh@academix.edu', department: 'Mathematics', specialization: 'Algebra' },
-            { name: 'Dr. Amit Sharma', email: 'amit.sharma@academix.edu', department: 'Physics', specialization: 'Quantum Mechanics' },
+            { name: 'Dr. John Smith', email: 'john.smith@academix.edu', deptCode: 'CS', designation: 'Professor' },
+            { name: 'Dr. Rajesh Kumar', email: 'rajesh.kumar@academix.edu', deptCode: 'CS', designation: 'Associate Professor' },
+            { name: 'Prof. Priya Singh', email: 'priya.singh@academix.edu', deptCode: 'MATH', designation: 'Professor' },
+            { name: 'Dr. Amit Sharma', email: 'amit.sharma@academix.edu', deptCode: 'PHYS', designation: 'Associate Professor' },
         ];
 
-        // insertMany bypasses pre-save hooks, so we must hash passwords manually
         const hashedPassword = await bcrypt.hash('password123', 10);
         const facultyUsers = await User.insertMany(
             facultyData.map(f => ({
@@ -74,95 +102,95 @@ const seedDatabase = async () => {
                 password: hashedPassword,
                 name: f.name,
                 role: 'faculty',
-                isEmailVerified: true,
             }))
         );
 
-        const faculties = await Faculty.insertMany(
+        const facultyProfiles = await Faculty.insertMany(
             facultyUsers.map((user, idx) => ({
                 user: user._id,
-                firstName: facultyData[idx].name.split(' ')[0],
-                lastName: facultyData[idx].name.split(' ')[1],
-                email: facultyData[idx].email,
-                department: facultyData[idx].department,
-                specialization: facultyData[idx].specialization,
-                qualification: 'PhD',
-                designation: 'Professor',
-                employeeId: `EMP-${2025}-${idx + 1}`,
-                telephoneNumber: '555-' + (1000 + idx),
-                isActive: true,
+                department: deptMap[facultyData[idx].deptCode], // ObjectId ref
+                designation: facultyData[idx].designation,
+                employeeId: `EMP-2025-${idx + 1}`,
             }))
         );
-        console.log(`✓ Created ${faculties.length} faculty members`);
 
-        // === 3. CREATE STUDENT USERS & PROFILES ===
-        const departments = ['Computer Science', 'Mathematics', 'Physics'];
+        // Update department heads
+        await Department.findByIdAndUpdate(deptMap['CS'], { headOfDepartment: facultyUsers[0]._id });
+        await Department.findByIdAndUpdate(deptMap['MATH'], { headOfDepartment: facultyUsers[2]._id });
+        await Department.findByIdAndUpdate(deptMap['PHYS'], { headOfDepartment: facultyUsers[3]._id });
+
+        console.log(`✓ Created ${facultyProfiles.length} faculty members`);
+
+        // ═══════════════════════════════════════════════════════════════════
+        // 5. STUDENT USERS & PROFILES
+        // ═══════════════════════════════════════════════════════════════════
+        const deptCodes = ['CS', 'MATH', 'PHYS'];
         const studentUsers = [];
-        const students = [];
+        const studentProfiles = [];
 
         for (let i = 0; i < 30; i++) {
-            const dept = departments[i % 3];
-            const firstName = `Student${i + 1}`;
+            const deptCode = deptCodes[i % 3];
+            const name = `Student ${i + 1}`;
             const email = `student${i + 1}@academix.edu`;
 
             const user = await User.create({
                 email,
                 password: 'password123',
-                name: firstName,
+                name,
                 role: 'student',
-                isEmailVerified: true,
             });
 
             const student = await Student.create({
                 user: user._id,
-                firstName,
-                lastName: `User${i + 1}`,
-                email,
-                rollNumber: `${dept.substring(0, 3).toUpperCase()}${2025}${String(i + 1).padStart(3, '0')}`,
-                department: dept,
+                rollNumber: `${deptCode}2025${String(i + 1).padStart(3, '0')}`,
+                department: deptMap[deptCode], // ObjectId ref
                 semester: 6,
                 batchYear: 2025,
             });
 
             studentUsers.push(user);
-            students.push(student);
+            studentProfiles.push(student);
         }
-        console.log(`✓ Created 30 students across 3 departments`);
+        console.log('✓ Created 30 students across 3 departments');
 
-        // === 4. CREATE COURSES ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 6. COURSES (primaryFaculty = User._id, department = ObjectId)
+        // ═══════════════════════════════════════════════════════════════════
         const courseData = [
-            { code: 'CS601', title: 'Data Structures & Algorithms', credits: 4, department: 'Computer Science', semester: 6 },
-            { code: 'CS602', title: 'Database Systems', credits: 4, department: 'Computer Science', semester: 6 },
-            { code: 'MATH601', title: 'Advanced Calculus', credits: 3, department: 'Mathematics', semester: 6 },
-            { code: 'MATH602', title: 'Linear Algebra', credits: 3, department: 'Mathematics', semester: 6 },
-            { code: 'PHYS601', title: 'Quantum Mechanics', credits: 4, department: 'Physics', semester: 6 },
-            { code: 'PHYS602', title: 'Thermodynamics', credits: 3, department: 'Physics', semester: 6 },
+            { code: 'CS601', title: 'Data Structures & Algorithms', credits: 4, deptCode: 'CS', semester: 6, facultyIdx: 0 },
+            { code: 'CS602', title: 'Database Systems', credits: 4, deptCode: 'CS', semester: 6, facultyIdx: 1 },
+            { code: 'MATH601', title: 'Advanced Calculus', credits: 3, deptCode: 'MATH', semester: 6, facultyIdx: 2 },
+            { code: 'MATH602', title: 'Linear Algebra', credits: 3, deptCode: 'MATH', semester: 6, facultyIdx: 2 },
+            { code: 'PHYS601', title: 'Quantum Mechanics', credits: 4, deptCode: 'PHYS', semester: 6, facultyIdx: 3 },
+            { code: 'PHYS602', title: 'Thermodynamics', credits: 3, deptCode: 'PHYS', semester: 6, facultyIdx: 3 },
         ];
 
         const courses = await Course.insertMany(
-            courseData.map((c, idx) => ({
+            courseData.map(c => ({
                 code: c.code,
                 title: c.title,
                 credits: c.credits,
-                department: c.department,
+                department: deptMap[c.deptCode],               // ObjectId
                 semester: c.semester,
                 description: `A comprehensive course on ${c.title}`,
-                primaryFaculty: faculties[idx % faculties.length]._id,
+                primaryFaculty: facultyUsers[c.facultyIdx]._id, // User._id, NOT Faculty._id
                 isActive: true,
-                academicYear: '2025-2026',
             }))
         );
-        console.log('✓ Created 6 courses');
+        console.log(`✓ Created ${courses.length} courses`);
 
-        // === 5. CREATE ENROLLMENTS ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 7. ENROLLMENTS (student = User._id)
+        // ═══════════════════════════════════════════════════════════════════
         const enrollments = [];
-        for (let i = 0; i < students.length; i++) {
-            const dept = students[i].department;
-            const deptCourses = courses.filter(c => c.department === dept);
+        for (let i = 0; i < studentUsers.length; i++) {
+            const deptCode = deptCodes[i % 3];
+            const deptId = deptMap[deptCode];
+            const deptCourses = courses.filter(c => c.department.toString() === deptId.toString());
 
             for (const course of deptCourses.slice(0, 2)) {
                 enrollments.push({
-                    student: students[i]._id,
+                    student: studentUsers[i]._id,  // User._id, NOT Student._id
                     course: course._id,
                     academicYear: '2025-2026',
                     semester: 6,
@@ -173,7 +201,9 @@ const seedDatabase = async () => {
         await Enrollment.insertMany(enrollments);
         console.log(`✓ Created ${enrollments.length} enrollments`);
 
-        // === 6. CREATE TIMETABLE ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 8. TIMETABLE (faculty = User._id)
+        // ═══════════════════════════════════════════════════════════════════
         const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
         const timeSlots = [
             { start: '09:00', end: '10:30' },
@@ -181,45 +211,41 @@ const seedDatabase = async () => {
             { start: '14:00', end: '15:30' },
         ];
 
-        const timetableEntries = [];
-        for (let i = 0; i < courses.length; i++) {
-            const course = courses[i];
-            const faculty = faculties[i % faculties.length];
-            const day = daysOfWeek[i % 5];
-            const slot = timeSlots[Math.floor(i / 5) % 3];
-
-            timetableEntries.push({
-                course: course._id,
-                faculty: faculty._id,
-                dayOfWeek: day,
-                startTime: slot.start,
-                endTime: slot.end,
-                classroom: `Room ${101 + i}`,
-                semester: 6,
-                academicYear: '2025-2026',
-                isActive: true,
-            });
-        }
+        const timetableEntries = courses.map((course, i) => ({
+            course: course._id,
+            faculty: course.primaryFaculty, // Already User._id
+            dayOfWeek: daysOfWeek[i % 5],
+            startTime: timeSlots[i % 3].start,
+            endTime: timeSlots[i % 3].end,
+            classroom: `Room ${101 + i}`,
+            semester: 6,
+            academicYear: '2025-2026',
+            isActive: true,
+        }));
         await Timetable.insertMany(timetableEntries);
         console.log(`✓ Created ${timetableEntries.length} timetable entries`);
 
-        // === 7. CREATE ATTENDANCE RECORDS ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 9. ATTENDANCE RECORDS (faculty = User._id, records.student = User._id)
+        // ═══════════════════════════════════════════════════════════════════
         const attendanceRecords = [];
         const today = new Date();
         for (let daysAgo = 10; daysAgo >= 0; daysAgo--) {
-            for (let i = 0; i < courses.length; i++) {
-                const course = courses[i];
+            for (const course of courses) {
                 const date = new Date(today);
                 date.setDate(date.getDate() - daysAgo);
+                date.setUTCHours(0, 0, 0, 0);
 
-                const relevantEnrollments = enrollments.filter(e => e.course.toString() === course._id.toString());
+                const relevantEnrollments = enrollments.filter(
+                    e => e.course.toString() === course._id.toString()
+                );
                 if (relevantEnrollments.length > 0) {
                     attendanceRecords.push({
                         course: course._id,
-                        faculty: faculties[i % faculties.length]._id, // Use Faculty reference
+                        faculty: course.primaryFaculty, // User._id
                         date,
                         records: relevantEnrollments.map(e => ({
-                            student: e.student,
+                            student: e.student,  // User._id
                             status: Math.random() > 0.1 ? 'present' : 'absent'
                         }))
                     });
@@ -229,17 +255,22 @@ const seedDatabase = async () => {
         await AttendanceRecord.insertMany(attendanceRecords);
         console.log(`✓ Created ${attendanceRecords.length} attendance records`);
 
-        // === 8. CREATE MARKS ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 10. MARKS (student = User._id, course = Course._id)
+        // ═══════════════════════════════════════════════════════════════════
         const marks = [];
-        const examTypes = ['midterm', 'final', 'quiz'];
-        for (const student of students) {
+        const examTypes = ['Internal 1', 'Mid-Sem', 'Final'];
+        for (let i = 0; i < studentUsers.length; i++) {
             for (const course of courses) {
-                const isEnrolled = enrollments.some(e => e.student.toString() === student._id.toString() && e.course.toString() === course._id.toString());
+                const isEnrolled = enrollments.some(
+                    e => e.student.toString() === studentUsers[i]._id.toString()
+                      && e.course.toString() === course._id.toString()
+                );
                 if (isEnrolled) {
                     for (const examType of examTypes) {
                         marks.push({
-                            student: student._id,
-                            subject: course._id,
+                            student: studentUsers[i]._id,  // User._id
+                            course: course._id,             // Course._id (not Subject)
                             examType,
                             score: Math.floor(Math.random() * 80) + 20,
                             maxScore: 100,
@@ -251,31 +282,34 @@ const seedDatabase = async () => {
         await Marks.insertMany(marks);
         console.log(`✓ Created ${marks.length} marks entries`);
 
-        // === 9. CREATE ASSIGNMENTS ===
-        const assignments = [];
-        for (const course of courses) {
-            assignments.push({
-                course: course._id,
-                faculty: course.primaryFaculty,
-                title: `Assignment 1: ${course.title}`,
-                description: `Complete the assignment on ${course.title}`,
-                dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                maxMarks: 20,
-            });
-        }
+        // ═══════════════════════════════════════════════════════════════════
+        // 11. ASSIGNMENTS (faculty = User._id)
+        // ═══════════════════════════════════════════════════════════════════
+        const assignments = courses.map(course => ({
+            course: course._id,
+            faculty: course.primaryFaculty, // User._id
+            title: `Assignment 1: ${course.title}`,
+            description: `Complete the assignment covering core topics in ${course.title}`,
+            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            maxMarks: 20,
+        }));
         const assignmentDocs = await Assignment.insertMany(assignments);
-        console.log('✓ Created 6 assignments');
+        console.log(`✓ Created ${assignmentDocs.length} assignments`);
 
-        // === 10. CREATE SUBMISSIONS ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 12. SUBMISSIONS (student = User._id)
+        // ═══════════════════════════════════════════════════════════════════
         const submissions = [];
         for (const assignment of assignmentDocs) {
-            const courseEnrollments = enrollments.filter(e => e.course.toString() === assignment.course.toString());
-            for (const enrollment of courseEnrollments.slice(0, 10)) {
+            const courseEnrollments = enrollments.filter(
+                e => e.course.toString() === assignment.course.toString()
+            );
+            for (const enrollment of courseEnrollments.slice(0, 8)) {
                 submissions.push({
                     assignment: assignment._id,
-                    student: enrollment.student,
-                    fileUrl: `https://academix.edu/submissions/assignment_${assignment._id}_${enrollment.student}.pdf`,
-                    submittedAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
+                    student: enrollment.student,  // User._id
+                    fileUrl: `https://academix.edu/submissions/a_${assignment._id}_s_${enrollment.student}.pdf`,
+                    submittedAt: new Date(Date.now() - Math.random() * 5 * 24 * 60 * 60 * 1000),
                     marksAwarded: Math.floor(Math.random() * 20),
                     feedback: 'Good work. Could be improved in section 2.',
                 });
@@ -284,43 +318,45 @@ const seedDatabase = async () => {
         await Submission.insertMany(submissions);
         console.log(`✓ Created ${submissions.length} submissions`);
 
-        // === 11. CREATE QUIZZES ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 13. QUIZZES (faculty = User._id)
+        // ═══════════════════════════════════════════════════════════════════
         const quizzes = await Quiz.insertMany(
             courses.map(course => ({
                 course: course._id,
-                faculty: course.primaryFaculty,
+                faculty: course.primaryFaculty, // User._id
                 title: `Quiz 1: ${course.title}`,
                 description: `Quick assessment on ${course.title}`,
                 timeLimitMinutes: 30,
                 questions: [
-                    { text: 'Question 1?', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 0 },
-                    { text: 'Question 2?', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 1 },
-                    { text: 'Question 3?', options: ['A', 'B', 'C', 'D'], correctOptionIndex: 2 },
+                    { text: 'What is the primary concept of this module?', options: ['Option A', 'Option B', 'Option C', 'Option D'], correctOptionIndex: 0 },
+                    { text: 'Which methodology is used in this domain?', options: ['Option A', 'Option B', 'Option C', 'Option D'], correctOptionIndex: 1 },
+                    { text: 'What is the expected output of this process?', options: ['Option A', 'Option B', 'Option C', 'Option D'], correctOptionIndex: 2 },
                 ],
                 isActive: true,
             }))
         );
-        console.log('✓ Created 6 quizzes');
+        console.log(`✓ Created ${quizzes.length} quizzes`);
 
-        // === 12. CREATE QUIZ ATTEMPTS ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 14. QUIZ ATTEMPTS (student = User._id)
+        // ═══════════════════════════════════════════════════════════════════
         const quizAttempts = [];
         for (const quiz of quizzes) {
-            const courseEnrollments = enrollments.filter(e => e.course.toString() === quiz.course.toString());
-            for (const enrollment of courseEnrollments.slice(0, 8)) {
-                // We need the User._id for the student, which is studentProfile.user
-                const studentProfile = students.find(s => s._id.toString() === enrollment.student.toString());
+            const courseEnrollments = enrollments.filter(
+                e => e.course.toString() === quiz.course.toString()
+            );
+            for (const enrollment of courseEnrollments.slice(0, 6)) {
                 const answersMap = {};
-                if (quiz.questions && quiz.questions.length >= 3) {
-                    answersMap[quiz.questions[0].questionId] = 0;
-                    answersMap[quiz.questions[1].questionId] = 1;
-                    answersMap[quiz.questions[2].questionId] = 2;
+                if (quiz.questions?.length >= 3) {
+                    answersMap[quiz.questions[0].questionId] = Math.floor(Math.random() * 4);
+                    answersMap[quiz.questions[1].questionId] = Math.floor(Math.random() * 4);
+                    answersMap[quiz.questions[2].questionId] = Math.floor(Math.random() * 4);
                 }
-                
-                const pastDate = new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000);
-
+                const pastDate = new Date(Date.now() - Math.random() * 5 * 24 * 60 * 60 * 1000);
                 quizAttempts.push({
                     quiz: quiz._id,
-                    student: enrollment.student,
+                    student: enrollment.student, // User._id
                     score: Math.floor(Math.random() * quiz.questions.length),
                     answers: answersMap,
                     startTime: new Date(pastDate.getTime() - 30 * 60000),
@@ -331,72 +367,65 @@ const seedDatabase = async () => {
         await QuizAttempt.insertMany(quizAttempts);
         console.log(`✓ Created ${quizAttempts.length} quiz attempts`);
 
-        // === 13. CREATE INVOICES ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 15. INVOICES (student = User._id)
+        // ═══════════════════════════════════════════════════════════════════
         const invoices = [];
-        for (const student of students) {
-            const amountDue = 5000 + Math.random() * 5000;
-            const amountPaid = [0, amountDue * 0.5, amountDue][Math.floor(Math.random() * 3)];
-            const status = amountPaid === 0 ? 'pending' : amountPaid === amountDue ? 'paid_full' : 'paid_partial';
-
+        for (const user of studentUsers) {
+            const amountDue = 5000 + Math.round(Math.random() * 5000);
+            const amountPaid = [0, Math.round(amountDue * 0.5), amountDue][Math.floor(Math.random() * 3)];
+            const status = amountPaid === 0 ? 'pending' : amountPaid >= amountDue ? 'paid_full' : 'paid_partial';
             invoices.push({
-                student: student.user, // Invoice.js references User
+                student: user._id, // User._id
                 amountDue,
                 amountPaid,
                 status,
                 type: 'tuition',
-                description: 'Semester fees',
+                description: 'Semester 6 tuition fees',
                 dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             });
         }
         const invoiceDocs = await Invoice.insertMany(invoices);
-        console.log('✓ Created 30 invoices');
+        console.log(`✓ Created ${invoiceDocs.length} invoices`);
 
-        // === 14. CREATE PAYMENTS ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 16. PAYMENTS (student = User._id, consistent with Invoice)
+        // ═══════════════════════════════════════════════════════════════════
         const payments = [];
-        const paymentMethods = ['credit_card', 'bank_transfer'];
         for (const invoice of invoiceDocs) {
             if (invoice.amountPaid > 0) {
-                // Find corresponding Student profile
-                const studentProfile = students.find(s => s.user.toString() === invoice.student.toString());
                 payments.push({
                     invoice: invoice._id,
-                    student: studentProfile._id, // Payment.js references Student
+                    student: invoice.student, // User._id — consistent!
                     amount: invoice.amountPaid,
                     paymentDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
-                    transactionId: `TXN-${Date.now()}-${Math.random().toString(36).substring(7)}`,
-                    method: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
+                    transactionId: `TXN-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+                    method: ['credit_card', 'bank_transfer', 'upi'][Math.floor(Math.random() * 3)],
                 });
             }
         }
         await Payment.insertMany(payments);
         console.log(`✓ Created ${payments.length} payment records`);
 
-        // === 15. CREATE ANNOUNCEMENTS ===
-        const notices = [];
-        const announcements = [
-            { title: 'Semester Registration Open', content: 'Registration for next semester is now open. Register before deadline.' },
-            { title: 'Mid-Semester Exams Schedule', content: 'Mid-semester exams will be held from next week. Check your timetable.' },
-            { title: 'Library Extended Hours', content: 'Library will remain open until 10 PM during exam season.' },
-            { title: 'New Lab Equipment', content: 'New lab equipment has been installed in Lab 3. All students have access.' },
-            { title: 'Scholarship Announcement', content: 'Merit-based scholarships are available. Apply by the deadline.' },
-        ];
-        for (const announcement of announcements) {
-            notices.push({
-                title: announcement.title,
-                content: announcement.content,
-                postedBy: adminUser._id,
-                visibleTo: 'all',
-            });
-        }
-        await Notice.insertMany(notices);
+        // ═══════════════════════════════════════════════════════════════════
+        // 17. ANNOUNCEMENTS
+        // ═══════════════════════════════════════════════════════════════════
+        await Notice.insertMany([
+            { title: 'Semester Registration Open', content: 'Registration for next semester is now open. Register before the deadline.', postedBy: adminUser._id, category: 'Academic', targetAudience: 'all' },
+            { title: 'Mid-Semester Exams Schedule', content: 'Mid-semester exams will be held from next week. Check your timetable.', postedBy: adminUser._id, category: 'Urgent', targetAudience: 'student' },
+            { title: 'Library Extended Hours', content: 'Library will remain open until 10 PM during exam season.', postedBy: adminUser._id, category: 'General', targetAudience: 'all' },
+            { title: 'New Lab Equipment', content: 'New lab equipment has been installed in Lab 3.', postedBy: adminUser._id, category: 'Event', targetAudience: 'all' },
+            { title: 'Scholarship Announcement', content: 'Merit-based scholarships are available. Apply by the deadline.', postedBy: adminUser._id, category: 'Academic', targetAudience: 'student' },
+        ]);
         console.log('✓ Created 5 announcements');
 
-        // === 16. CREATE NOTIFICATIONS ===
+        // ═══════════════════════════════════════════════════════════════════
+        // 18. NOTIFICATIONS (recipient = User._id)
+        // ═══════════════════════════════════════════════════════════════════
         const notifications = [];
-        for (const student of students.slice(0, 10)) {
+        for (const user of studentUsers.slice(0, 10)) {
             notifications.push({
-                recipient: student.user,
-                title: 'Assignment Submitted',
+                recipient: user._id, // User._id
                 message: 'Your assignment has been submitted successfully.',
                 type: 'assignment_created',
                 isRead: false,
@@ -405,24 +434,27 @@ const seedDatabase = async () => {
         await Notification.insertMany(notifications);
         console.log('✓ Created 10 notifications');
 
-        console.log('\n✅ Sample Data Imported Successfully!');
-        console.log('📊 Created:');
-        console.log('   • 1 Admin');
-        console.log(`   • ${faculties.length} Faculty members`);
-        console.log('   • 30 Students across 3 departments');
-        console.log('   • 6 Courses');
-        console.log('   • 60 Enrollments');
-        console.log('   • 6 Timetable entries');
+        // ═══════════════════════════════════════════════════════════════════
+        // SUMMARY
+        // ═══════════════════════════════════════════════════════════════════
+        console.log('\n✅ Academix ERP Seed Complete!');
+        console.log('📊 Summary:');
+        console.log('   • 1 Admin (admin@academix.edu / password123)');
+        console.log(`   • ${facultyProfiles.length} Faculty (john.smith@academix.edu / password123)`);
+        console.log(`   • ${studentUsers.length} Students (student1@academix.edu / password123)`);
+        console.log(`   • ${departments.length} Departments`);
+        console.log(`   • ${courses.length} Courses`);
+        console.log(`   • ${enrollments.length} Enrollments`);
+        console.log(`   • ${timetableEntries.length} Timetable entries`);
         console.log(`   • ${attendanceRecords.length} Attendance records`);
         console.log(`   • ${marks.length} Marks entries`);
-        console.log('   • 6 Assignments');
+        console.log(`   • ${assignmentDocs.length} Assignments`);
         console.log(`   • ${submissions.length} Submissions`);
-        console.log('   • 6 Quizzes');
+        console.log(`   • ${quizzes.length} Quizzes`);
         console.log(`   • ${quizAttempts.length} Quiz attempts`);
-        console.log('   • 30 Invoices');
+        console.log(`   • ${invoiceDocs.length} Invoices`);
         console.log(`   • ${payments.length} Payments`);
-        console.log('   • 5 Announcements');
-        console.log('   • 10 Notifications');
+        console.log('\n🔑 All passwords: password123');
 
         process.exit(0);
     } catch (error) {
@@ -431,8 +463,8 @@ const seedDatabase = async () => {
     }
 };
 
-// Connect to database and seed
-mongoose().then(seedDatabase).catch(err => {
+// Connect and seed
+connectDB().then(seedDatabase).catch(err => {
     console.error('Database connection failed:', err);
     process.exit(1);
 });

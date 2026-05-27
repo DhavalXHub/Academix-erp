@@ -1,26 +1,24 @@
 const Submission = require('../models/Submission');
 const Assignment = require('../models/Assignment');
-const Faculty = require('../models/Faculty');
-const Student = require('../models/Student');
 const Enrollment = require('../models/Enrollment');
+const ApiError = require('../utils/ApiError');
 
-const _bad = (msg) => Object.assign(new Error(msg), { code: 'BAD_REQUEST', status: 400 });
-const _notFound = (msg) => Object.assign(new Error(msg), { code: 'NOT_FOUND', status: 404 });
-
+/**
+ * Submit an assignment (student).
+ * Submission.student = User._id, Enrollment.student = User._id.
+ * No Student profile lookup needed.
+ */
 const submitAssignment = async (userId, assignmentId, fileUrl) => {
-    const student = await Student.findOne({ user: userId });
-    if (!student) throw _bad('Only students can submit assignments.');
-
     const assignment = await Assignment.findById(assignmentId);
-    if (!assignment) throw _notFound('Assignment not found.');
+    if (!assignment) throw ApiError.notFound('Assignment not found.');
 
-    const isEnrolled = await Enrollment.exists({ student: student._id, course: assignment.course, status: 'enrolled' });
-    if (!isEnrolled) throw _bad('You must be enrolled in the course to submit this assignment.');
+    // Check enrollment using User._id directly
+    const isEnrolled = await Enrollment.exists({ student: userId, course: assignment.course, status: 'enrolled' });
+    if (!isEnrolled) throw ApiError.forbidden('You must be enrolled in the course to submit this assignment.');
 
-    // Upsert or throw error on duplicate? The prompt says "store only the fileUrl". We can allow resubmission until due date.
-    // Let's do an upsert so students can overwrite their submission if they made a mistake
-    let submission = await Submission.findOne({ assignment: assignmentId, student: student._id });
-    
+    // Upsert: allow resubmission until due date
+    let submission = await Submission.findOne({ assignment: assignmentId, student: userId });
+
     if (submission) {
         submission.fileUrl = fileUrl;
         submission.submittedAt = Date.now();
@@ -28,7 +26,7 @@ const submitAssignment = async (userId, assignmentId, fileUrl) => {
     } else {
         submission = await Submission.create({
             assignment: assignmentId,
-            student: student._id,
+            student: userId, // User._id
             fileUrl,
         });
     }
@@ -36,79 +34,72 @@ const submitAssignment = async (userId, assignmentId, fileUrl) => {
     return submission;
 };
 
-// Faculty fetching all submissions for their assignment
+/**
+ * Faculty fetching all submissions for their assignment.
+ * Assignment.faculty = User._id — compare directly.
+ */
 const getSubmissionsForAssignment = async (userId, assignmentId) => {
     const assignment = await Assignment.findById(assignmentId);
-    if (!assignment) throw _notFound('Assignment not found.');
+    if (!assignment) throw ApiError.notFound('Assignment not found.');
 
-    // assignment.faculty stores Faculty._id or User._id (see assignmentService)
-    // Check ownership: try Faculty profile first, fall back to direct userId comparison
-    const faculty = await Faculty.findOne({ user: userId });
-    const facultyRef = faculty?._id?.toString();
-    const assignFacRef = assignment.faculty?.toString();
-
-    if (assignFacRef !== facultyRef && assignFacRef !== userId.toString()) {
-        throw _bad('You are not authorized to view these submissions.');
+    // Assignment.faculty = User._id — direct comparison
+    if (assignment.faculty.toString() !== userId.toString()) {
+        throw ApiError.forbidden('You are not authorized to view these submissions.');
     }
 
     return Submission.find({ assignment: assignmentId })
-        .populate({
-            path: 'student',
-            select: 'rollNumber user',
-            populate: { path: 'user', select: 'name email' }
-        })
+        .populate('student', 'name email') // User fields directly
         .sort({ submittedAt: -1 });
 };
 
-// Student fetching their own submission
+/**
+ * Student fetching their own submission.
+ * Submission.student = User._id — query directly.
+ */
 const getMySubmission = async (userId, assignmentId) => {
-    const student = await Student.findOne({ user: userId });
-    if (!student) throw _bad('Student profile not found.');
-
-    return Submission.findOne({ assignment: assignmentId, student: student._id });
+    return Submission.findOne({ assignment: assignmentId, student: userId });
 };
 
-// Faculty grades a submission
+/**
+ * Faculty grades a submission.
+ * Assignment.faculty = User._id — compare directly.
+ */
 const gradeSubmission = async (userId, submissionId, marksAwarded, feedback) => {
     const submission = await Submission.findById(submissionId).populate('assignment');
-    if (!submission) throw _notFound('Submission not found.');
+    if (!submission) throw ApiError.notFound('Submission not found.');
 
-    // Check ownership via Faculty profile or direct User._id
-    const faculty = await Faculty.findOne({ user: userId });
-    const facultyRef = faculty?._id?.toString();
-    const assignFacRef = submission.assignment?.faculty?.toString();
-
-    if (assignFacRef !== facultyRef && assignFacRef !== userId.toString()) {
-        throw _bad('You are not authorized to grade this submission.');
+    // Assignment.faculty = User._id — direct comparison
+    if (submission.assignment?.faculty?.toString() !== userId.toString()) {
+        throw ApiError.forbidden('You are not authorized to grade this submission.');
     }
 
     if (marksAwarded > submission.assignment.maxMarks) {
-        throw _bad(`Marks cannot exceed the max marks: ${submission.assignment.maxMarks}`);
+        throw ApiError.badRequest(`Marks cannot exceed the max marks: ${submission.assignment.maxMarks}`);
     }
 
     submission.marksAwarded = marksAwarded;
     submission.feedback = feedback || '';
     await submission.save();
 
-    await submission.populate({
-        path: 'student',
-        select: 'rollNumber user',
-        populate: { path: 'user', select: 'name' }
-    });
-
+    // Notify the student
     const { createDirectNotification } = require('./notificationService');
-    const studentUserId = submission.student.user._id || submission.student.user;
-    await createDirectNotification(studentUserId, 'submission_graded', `Your submission for ${submission.assignment.title} was graded: ${marksAwarded} marks.`, '/student/assignments');
+    // submission.student is User._id directly
+    await createDirectNotification(
+        submission.student,
+        'submission_graded',
+        `Your submission for "${submission.assignment.title}" was graded: ${marksAwarded} marks.`,
+        '/student/assignments'
+    );
 
-    return submission;
+    return submission.populate('student', 'name email');
 };
 
-// Student fetching all their submissions
+/**
+ * Student fetching all their submissions.
+ * Submission.student = User._id — query directly.
+ */
 const getAllMySubmissions = async (userId) => {
-    const student = await Student.findOne({ user: userId });
-    if (!student) throw _bad('Student profile not found.');
-
-    return Submission.find({ student: student._id })
+    return Submission.find({ student: userId })
         .populate({
             path: 'assignment',
             select: 'title maxMarks dueDate course description',

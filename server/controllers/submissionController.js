@@ -1,51 +1,39 @@
 const submissionService = require('../services/submissionService');
+const asyncHandler = require('../utils/asyncHandler');
+const ApiResponse = require('../utils/ApiResponse');
+const ApiError = require('../utils/ApiError');
 
-const ok = (res, code, data, msg = 'Success') =>
-    res.status(code).json({ success: true, message: msg, data, error: null });
-const err = (res, e) =>
-    res.status(e.status || 500).json({ success: false, data: null, error: { code: e.code || 'SERVER_ERROR', message: e.message } });
+const submitAssignment = asyncHandler(async (req, res) => {
+    const { assignmentId, fileUrl } = req.body;
+    if (!assignmentId || !fileUrl) {
+        throw ApiError.badRequest('assignmentId and fileUrl are required.');
+    }
+    const submission = await submissionService.submitAssignment(req.user.id, assignmentId, fileUrl);
+    return ApiResponse.success(res, 201, { submission }, 'Assignment submitted successfully.');
+});
 
-const submitAssignment = async (req, res) => {
-    try {
-        const { assignmentId, fileUrl } = req.body;
-        if (!assignmentId || !fileUrl) {
-            return res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'assignmentId, fileUrl required.' } });
-        }
-        const submission = await submissionService.submitAssignment(req.user.id, assignmentId, fileUrl);
-        return ok(res, 201, { submission }, 'Assignment submitted successfully.');
-    } catch (e) { return err(res, e); }
-};
+const getSubmissionsForAssignment = asyncHandler(async (req, res) => {
+    const submissions = await submissionService.getSubmissionsForAssignment(req.user.id, req.params.assignmentId);
+    return ApiResponse.success(res, 200, { submissions });
+});
 
-const getSubmissionsForAssignment = async (req, res) => {
-    try {
-        const submissions = await submissionService.getSubmissionsForAssignment(req.user.id, req.params.assignmentId);
-        return ok(res, 200, { submissions });
-    } catch (e) { return err(res, e); }
-};
+const getMySubmission = asyncHandler(async (req, res) => {
+    const submission = await submissionService.getMySubmission(req.user.id, req.params.assignmentId);
+    return ApiResponse.success(res, 200, { submission });
+});
 
-const getMySubmission = async (req, res) => {
-    try {
-        const submission = await submissionService.getMySubmission(req.user.id, req.params.assignmentId);
-        return ok(res, 200, { submission });
-    } catch (e) { return err(res, e); }
-};
+const getAllMySubmissions = asyncHandler(async (req, res) => {
+    const submissions = await submissionService.getAllMySubmissions(req.user.id);
+    return ApiResponse.success(res, 200, { submissions });
+});
 
-const getAllMySubmissions = async (req, res) => {
-    try {
-        const submissions = await submissionService.getAllMySubmissions(req.user.id);
-        return ok(res, 200, { submissions });
-    } catch (e) { return err(res, e); }
-};
-
-const gradeSubmission = async (req, res) => {
-    try {
-        const { marksAwarded, feedback } = req.body;
-        if (marksAwarded === undefined) {
-             return res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'marksAwarded is required.' } });
-        }
-        const submission = await submissionService.gradeSubmission(req.user.id, req.params.id, marksAwarded, feedback);
-        return ok(res, 200, { submission }, 'Graded successfully.');
-    } catch (e) { return err(res, e); }
-};
+const gradeSubmission = asyncHandler(async (req, res) => {
+    const { marksAwarded, feedback } = req.body;
+    if (marksAwarded === undefined) {
+        throw ApiError.badRequest('marksAwarded is required.');
+    }
+    const submission = await submissionService.gradeSubmission(req.user.id, req.params.id, marksAwarded, feedback);
+    return ApiResponse.success(res, 200, { submission }, 'Graded successfully.');
+});
 
 module.exports = { submitAssignment, getSubmissionsForAssignment, getMySubmission, getAllMySubmissions, gradeSubmission };

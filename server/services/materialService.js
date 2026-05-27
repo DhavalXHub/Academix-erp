@@ -1,75 +1,167 @@
 const CourseMaterial = require('../models/CourseMaterial');
-const Faculty = require('../models/Faculty');
 const Course = require('../models/Course');
 const Enrollment = require('../models/Enrollment');
-const Student = require('../models/Student');
+const ApiError = require('../utils/ApiError');
+const path = require('path');
+const fs = require('fs');
 
-const _bad = (msg) => Object.assign(new Error(msg), { code: 'BAD_REQUEST', status: 400 });
-const _notFound = (msg) => Object.assign(new Error(msg), { code: 'NOT_FOUND', status: 404 });
-
-// Determine if a user has access to a course's materials
+/**
+ * Verify access to a course's materials.
+ * Admin: always. Faculty: must be primaryFaculty. Student: must be enrolled.
+ */
 const checkCourseAccess = async (userId, userRole, courseId) => {
     if (userRole === 'admin') return true;
-
     if (userRole === 'faculty') {
-        const faculty = await Faculty.findOne({ user: userId });
-        if (!faculty) throw _bad('Faculty profile not found.');
         const course = await Course.findById(courseId);
-        if (!course) throw _notFound('Course not found.');
-        if (course.primaryFaculty.toString() !== faculty._id.toString()) {
-            throw _bad('You are not authorized to access this course.');
+        if (!course) throw ApiError.notFound('Course not found.');
+        if (!course.primaryFaculty || course.primaryFaculty.toString() !== userId.toString()) {
+            throw ApiError.forbidden('You are not assigned to this course.');
         }
-        return faculty;
+        return true;
     }
-
     if (userRole === 'student') {
-        const student = await Student.findOne({ user: userId });
-        if (!student) throw _bad('Student profile not found.');
-        const isEnrolled = await Enrollment.exists({ student: student._id, course: courseId, status: 'enrolled' });
-        if (!isEnrolled) throw _bad('You must be enrolled in this course to access materials.');
-        return student;
+        const isEnrolled = await Enrollment.exists({ student: userId, course: courseId, status: 'enrolled' });
+        if (!isEnrolled) throw ApiError.forbidden('You must be enrolled to access course materials.');
+        return true;
     }
 };
 
+// GET /api/v1/materials/course/:courseId
 const getMaterialsByCourse = async (userId, userRole, courseId) => {
     await checkCourseAccess(userId, userRole, courseId);
-    return CourseMaterial.find({ course: courseId }).sort({ uploadedAt: -1 });
+
+    const query = userRole === 'student'
+        ? { course: courseId, isVisible: true }
+        : { course: courseId };
+
+    return CourseMaterial.find(query)
+        .populate('faculty', 'name email')
+        .sort({ isPinned: -1, uploadedAt: -1 });
 };
 
-const uploadMaterial = async (userId, courseId, data) => {
-    const faculty = await Faculty.findOne({ user: userId });
-    if (!faculty) throw _bad('Only faculty can upload materials.');
-
+// POST /api/v1/materials/upload — multipart/form-data (real file)
+const uploadMaterialFile = async (userId, courseId, fileInfo, metadata) => {
     const course = await Course.findById(courseId);
-    if (!course || course.primaryFaculty.toString() !== faculty._id.toString()) {
-        throw _bad('You are not authorized to upload to this course.');
+    if (!course) throw ApiError.notFound('Course not found.');
+    if (!course.primaryFaculty || course.primaryFaculty.toString() !== userId.toString()) {
+        throw ApiError.forbidden('You are not assigned to this course.');
     }
 
-    return CourseMaterial.create({
+    const baseUrl = process.env.API_BASE_URL || 'http://localhost:5000';
+    const relPath = `/uploads/materials/${fileInfo.filename}`;
+    const fileUrl = `${baseUrl}${relPath}`;
+
+    const material = await CourseMaterial.create({
         course: courseId,
-        faculty: faculty._id,
-        title: data.title,
-        description: data.description,
-        fileUrl: data.fileUrl,
-        type: data.type || 'other',
+        faculty: userId,
+        title: metadata.title || fileInfo.originalname,
+        description: metadata.description || '',
+        fileUrl,
+        fileName: fileInfo.originalname,
+        fileSize: fileInfo.size,
+        mimeType: fileInfo.mimetype,
+        isExternalLink: false,
+        category: metadata.category || 'notes',
+        module: metadata.module || 'General',
+        isPinned: false,
+        isVisible: true,
     });
+
+    try {
+        const { notifyCourseStudents } = require('./notificationService');
+        const courseCode = course.code || 'Course';
+        notifyCourseStudents(
+            courseId,
+            'material_added',
+            `📚 New Resource: "${material.title}" has been uploaded in ${courseCode}.`,
+            `/student/courses/${courseId}`
+        );
+    } catch (err) {
+        console.error('[Notification Error] Failed to send material notification:', err.message);
+    }
+
+    return material;
 };
 
-const deleteMaterial = async (userId, materialId) => {
-    const faculty = await Faculty.findOne({ user: userId });
-    if (!faculty) throw _bad('Only faculty can delete materials.');
-
-    const material = await CourseMaterial.findById(materialId);
-    if (!material) throw _notFound('Material not found.');
-    if (material.faculty.toString() !== faculty._id.toString()) {
-        throw _bad('You can only delete your own materials.');
+// POST /api/v1/materials — external link (JSON body)
+const uploadMaterialLink = async (userId, courseId, data) => {
+    const course = await Course.findById(courseId);
+    if (!course) throw ApiError.notFound('Course not found.');
+    if (!course.primaryFaculty || course.primaryFaculty.toString() !== userId.toString()) {
+        throw ApiError.forbidden('You are not assigned to this course.');
     }
 
+    const material = await CourseMaterial.create({
+        course: courseId,
+        faculty: userId,
+        title: data.title,
+        description: data.description || '',
+        fileUrl: data.fileUrl,
+        fileName: data.title,
+        isExternalLink: true,
+        category: data.category || 'other',
+        module: data.module || 'General',
+    });
+
+    try {
+        const { notifyCourseStudents } = require('./notificationService');
+        const courseCode = course.code || 'Course';
+        notifyCourseStudents(
+            courseId,
+            'material_added',
+            `🔗 New Resource Link: "${material.title}" has been added in ${courseCode}.`,
+            `/student/courses/${courseId}`
+        );
+    } catch (err) {
+        console.error('[Notification Error] Failed to send material notification:', err.message);
+    }
+
+    return material;
+};
+
+// PATCH /api/v1/materials/:id — update metadata
+const updateMaterial = async (userId, materialId, updates) => {
+    const material = await CourseMaterial.findById(materialId);
+    if (!material) throw ApiError.notFound('Material not found.');
+    if (material.faculty.toString() !== userId.toString()) {
+        throw ApiError.forbidden('You can only edit your own materials.');
+    }
+    const allowed = ['title', 'description', 'category', 'module', 'isPinned', 'isVisible'];
+    allowed.forEach(key => { if (updates[key] !== undefined) material[key] = updates[key]; });
+    await material.save();
+    return material;
+};
+
+// DELETE /api/v1/materials/:id
+const deleteMaterial = async (userId, userRole, materialId) => {
+    const material = await CourseMaterial.findById(materialId);
+    if (!material) throw ApiError.notFound('Material not found.');
+    if (userRole !== 'admin' && material.faculty.toString() !== userId.toString()) {
+        throw ApiError.forbidden('You can only delete your own materials.');
+    }
+    // Delete physical file if it exists
+    if (!material.isExternalLink && material.fileUrl) {
+        try {
+            const filename = path.basename(material.fileUrl);
+            const filePath = path.join(__dirname, '../uploads/materials', filename);
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        } catch (e) {
+            console.warn('[Material Delete] Could not delete physical file:', e.message);
+        }
+    }
     await CourseMaterial.findByIdAndDelete(materialId);
+};
+
+// POST /api/v1/materials/:id/track-download — increment download count
+const trackDownload = async (materialId) => {
+    await CourseMaterial.findByIdAndUpdate(materialId, { $inc: { downloadCount: 1 } });
 };
 
 module.exports = {
     getMaterialsByCourse,
-    uploadMaterial,
+    uploadMaterialFile,
+    uploadMaterialLink,
+    updateMaterial,
     deleteMaterial,
+    trackDownload,
 };

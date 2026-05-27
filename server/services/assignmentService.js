@@ -1,57 +1,49 @@
 const Assignment = require('../models/Assignment');
-const Faculty = require('../models/Faculty');
 const Course = require('../models/Course');
 const Enrollment = require('../models/Enrollment');
-const Student = require('../models/Student');
 const { notifyCourseStudents } = require('./notificationService');
-
-const _bad = (msg) => Object.assign(new Error(msg), { code: 'BAD_REQUEST', status: 400 });
-const _notFound = (msg) => Object.assign(new Error(msg), { code: 'NOT_FOUND', status: 404 });
+const ApiError = require('../utils/ApiError');
 
 /**
- * Resolve User._id → Faculty._id for authorization checks.
- * Course.primaryFaculty stores Faculty._id (ref: 'Faculty').
+ * Check if a user has access to a course's assignments.
+ * Since primaryFaculty now stores User._id, no Faculty profile lookup needed.
  */
-const getFacultyId = async (userId) => {
-    const faculty = await Faculty.findOne({ user: userId });
-    return faculty?._id || null;
-};
-
 const checkCourseAccess = async (userId, userRole, courseId) => {
     if (userRole === 'admin') return true;
 
     if (userRole === 'faculty') {
         const course = await Course.findById(courseId);
-        if (!course) throw _notFound('Course not found.');
-        const facultyId = await getFacultyId(userId);
-        if (!facultyId || !course.primaryFaculty || course.primaryFaculty.toString() !== facultyId.toString()) {
-            throw _bad('You are not authorized to access this course.');
+        if (!course) throw ApiError.notFound('Course not found.');
+        // primaryFaculty = User._id — compare directly
+        if (!course.primaryFaculty || course.primaryFaculty.toString() !== userId.toString()) {
+            throw ApiError.forbidden('You are not authorized to access this course.');
         }
-        return { _id: facultyId };
+        return true;
     }
 
     if (userRole === 'student') {
-        const student = await Student.findOne({ user: userId });
-        if (!student) throw _bad('Student profile not found.');
-        const isEnrolled = await Enrollment.exists({ student: student._id, course: courseId, status: 'enrolled' });
-        if (!isEnrolled) throw _bad('You must be enrolled in this course to access assignments.');
-        return student;
+        // Enrollment.student = User._id — compare directly
+        const isEnrolled = await Enrollment.exists({ student: userId, course: courseId, status: 'enrolled' });
+        if (!isEnrolled) throw ApiError.forbidden('You must be enrolled in this course to access assignments.');
+        return true;
     }
 };
 
 const getAssignmentsByCourse = async (userId, userRole, courseId) => {
     await checkCourseAccess(userId, userRole, courseId);
-    return Assignment.find({ course: courseId }).sort({ dueDate: 1 });
+    return Assignment.find({ course: courseId })
+        .populate('course', 'code title')
+        .populate('faculty', 'name email')
+        .sort({ dueDate: 1 });
 };
 
 const createAssignment = async (userId, courseId, data) => {
     const course = await Course.findById(courseId);
-    if (!course) throw _notFound('Course not found.');
+    if (!course) throw ApiError.notFound('Course not found.');
 
-    // primaryFaculty stores Faculty._id — resolve userId → Faculty._id to compare
-    const facultyId = await getFacultyId(userId);
-    if (!facultyId || !course.primaryFaculty || course.primaryFaculty.toString() !== facultyId.toString()) {
-        throw _bad('You are not authorized to create assignments for this course.');
+    // primaryFaculty = User._id — compare directly
+    if (!course.primaryFaculty || course.primaryFaculty.toString() !== userId.toString()) {
+        throw ApiError.forbidden('You are not authorized to create assignments for this course.');
     }
 
     // Assignment.faculty refs User — store User._id
@@ -78,10 +70,10 @@ const createAssignment = async (userId, courseId, data) => {
 
 const updateAssignment = async (userId, assignmentId, data) => {
     const assignment = await Assignment.findById(assignmentId);
-    if (!assignment) throw _notFound('Assignment not found.');
+    if (!assignment) throw ApiError.notFound('Assignment not found.');
     // Assignment.faculty stores User._id
     if (assignment.faculty.toString() !== userId.toString()) {
-        throw _bad('You can only edit your own assignments.');
+        throw ApiError.forbidden('You can only edit your own assignments.');
     }
 
     if (data.title !== undefined) assignment.title = data.title;
@@ -104,9 +96,9 @@ const updateAssignment = async (userId, assignmentId, data) => {
 
 const deleteAssignment = async (userId, assignmentId) => {
     const assignment = await Assignment.findById(assignmentId);
-    if (!assignment) throw _notFound('Assignment not found.');
+    if (!assignment) throw ApiError.notFound('Assignment not found.');
     if (assignment.faculty.toString() !== userId.toString()) {
-        throw _bad('You can only delete your own assignments.');
+        throw ApiError.forbidden('You can only delete your own assignments.');
     }
     await Assignment.findByIdAndDelete(assignmentId);
 };

@@ -8,7 +8,7 @@ import {
     fetchCourses, createCourse, updateCourse, deleteCourse,
 } from '@/services/courseService';
 import api from '@/services/api';
-import type { Course, CreateCoursePayload } from '@/services/courseService';
+import type { Course, CreateCoursePayload, DepartmentInfo } from '@/services/courseService';
 
 // ── In-app confirmation modal (replaces window.confirm) ──────────────────────
 interface ConfirmModalProps {
@@ -72,6 +72,7 @@ const AdminCoursesPage: React.FC = () => {
     const { socket } = useSocket();
     const [courses, setCourses] = useState<Course[]>([]);
     const [faculties, setFaculties] = useState<any[]>([]);
+    const [departments, setDepartments] = useState<DepartmentInfo[]>([]);
     const [meta, setMeta] = useState({ page: 1, totalPages: 1, totalRecords: 0 });
     const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState('');
@@ -89,7 +90,7 @@ const AdminCoursesPage: React.FC = () => {
 
     const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
-    const DEPARTMENTS = ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Electronics', 'Mechanical', 'General'];
+
 
     const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
         setToast({ msg, type });
@@ -121,6 +122,7 @@ const AdminCoursesPage: React.FC = () => {
     useEffect(() => {
         loadCourses();
         if (!accessToken) return;
+        // Fetch faculty list
         api.get('/faculty', accessToken)
             .then((res: any) => setFaculties(res.data?.faculties || res.faculties || res.data || []))
             .catch(() =>
@@ -128,6 +130,13 @@ const AdminCoursesPage: React.FC = () => {
                     .then((r2: any) => setFaculties(r2.data?.users || r2.users || r2.data || []))
                     .catch(console.error)
             );
+        // Fetch departments
+        api.get('/foundation/departments', accessToken)
+            .then((res: any) => {
+                const depts = res.data?.departments || res.departments || res.data || [];
+                setDepartments(depts);
+            })
+            .catch(console.error);
     }, [accessToken]);
 
     const handleSearch = (e: React.FormEvent) => {
@@ -240,7 +249,7 @@ const AdminCoursesPage: React.FC = () => {
                 />
                 <select style={styles.select} value={deptFilter} onChange={e => setDeptFilter(e.target.value)}>
                     <option value="">All Departments</option>
-                    {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
+                    {departments.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
                 </select>
                 <button type="submit" style={styles.searchBtn}>Filter</button>
                 {(search || deptFilter) && (

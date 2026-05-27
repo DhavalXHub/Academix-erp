@@ -1,35 +1,22 @@
 const AttendanceRecord = require('../models/AttendanceRecord');
 const Course = require('../models/Course');
-const Student = require('../models/Student');
-const Faculty = require('../models/Faculty');
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-const _notFound = (msg) => Object.assign(new Error(msg), { code: 'NOT_FOUND', status: 404 });
-const _conflict = (msg) => Object.assign(new Error(msg), { code: 'CONFLICT', status: 409 });
-const _bad = (msg) => Object.assign(new Error(msg), { code: 'BAD_REQUEST', status: 400 });
+const ApiError = require('../utils/ApiError');
 
 // ── Service ───────────────────────────────────────────────────────────────────
 
 /**
  * Mark attendance for a specific course and date.
  * Creates or updates the attendance record.
+ * All refs (faculty, records.student) are now User._id.
  */
 const markAttendance = async (userId, courseId, dateParam, records) => {
-    // 1. Validate faculty & course
+    // 1. Validate course and faculty authorization
     const course = await Course.findById(courseId);
-    if (!course) throw _notFound('Course not found.');
+    if (!course) throw ApiError.notFound('Course not found.');
 
-    // primaryFaculty stores User._id — compare directly with userId
+    // primaryFaculty stores User._id — compare directly
     if (!course.primaryFaculty || course.primaryFaculty.toString() !== userId.toString()) {
-        throw _bad('You are not authorized to mark attendance for this course.');
-    }
-
-    // Get or create faculty profile for the attendance record audit trail
-    let faculty = await Faculty.findOne({ user: userId });
-    if (!faculty) {
-        // Graceful fallback: create a minimal faculty profile if missing
-        // This prevents a crash when profile is missing but user has correct role
-        faculty = { _id: userId }; // use userId as placeholder
+        throw ApiError.badRequest('You are not authorized to mark attendance for this course.');
     }
 
     // 2. Parse date (strip time for accurate day-level indexing)
@@ -38,40 +25,43 @@ const markAttendance = async (userId, courseId, dateParam, records) => {
 
     // 3. Upsert record: if exists for course+date, update; otherwise create
     let doc = await AttendanceRecord.findOne({ course: courseId, date });
-    
+
+    // Normalize the records to match schema: map 'studentId' or 'student' directly to 'student'
+    const formattedRecords = records.map(r => ({
+        student: r.studentId || r.student,
+        status: r.status,
+        remarks: r.remarks || '',
+    }));
+
     if (doc) {
-        // Update existing record
-        // It's a full replacement of the array per the request
-        doc.records = records;
-        doc.faculty = faculty._id; // audit trail of last modifier
+        // Update existing record — full replacement of the array
+        doc.records = formattedRecords;
+        doc.faculty = userId; // User._id of the faculty
         await doc.save();
     } else {
         // Create new
         doc = await AttendanceRecord.create({
             course: courseId,
-            faculty: faculty._id,
+            faculty: userId, // User._id directly
             date,
-            records,
+            records: formattedRecords,
         });
     }
 
     return doc.populate([
         { path: 'course', select: 'code title' },
-        { path: 'records.student', select: 'rollNumber user', populate: { path: 'user', select: 'name' } }
+        { path: 'records.student', select: 'name email' } // User fields directly
     ]);
 };
 
 /**
  * Get the logged-in student's full attendance history across all courses.
- * Calculates overall percentage per course.
+ * records.student is now User._id, so we query by userId directly.
  */
 const getStudentAttendance = async (userId) => {
-    // Try to find Student profile; if missing, return empty data gracefully
-    const student = await Student.findOne({ user: userId });
-    if (!student) return { summary: [], history: [] };
-
-    const records = await AttendanceRecord.find({ 'records.student': student._id })
-        .populate('course', 'code title credits department')
+    const records = await AttendanceRecord.find({ 'records.student': userId })
+        .populate('course', 'code title credits')
+        .populate({ path: 'course', populate: { path: 'department', select: 'name code' } })
         .sort({ date: -1 });
 
     // Format response and group by course
@@ -79,8 +69,8 @@ const getStudentAttendance = async (userId) => {
     const courseStats = {};
 
     records.forEach(session => {
-        const myRecord = session.records.find(r => r.student.toString() === student._id.toString());
-        if (!myRecord) return; // Should never happen unless DB is corrupt
+        const myRecord = session.records.find(r => r.student.toString() === userId.toString());
+        if (!myRecord) return;
 
         const courseId = session.course._id.toString();
         if (!courseStats[courseId]) {
@@ -115,16 +105,14 @@ const getStudentAttendance = async (userId) => {
 
 /**
  * Get the full history for a specific course (Admin/Faculty).
- * Also aggregates attendance percentage per student for the entire course list.
+ * faculty and records.student are now User._id — populate User directly.
  */
 const getCourseAttendance = async (courseId) => {
     const records = await AttendanceRecord.find({ course: courseId })
-        .populate('faculty', 'employeeId user')
-        .populate({ path: 'faculty', populate: { path: 'user', select: 'name' } })
+        .populate('faculty', 'name email') // User fields directly
         .populate({
             path: 'records.student',
-            select: 'rollNumber user',
-            populate: { path: 'user', select: 'name email' }
+            select: 'name email'  // User fields directly
         })
         .sort({ date: -1 });
 
@@ -134,7 +122,8 @@ const getCourseAttendance = async (courseId) => {
 
     records.forEach(session => {
         session.records.forEach(r => {
-            const sid = r.student._id.toString();
+            const sid = r.student?._id?.toString() || r.student?.toString();
+            if (!sid) return;
             if (!studentStats[sid]) {
                 studentStats[sid] = {
                     student: r.student,
