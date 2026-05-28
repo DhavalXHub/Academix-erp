@@ -65,15 +65,19 @@ const securityHeaders = (req, res, next) => {
     }
 
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'DENY');
+    // Allow embedding from same origin or allowed client origins for PDF previews
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN'); 
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     // Allow camera for QR scanning in student portal
     res.setHeader('Permissions-Policy', 'camera=*, microphone=(), geolocation=()');
+    
+    const frameAncestors = ["'self'", ...clientOrigins].join(' ');
+
     res.setHeader('Content-Security-Policy', [
         "default-src 'self'",
         "base-uri 'self'",
-        "object-src 'none'",
-        "frame-ancestors 'none'",
+        "object-src 'self'", // Allow PDFs to be loaded in <object> or <embed> if needed
+        `frame-ancestors ${frameAncestors}`, // Allow embedding in our own frontend iframes
         "script-src 'self' 'unsafe-inline'",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         // Allow QR code image from external service + data URIs + Google Fonts

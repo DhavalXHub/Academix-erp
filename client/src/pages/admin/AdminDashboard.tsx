@@ -71,20 +71,20 @@ const AdminDashboard: React.FC = () => {
 
             <FinanceStatsCards stats={topLevelStats} />
 
-            <div style={styles.grid}>
-                <div style={styles.cardLarge}>
+            <div className="chart-grid">
+                <div className="erp-card" style={{ padding: 24 }}>
                     <div style={styles.cardHeader}>
                         <h3 style={styles.cardTitle}>Revenue Collection Trajectory</h3>
                         <span style={styles.badgeSuccess}>Total: ${analytics.totalRevenue.toLocaleString()}</span>
                     </div>
-                    <RevenueChart data={revenueData} />
+                    <div className="chart-container"><RevenueChart data={revenueData} /></div>
                 </div>
 
-                <div style={styles.cardSmall}>
+                <div className="erp-card" style={{ padding: 24 }}>
                     <div style={styles.cardHeader}>
                         <h3 style={styles.cardTitle}>Department Scale</h3>
                     </div>
-                    <DepartmentComparisonChart data={deptData} />
+                    <div className="chart-container"><DepartmentComparisonChart data={deptData} /></div>
                 </div>
             </div>
         </div>
@@ -92,7 +92,7 @@ const AdminDashboard: React.FC = () => {
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    page: { padding: '2rem', maxWidth: 1400, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
+    page: { maxWidth: 1400, margin: '0 auto', fontFamily: "'Inter', sans-serif" },
     header: { marginBottom: 32 },
     title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
     subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },
@@ -102,10 +102,7 @@ const styles: Record<string, React.CSSProperties> = {
     errorTitle: { fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: '0 0 8px' },
     errorText: { fontSize: 14, color: 'var(--text-muted)', margin: '0 0 24px', lineHeight: 1.6 },
     retryBtn: { padding: '10px 24px', background: '#2563eb', color:'var(--card-bg)', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer' },
-    grid: { display: 'grid', gridTemplateColumns: '7fr 4fr', gap: 24 },
-    cardLarge: { background:'var(--card-bg)', padding: 24, borderRadius: 16, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
-    cardSmall: { background:'var(--card-bg)', padding: 24, borderRadius: 16, border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' },
-    cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
+    cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 8 },
     cardTitle: { margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-main)' },
     badgeSuccess: { background: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: 99, fontSize: 13, fontWeight: 700 },
 };

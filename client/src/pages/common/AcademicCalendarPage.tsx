@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, Clock, MapPin, Plus, Trash2, FileText, Download, Eye, Maximize2, ZoomIn, ZoomOut, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchCourses, type Course } from '@/services/courseService';
-import axios from 'axios';
-import api from '@/services/api';
+import api, { client } from '@/services/api';
 import {
     createExamEvent,
     deleteExamEvent,
@@ -161,12 +160,14 @@ const AcademicCalendarPage: React.FC = () => {
 
         setIsUploading(true);
         try {
-            const baseURL = (import.meta as any).env?.VITE_API_BASE_URL || '/api/v1';
-            await axios.post(`${baseURL}/academic-calendars`, formData, {
+            // Use the configured client so the CSRF + auth interceptors run
+            // Note: client already has baseURL set to API_BASE_URL, so use relative path only
+            await client.post('/academic-calendars', formData, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
-                    'Content-Type': 'multipart/form-data'
-                }
+                    // Do NOT manually set Content-Type for FormData;
+                    // axios sets it automatically with the correct boundary
+                },
             });
             showNotice('Yearly institutional calendar uploaded successfully!');
             setUploadTitle('');

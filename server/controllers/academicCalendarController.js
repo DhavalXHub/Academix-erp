@@ -42,6 +42,22 @@ const uploadCalendar = asyncHandler(async (req, res) => {
         uploadedBy: req.user.id,
     });
 
+    // Broadcast notification to all students and faculty
+    try {
+        const notificationService = require('../services/notificationService');
+        const typeLabel = calendarType === 'holiday' ? 'Holiday Schedule'
+            : calendarType === 'exam' ? 'Exam Timetable'
+            : 'Academic Calendar';
+        await notificationService.broadcastAnnouncement(
+            `📅 New ${typeLabel} Uploaded`,
+            `"${title}" for ${academicYear} is now available in the Academic Calendar section.`,
+            'all',
+            'Admin'
+        );
+    } catch (notifErr) {
+        console.error('[Calendar Notification] Failed:', notifErr.message);
+    }
+
     return ApiResponse.success(res, 201, { calendar }, 'Calendar uploaded successfully.');
 });
 

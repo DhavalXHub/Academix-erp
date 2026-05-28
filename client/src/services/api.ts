@@ -21,7 +21,10 @@ type ApiEnvelope<T> =
 const client: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,
     withCredentials: true,
-    headers: { 'Content-Type': 'application/json' },
+    // NOTE: Do NOT set a default Content-Type here.
+    // Axios automatically sets 'application/json' for JSON bodies.
+    // Setting it as a default suppresses the 'multipart/form-data; boundary=...' header
+    // that browsers inject for FormData, breaking multer file uploads on the server.
 });
 
 const readCookie = (name: string): string | null => {
@@ -63,6 +66,15 @@ client.interceptors.request.use((config) => {
             (config.headers as any) = { ...(config.headers as any), Authorization: `Bearer ${token}` };
         }
     }
+
+    // For FormData bodies, delete Content-Type so the browser sets
+    // 'multipart/form-data; boundary=...' automatically with the correct boundary.
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+        if ((config.headers as any)?.['Content-Type']) {
+            delete (config.headers as any)['Content-Type'];
+        }
+    }
+
     const method = String(config.method || 'get').toUpperCase();
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
         const csrf = readCookie('academix_csrf');

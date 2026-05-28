@@ -76,6 +76,26 @@ const createExamEvent = async (req, res, next) => {
             { path: 'createdBy', select: 'name role' },
         ]);
 
+        // Notify relevant audience when event is published
+        if (status === 'published') {
+            try {
+                const { broadcastAnnouncement } = require('../services/notificationService');
+                const typeLabel = type === 'final' ? 'Final Exam' : type === 'midterm' ? 'Mid-Term Exam'
+                    : type === 'internal' ? 'Internal Assessment' : type === 'practical' ? 'Practical Exam'
+                    : type === 'viva' ? 'Viva/Oral Exam' : 'Academic Event';
+                const dateStr = start.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                const audience = targetAudience === 'student' ? 'student' : targetAudience === 'faculty' ? 'faculty' : 'all';
+                await broadcastAnnouncement(
+                    `📅 ${typeLabel}: ${title}`,
+                    `Scheduled on ${dateStr}${venue ? ` at ${venue}` : ''}. Check the Academic Calendar for full details.`,
+                    audience,
+                    'Academic Office'
+                );
+            } catch (notifErr) {
+                console.error('[ExamEvent Notification] Failed:', notifErr.message);
+            }
+        }
+
         ok(res, 201, { event: populated }, 'Academic event created.');
     } catch (err) {
         next(err);

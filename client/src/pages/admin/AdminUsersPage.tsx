@@ -128,13 +128,15 @@ const AdminUsersPage: React.FC = () => {
             </form>
 
             {/* Table */}
-            <UserTable
-                users={users}
-                isLoading={isLoading}
-                onEdit={handleOpenEdit}
-                onDeactivate={handleDeactivate}
-                onDelete={handleDelete}
-            />
+            <div className="table-responsive">
+                <UserTable
+                    users={users}
+                    isLoading={isLoading}
+                    onEdit={handleOpenEdit}
+                    onDeactivate={handleDeactivate}
+                    onDelete={handleDelete}
+                />
+            </div>
 
             {/* Pagination */}
             {meta.totalPages > 1 && (
@@ -158,7 +160,7 @@ const AdminUsersPage: React.FC = () => {
 };
 
 const styles: Record<string, React.CSSProperties> = {
-    page: { padding: '2rem', maxWidth: 1200, margin: '0 auto', fontFamily: "'Inter', sans-serif", position: 'relative' },
+    page: { maxWidth: 1200, margin: '0 auto', fontFamily: "'Inter', sans-serif", position: 'relative' },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' },
     title: { fontSize: 26, fontWeight: 700, color: 'var(--text-main)', margin: 0 },
     subtitle: { fontSize: 14, color: 'var(--text-muted)', margin: '4px 0 0' },

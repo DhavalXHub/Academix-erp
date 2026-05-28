@@ -352,7 +352,8 @@ router.post('/mentorship/meetings', protect, asyncHandler(async (req, res) => {
 
     // Notify the target user in real-time
     const notificationService = require('../services/notificationService');
-    const senderName = req.user.name || 'Your Mentor/Student';
+    const senderUser = await User.findById(req.user.id).select('name').lean();
+    const senderName = senderUser?.name || (isStudent ? 'Your Student' : 'Your Mentor');
     await notificationService.createDirectNotification(
         targetUserId,
         'mentorship_meeting',

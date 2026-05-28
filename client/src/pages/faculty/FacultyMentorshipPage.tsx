@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchCourseRoster } from '@/services/courseService';
-import { HelpCircle, UserCheck, MessageSquare, Clipboard, Star, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { useSocket } from '@/contexts/SocketContext';
+import { Clipboard, AlertTriangle, ShieldAlert, Calendar, Check, X } from 'lucide-react';
 import api from '@/services/api';
-import { fetchMentees, recordMentorshipNote } from '@/services/facultyAddonsService';
+import { fetchMentees, recordMentorshipNote, updateMentorshipMeetingStatus, requestMentorshipMeeting, type MentorshipMeeting } from '@/services/facultyAddonsService';
 
 interface Mentee {
     _id: string;
@@ -15,19 +15,19 @@ interface Mentee {
     attendanceRate: number;
     backlogsCount: number;
     notes: string[];
+    meetings: MentorshipMeeting[];
 }
 
-// Seed reasonable mock mentee datasets since MongoDB doesn't store advisor mapping by default,
-// but fetch actual students to make it partially dynamic!
 const DEFAULT_MENTEES = [
-    { name: 'Aarav Sharma', roll: '2023CS01', dept: 'CSE', sem: 6, gpa: 8.7, att: 84, backlogs: 0, notes: ['Aarav is showing great interest in deep learning. Wants to apply for a research internship.'] },
-    { name: 'Kavya Iyer', roll: '2023CS12', dept: 'CSE', sem: 6, gpa: 7.2, att: 71, backlogs: 1, notes: ['Low attendance in Quantum Mechanics. Discussed health issues, advised her to submit leave proofs.'] },
-    { name: 'Aditya Verma', roll: '2023CS25', dept: 'CSE', sem: 6, gpa: 9.4, att: 96, backlogs: 0, notes: ['Top performer. Advised him to prepare for competitive coding contests like ACM ICPC.'] },
-    { name: 'Ananya Sen', roll: '2023CS44', dept: 'CSE', sem: 6, gpa: 6.1, att: 65, backlogs: 3, notes: ['Critical backlog alert in Discrete Mathematics. Set up weekly doubt solving drills.'] },
+    { name: 'Aarav Sharma', roll: '2023CS01', dept: 'CSE', sem: 6, gpa: 8.7, att: 84, backlogs: 0, notes: ['Aarav is showing great interest in deep learning. Wants to apply for a research internship.'], meetings: [] },
+    { name: 'Kavya Iyer', roll: '2023CS12', dept: 'CSE', sem: 6, gpa: 7.2, att: 71, backlogs: 1, notes: ['Low attendance in Quantum Mechanics. Discussed health issues, advised her to submit leave proofs.'], meetings: [] },
+    { name: 'Aditya Verma', roll: '2023CS25', dept: 'CSE', sem: 6, gpa: 9.4, att: 96, backlogs: 0, notes: ['Top performer. Advised him to prepare for competitive coding contests like ACM ICPC.'], meetings: [] },
+    { name: 'Ananya Sen', roll: '2023CS44', dept: 'CSE', sem: 6, gpa: 6.1, att: 65, backlogs: 3, notes: ['Critical backlog alert in Discrete Mathematics. Set up weekly doubt solving drills.'], meetings: [] },
 ];
 
 const FacultyMentorshipPage: React.FC = () => {
-    const { accessToken } = useAuth();
+    const { accessToken, user } = useAuth();
+    const { socket } = useSocket();
     const [mentees, setMentees] = useState<Mentee[]>([]);
     const [selectedMentee, setSelectedMentee] = useState<Mentee | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +35,14 @@ const FacultyMentorshipPage: React.FC = () => {
     // Advising log note input state
     const [newNote, setNewNote] = useState('');
     const [isSavingNote, setIsSavingNote] = useState(false);
+
+    // Meeting modal state
+    const [showMeetingModal, setShowMeetingModal] = useState(false);
+    const [meetingTitle, setMeetingTitle] = useState('');
+    const [meetingDesc, setMeetingDesc] = useState('');
+    const [scheduledAt, setScheduledAt] = useState('');
+    const [isSubmittingMeeting, setIsSubmittingMeeting] = useState(false);
+
     const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
 
     const showToast = (msg: string, ok = true) => {
@@ -42,14 +50,12 @@ const FacultyMentorshipPage: React.FC = () => {
         setTimeout(() => setToast(null), 3000);
     };
 
-    useEffect(() => {
+    const loadMentees = () => {
         if (!accessToken) return;
         setIsLoading(true);
-        // Load real mentees from dynamic MongoDB database
         fetchMentees(accessToken)
             .then((res: any) => {
                 const fetched = res.mentees || [];
-                // If fetched are empty, enrich dynamic list
                 if (fetched.length === 0) {
                     api.get('/faculty/students', accessToken)
                         .then(stdRes => {
@@ -69,16 +75,32 @@ const FacultyMentorshipPage: React.FC = () => {
                                     attendanceRate: Math.round(62 + (idx * 9.7) % 38),
                                     backlogsCount: (idx % 4 === 0) ? (idx % 2 === 0 ? 2 : 1) : 0,
                                     notes: [...mockData.notes],
+                                    meetings: [],
                                 };
                             });
                             setMentees(enriched);
-                            if (enriched.length > 0) setSelectedMentee(enriched[0]);
+                            if (enriched.length > 0) {
+                                // Match previously selected or pick first
+                                setSelectedMentee(prev => {
+                                    if (prev) {
+                                        const match = enriched.find((m: any) => m._id === prev._id);
+                                        if (match) return match;
+                                    }
+                                    return enriched[0];
+                                });
+                            }
                         })
                         .catch(() => setMentees([]));
                 } else {
                     setMentees(fetched);
                     if (fetched.length > 0) {
-                        setSelectedMentee(fetched[0]);
+                        setSelectedMentee(prev => {
+                            if (prev) {
+                                const match = fetched.find((m: any) => m._id === prev._id);
+                                if (match) return match;
+                            }
+                            return fetched[0];
+                        });
                     }
                 }
                 setIsLoading(false);
@@ -87,7 +109,23 @@ const FacultyMentorshipPage: React.FC = () => {
                 console.error(err);
                 setIsLoading(false);
             });
+    };
+
+    useEffect(() => {
+        loadMentees();
     }, [accessToken]);
+
+    // Live Socket sync
+    useEffect(() => {
+        if (!socket) return;
+        const handleNotif = () => {
+            loadMentees();
+        };
+        socket.on('newNotification', handleNotif);
+        return () => {
+            socket.off('newNotification', handleNotif);
+        };
+    }, [socket]);
 
     const handleAddNote = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -121,6 +159,43 @@ const FacultyMentorshipPage: React.FC = () => {
         }
     };
 
+    const handleUpdateMeetingStatus = async (meetingId: string, status: 'approved' | 'declined' | 'completed') => {
+        if (!accessToken || !selectedMentee) return;
+        try {
+            await updateMentorshipMeetingStatus(accessToken, meetingId, status);
+            showToast(`Meeting marked as ${status}.`);
+            loadMentees();
+        } catch (e: any) {
+            showToast(e.message || 'Failed to update meeting status.', false);
+        }
+    };
+
+    const handleScheduleMeeting = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedMentee || !accessToken) return showToast('Please select a student first.', false);
+        if (!meetingTitle.trim() || !scheduledAt) return showToast('Please provide a title and date/time.', false);
+
+        setIsSubmittingMeeting(true);
+        try {
+            await requestMentorshipMeeting(accessToken, {
+                title: meetingTitle,
+                description: meetingDesc,
+                scheduledAt,
+                targetUserId: selectedMentee._id,
+            });
+            showToast('✅ Mentorship meeting proposed successfully!');
+            setMeetingTitle('');
+            setMeetingDesc('');
+            setScheduledAt('');
+            setShowMeetingModal(false);
+            loadMentees();
+        } catch (e: any) {
+            showToast(e.message || 'Failed to schedule meeting.', false);
+        } finally {
+            setIsSubmittingMeeting(false);
+        }
+    };
+
     // Calculate mentoring summary
     const criticalCount = mentees.filter(m => m.attendanceRate < 75 || m.backlogsCount > 0).length;
 
@@ -144,7 +219,7 @@ const FacultyMentorshipPage: React.FC = () => {
                 </div>
             </div>
 
-            {isLoading ? (
+            {isLoading && mentees.length === 0 ? (
                 <div style={styles.empty}>Assembling mentee database...</div>
             ) : (
                 <div style={styles.grid}>
@@ -203,9 +278,15 @@ const FacultyMentorshipPage: React.FC = () => {
                         ) : (
                             <div style={styles.menteeFile}>
                                 <div style={styles.fileHeader}>
-                                    <div>
-                                        <h3 style={styles.fileTitle}>{selectedMentee.user.name}</h3>
-                                        <p style={styles.fileSub}>Dept: {selectedMentee.department} • Semester: {selectedMentee.semester} • {selectedMentee.user.email}</p>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <div>
+                                            <h3 style={styles.fileTitle}>{selectedMentee.user.name}</h3>
+                                            <p style={styles.fileSub}>Dept: {selectedMentee.department} • Semester: {selectedMentee.semester} • {selectedMentee.user.email}</p>
+                                        </div>
+                                        <button style={styles.primaryBtn} onClick={() => setShowMeetingModal(true)}>
+                                            <Calendar size={16} />
+                                            Schedule Session
+                                        </button>
                                     </div>
                                 </div>
 
@@ -228,6 +309,68 @@ const FacultyMentorshipPage: React.FC = () => {
                                         <div style={{ ...styles.statVal, color: selectedMentee.backlogsCount > 0 ? '#ef4444' : 'var(--text-muted)' }}>
                                             {selectedMentee.backlogsCount}
                                         </div>
+                                    </div>
+                                </div>
+
+                                {/* Meetings section */}
+                                <div style={styles.meetingsSection}>
+                                    <h4 style={styles.sectionHeading}>🗓️ Mentorship Meetings</h4>
+                                    <div style={styles.meetingsList}>
+                                        {(!selectedMentee.meetings || selectedMentee.meetings.length === 0) ? (
+                                            <p style={styles.noNotes}>No advising meetings scheduled.</p>
+                                        ) : (
+                                            selectedMentee.meetings.map(m => {
+                                                const isStudentReq = m.requestedBy === 'student';
+                                                return (
+                                                    <div key={m._id} style={styles.meetingItem}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                            <div>
+                                                                <h5 style={styles.meetingTitle}>{m.title}</h5>
+                                                                {m.description && <p style={styles.meetingDesc}>{m.description}</p>}
+                                                                <span style={styles.meetingTime}>🕒 {new Date(m.scheduledAt).toLocaleString()}</span>
+                                                                <span style={{ marginLeft: 8, fontSize: 10, color: 'var(--text-muted)' }}>
+                                                                    ({isStudentReq ? 'Requested by Student' : 'Scheduled by You'})
+                                                                </span>
+                                                            </div>
+                                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                                                                <span style={{
+                                                                    ...styles.statusTag,
+                                                                    background: m.status === 'approved' ? '#dcfce7' : m.status === 'declined' ? '#fee2e2' : m.status === 'completed' ? '#f3f4f6' : '#fef3c7',
+                                                                    color: m.status === 'approved' ? '#15803d' : m.status === 'declined' ? '#b91c1c' : m.status === 'completed' ? '#4b5563' : '#b45309',
+                                                                }}>{m.status.toUpperCase()}</span>
+
+                                                                {m.status === 'pending' && (
+                                                                    <div style={{ display: 'flex', gap: 4 }}>
+                                                                        <button 
+                                                                            style={styles.approveBtn}
+                                                                            onClick={() => handleUpdateMeetingStatus(m._id, 'approved')}
+                                                                            title="Approve"
+                                                                        >
+                                                                            <Check size={12} /> Accept
+                                                                        </button>
+                                                                        <button 
+                                                                            style={styles.declineBtn}
+                                                                            onClick={() => handleUpdateMeetingStatus(m._id, 'declined')}
+                                                                            title="Decline"
+                                                                        >
+                                                                            <X size={12} /> Decline
+                                                                        </button>
+                                                                    </div>
+                                                                )}
+                                                                {m.status === 'approved' && (
+                                                                    <button
+                                                                        style={styles.completeBtn}
+                                                                        onClick={() => handleUpdateMeetingStatus(m._id, 'completed')}
+                                                                    >
+                                                                        Mark Complete
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })
+                                        )}
                                     </div>
                                 </div>
 
@@ -275,6 +418,58 @@ const FacultyMentorshipPage: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            {/* Schedule Meeting Modal */}
+            {showMeetingModal && selectedMentee && (
+                <div style={styles.modalOverlay}>
+                    <div style={styles.modal}>
+                        <div style={styles.modalHeader}>
+                            <h3 style={styles.modalTitle}>Schedule Advising Session with {selectedMentee.user.name}</h3>
+                            <button style={styles.closeBtn} onClick={() => setShowMeetingModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <form onSubmit={handleScheduleMeeting} style={styles.modalForm}>
+                            <div style={styles.formGroup}>
+                                <label style={styles.label}>Proposed Subject / Title</label>
+                                <input 
+                                    type="text" 
+                                    required 
+                                    placeholder="e.g. Attendance Review, Grade Assessment Feedback" 
+                                    style={styles.input} 
+                                    value={meetingTitle}
+                                    onChange={e => setMeetingTitle(e.target.value)}
+                                />
+                            </div>
+                            <div style={styles.formGroup}>
+                                <label style={styles.label}>Description / Goals</label>
+                                <textarea 
+                                    placeholder="Outline primary targets for this meeting..." 
+                                    style={{ ...styles.input, height: 90, resize: 'none' }}
+                                    value={meetingDesc}
+                                    onChange={e => setMeetingDesc(e.target.value)}
+                                />
+                            </div>
+                            <div style={styles.formGroup}>
+                                <label style={styles.label}>Scheduled Date-Time</label>
+                                <input 
+                                    type="datetime-local" 
+                                    required 
+                                    style={styles.input} 
+                                    value={scheduledAt}
+                                    onChange={e => setScheduledAt(e.target.value)}
+                                />
+                            </div>
+                            <div style={styles.modalActions}>
+                                <button type="button" style={styles.cancelBtn} onClick={() => setShowMeetingModal(false)}>Cancel</button>
+                                <button type="submit" style={styles.primaryBtn} disabled={isSubmittingMeeting}>
+                                    {isSubmittingMeeting ? 'Scheduling...' : 'Schedule Meeting'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -287,7 +482,7 @@ const styles: Record<string, React.CSSProperties> = {
     
     empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--page-bg)', borderRadius: 12, border: '1px dashed #d1d5db' },
     
-    grid: { display: 'grid', gridTemplateColumns: '1.1fr 1.6fr', gap: 24, height: '72vh', alignItems: 'stretch' },
+    grid: { display: 'grid', gridTemplateColumns: '1.1fr 1.6fr', gap: 24, minHeight: '72vh', alignItems: 'stretch' },
     
     // Left List
     listCard: { background: 'var(--card-bg, #ffffff)', border: '1px solid #e5e7eb', borderRadius: 16, padding: 20, display: 'flex', flexDirection: 'column', boxShadow: '0 4px 6px rgba(0,0,0,0.01)' },
@@ -310,12 +505,24 @@ const styles: Record<string, React.CSSProperties> = {
     fileHeader: { borderBottom: '1px solid #f1f5f9', paddingBottom: 16 },
     fileTitle: { margin: 0, fontSize: 18, fontWeight: 800, color: 'var(--text-main)' },
     fileSub: { margin: '4px 0 0', fontSize: 13, color: 'var(--text-muted)' },
+    primaryBtn: { display: 'flex', alignItems: 'center', gap: 8, padding: '9px 18px', background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' },
     
     statsRoster: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 },
     statBox: { padding: 14, background: '#fafbfc', borderRadius: 10, border: '1px solid #e2e8f0', textAlign: 'center' },
     statLabel: { fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' },
     statVal: { fontSize: 20, fontWeight: 800, color: 'var(--text-main)', marginTop: 4 },
     
+    meetingsSection: { display: 'flex', flexDirection: 'column', gap: 12, borderBottom: '1px solid #f1f5f9', paddingBottom: 20 },
+    meetingsList: { display: 'flex', flexDirection: 'column', gap: 10 },
+    meetingItem: { border: '1px solid #e2e8f0', borderRadius: 8, padding: 12, background: '#fafbfc' },
+    meetingTitle: { margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--text-main)' },
+    meetingDesc: { margin: '4px 0', fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4 },
+    meetingTime: { fontSize: 11, color: '#6366f1', fontWeight: 600 },
+    statusTag: { fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 4 },
+    approveBtn: { display: 'flex', alignItems: 'center', gap: 4, background: '#dcfce7', color: '#15803d', border: 'none', borderRadius: 4, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' },
+    declineBtn: { display: 'flex', alignItems: 'center', gap: 4, background: '#fee2e2', color: '#b91c1c', border: 'none', borderRadius: 4, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' },
+    completeBtn: { background: '#f3f4f6', color: '#4b5563', border: 'none', borderRadius: 4, padding: '4px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' },
+
     logsSection: { display: 'flex', flexDirection: 'column', gap: 16 },
     sectionHeading: { margin: '12px 0 0', fontSize: 14, fontWeight: 700, color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.05em' },
     noteForm: { display: 'flex', flexDirection: 'column', gap: 10 },
@@ -331,7 +538,20 @@ const styles: Record<string, React.CSSProperties> = {
     noNotes: { fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 },
     
     emptyState: { padding: '4rem 2rem', textAlign: 'center', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' },
-    toast: { position: 'fixed', top: 20, right: 20, padding: '12px 20px', borderRadius: 10, border: '1px solid', fontSize: 14, fontWeight: 600, zIndex: 9999, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }
+    toast: { position: 'fixed', top: 20, right: 20, padding: '12px 20px', borderRadius: 10, border: '1px solid', fontSize: 14, fontWeight: 600, zIndex: 9999, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' },
+
+    // Modal
+    modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(2px)' },
+    modal: { background: '#fff', width: '100%', maxWidth: 460, borderRadius: 16, padding: 24, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
+    modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 },
+    modalTitle: { margin: 0, fontSize: 17, fontWeight: 800, color: 'var(--text-main)' },
+    closeBtn: { background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' },
+    modalForm: { display: 'flex', flexDirection: 'column', gap: 16 },
+    formGroup: { display: 'flex', flexDirection: 'column', gap: 6 },
+    label: { fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' },
+    input: { padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: 8, fontSize: 13, outline: 'none', width: '100%', boxSizing: 'border-box' },
+    modalActions: { display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 8 },
+    cancelBtn: { padding: '9px 18px', background: '#f3f4f6', color: '#4b5563', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' },
 };
 
 export default FacultyMentorshipPage;

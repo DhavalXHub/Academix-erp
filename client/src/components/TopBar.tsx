@@ -1,22 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search, ChevronDown, User, Settings, LogOut, Home, X, Bell } from 'lucide-react';
+import { Search, ChevronDown, User, Settings, LogOut, Home, X, Menu } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import NotificationBell from './NotificationBell';
 
 /* ─────────────────────────────────────────────
-   Mock Notifications (dummy data)
-───────────────────────────────────────────── */
-const INITIAL_NOTIFICATIONS = [
-    { id: 1, text: 'New assignment uploaded for CS101', time: '5 min ago', read: false, icon: '📝' },
-    { id: 2, text: 'Fee payment reminder — due in 3 days', time: '1 hour ago', read: false, icon: '💳' },
-    { id: 3, text: 'Quiz results published: Data Structures', time: '3 hours ago', read: true, icon: '📊' },
-    { id: 4, text: 'Attendance marked for today\'s lecture', time: 'Yesterday', read: true, icon: '✅' },
-];
-
-/* ─────────────────────────────────────────────
-   Mock Search Suggestions (dummy data)
+   Mock Search Suggestions
 ───────────────────────────────────────────── */
 interface SearchSuggestion {
     id: number;
@@ -26,13 +16,13 @@ interface SearchSuggestion {
     path: string;
 }
 const ALL_SUGGESTIONS: SearchSuggestion[] = [
-    { id: 1,  label: 'Dashboard',       category: 'Page',       icon: '🏠', path: 'dashboard' },
-    { id: 2,  label: 'Courses',         category: 'Page',       icon: '📚', path: 'courses' },
-    { id: 3,  label: 'Attendance',      category: 'Page',       icon: '📋', path: 'attendance' },
-    { id: 4,  label: 'Assignments',     category: 'Page',       icon: '📝', path: 'assignments' },
-    { id: 5,  label: 'Quizzes',         category: 'Page',       icon: '🧪', path: 'quizzes' },
-    { id: 6,  label: 'Messages',        category: 'Page',       icon: '💬', path: 'messages' },
-    { id: 7,  label: 'Profile',         category: 'Page',       icon: '👤', path: 'profile' },
+    { id: 1,  label: 'Dashboard',       category: 'Page',   icon: '🏠', path: 'dashboard' },
+    { id: 2,  label: 'Courses',         category: 'Page',   icon: '📚', path: 'courses' },
+    { id: 3,  label: 'Attendance',      category: 'Page',   icon: '📋', path: 'attendance' },
+    { id: 4,  label: 'Assignments',     category: 'Page',   icon: '📝', path: 'assignments' },
+    { id: 5,  label: 'Quizzes',         category: 'Page',   icon: '🧪', path: 'quizzes' },
+    { id: 6,  label: 'Messages',        category: 'Page',   icon: '💬', path: 'messages' },
+    { id: 7,  label: 'Profile',         category: 'Page',   icon: '👤', path: 'profile' },
     { id: 8,  label: 'CS101 – Intro to Computer Science', category: 'Course', icon: '💻', path: 'courses' },
     { id: 9,  label: 'MA201 – Calculus II',               category: 'Course', icon: '📐', path: 'courses' },
     { id: 10, label: 'PH101 – Physics Fundamentals',      category: 'Course', icon: '⚛️', path: 'courses' },
@@ -50,23 +40,12 @@ const ROLE_LABELS: Record<string, string> = {
 const getPageTitle = (pathname: string): string => {
     const segment = pathname.split('/').filter(Boolean).pop() || '';
     if (!segment) return 'Dashboard';
-    return segment
-        .replace(/-/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase());
+    return segment.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 };
 
-/* ─────────────────────────────────────────────
-   Hover-aware style helpers
-───────────────────────────────────────────── */
 function useHover(): [boolean, { onMouseEnter: () => void; onMouseLeave: () => void }] {
     const [hovered, setHovered] = useState(false);
-    return [
-        hovered,
-        {
-            onMouseEnter: () => setHovered(true),
-            onMouseLeave: () => setHovered(false),
-        },
-    ];
+    return [hovered, { onMouseEnter: () => setHovered(true), onMouseLeave: () => setHovered(false) }];
 }
 
 /* ─────────────────────────────────────────────
@@ -74,29 +53,24 @@ function useHover(): [boolean, { onMouseEnter: () => void; onMouseLeave: () => v
 ───────────────────────────────────────────── */
 interface TopBarProps {
     pageTitle?: string;
+    onMenuClick?: () => void;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
+const TopBar: React.FC<TopBarProps> = ({ pageTitle, onMenuClick }) => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery]   = useState('');
     const [searchFocused, setSearchFocused] = useState(false);
-    const [showNotifications, setShowNotifications] = useState(false);
-    const [showProfile, setShowProfile] = useState(false);
-    const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+    const [showProfile, setShowProfile]   = useState(false);
 
-    const notifRef  = useRef<HTMLDivElement>(null);
     const profileRef = useRef<HTMLDivElement>(null);
     const searchRef  = useRef<HTMLDivElement>(null);
 
-    /* ── Close dropdowns when clicking outside ── */
+    /* Close dropdowns on outside click */
     useEffect(() => {
         const handler = (e: MouseEvent) => {
-            if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
-                setShowNotifications(false);
-            }
             if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
                 setShowProfile(false);
             }
@@ -114,15 +88,6 @@ const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
         navigate('/login');
     };
 
-    const markAllRead = () => {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    };
-
-    const markOneRead = (id: number) => {
-        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-    };
-
-    /* ── Search: filter suggestions ── */
     const filteredSuggestions = useCallback(() => {
         const q = searchQuery.trim().toLowerCase();
         if (!q) return [];
@@ -138,33 +103,44 @@ const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
         setSearchFocused(false);
     };
 
-    const unreadCount = notifications.filter(n => !n.read).length;
     const title = pageTitle || getPageTitle(location.pathname);
     const showSearchResults = searchFocused && searchQuery.trim().length > 0;
     const results = filteredSuggestions();
 
     return (
         <header style={s.bar}>
-            {/* ── Left: Home icon + Page title ── */}
+            {/* ── Left: Hamburger (mobile) + Home icon + Page title ── */}
             <div style={s.left}>
+                {/* Hamburger – only shown on mobile via CSS */}
+                <button
+                    className="hamburger-btn"
+                    style={s.hamburger}
+                    onClick={onMenuClick}
+                    aria-label="Open navigation menu"
+                    title="Open menu"
+                >
+                    <Menu size={20} />
+                </button>
+
                 <HomeBtn />
-                <span style={s.pageTitle}>{title}</span>
+                <span className="topbar-page-title" style={s.pageTitle}>{title}</span>
             </div>
 
             {/* ── Center: Search bar ── */}
             <div
                 ref={searchRef}
+                className="topbar-search-wrap"
                 style={{
                     ...s.searchWrap,
                     ...(searchFocused ? s.searchWrapFocused : {}),
                     position: 'relative',
                 }}
             >
-                <Search size={15} style={{ color: searchFocused ? '#2563eb' : 'var(--text-muted)', flexShrink: 0, transition: 'color 0.15s' }} />
+                <Search size={15} style={{ color: searchFocused ? 'var(--primary)' : 'var(--text-muted)', flexShrink: 0, transition: 'color 0.15s' }} />
                 <input
                     id="topbar-search"
                     style={s.searchInput}
-                    placeholder="Search pages, courses, assignments…"
+                    placeholder="Search pages, courses…"
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     onFocus={() => setSearchFocused(true)}
@@ -182,7 +158,7 @@ const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
                     </button>
                 )}
 
-                {/* ── Search Results Dropdown ── */}
+                {/* Search Results Dropdown */}
                 {showSearchResults && (
                     <div style={s.searchDropdown}>
                         {results.length === 0 ? (
@@ -206,25 +182,23 @@ const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
                 )}
             </div>
 
-            {/* ── Right: Notification bell + Profile ── */}
+            {/* ── Right: Theme + Notifications + Profile ── */}
             <div style={s.right}>
                 <ThemeToggle />
-
-                {/* ──── Notification Bell ──── */}
                 <NotificationBell />
 
-                {/* ──── Profile Dropdown ──── */}
+                {/* Profile Dropdown */}
                 <div ref={profileRef} style={{ position: 'relative' }}>
                     <button
                         id="topbar-profile"
                         style={s.profileBtn}
-                        onClick={() => { setShowProfile(v => !v); setShowNotifications(false); }}
+                        onClick={() => setShowProfile(v => !v)}
                         aria-label="User menu"
                     >
                         <div style={s.avatar}>
                             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
-                        <div style={s.userInfo}>
+                        <div style={s.userInfo} className="topbar-user-info">
                             <span style={s.userName}>{user?.name?.split(' ')[0] || 'User'}</span>
                             <span style={s.userRole}>{ROLE_LABELS[user?.role || ''] || ''}</span>
                         </div>
@@ -240,7 +214,6 @@ const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
 
                     {showProfile && (
                         <div style={s.profileDropdown}>
-                            {/* User Info Header */}
                             <div style={s.profileHeader}>
                                 <div style={s.profileAvatarLg}>
                                     {user?.name?.charAt(0)?.toUpperCase() || 'U'}
@@ -254,7 +227,6 @@ const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
 
                             <div style={s.menuDivider} />
 
-                            {/* Menu Items */}
                             <ProfileMenuItem
                                 to={`/${user?.role}/profile`}
                                 icon={<User size={15} />}
@@ -280,20 +252,15 @@ const TopBar: React.FC<TopBarProps> = ({ pageTitle }) => {
 };
 
 /* ─────────────────────────────────────────────
-   Sub-components (hover-aware)
+   Sub-components
 ───────────────────────────────────────────── */
-
-/* Home button */
 const HomeBtn: React.FC = () => {
     const [hovered, hoverProps] = useHover();
     return (
         <Link
             to="/"
             title="Back to Home"
-            style={{
-                ...s.homeBtn,
-                ...(hovered ? s.homeBtnHover : {}),
-            }}
+            style={{ ...s.homeBtn, ...(hovered ? s.homeBtnHover : {}) }}
             {...hoverProps}
         >
             <Home size={17} />
@@ -301,67 +268,7 @@ const HomeBtn: React.FC = () => {
     );
 };
 
-/* Notification button */
-interface NotifButtonProps {
-    unreadCount: number;
-    active: boolean;
-    onClick: () => void;
-}
-const NotifButton: React.FC<NotifButtonProps> = ({ unreadCount, active, onClick }) => {
-    const [hovered, hoverProps] = useHover();
-    return (
-        <button
-            id="topbar-notifications"
-            style={{
-                ...s.iconBtn,
-                ...(hovered || active ? s.iconBtnHover : {}),
-            }}
-            onClick={onClick}
-            aria-label="Notifications"
-            title="Notifications"
-            {...hoverProps}
-        >
-            <Bell size={19} />
-            {unreadCount > 0 && (
-                <span style={s.badge}>{unreadCount}</span>
-            )}
-        </button>
-    );
-};
-
-/* Notification item */
-interface NotifItemProps {
-    n: typeof INITIAL_NOTIFICATIONS[number];
-    onRead: () => void;
-}
-const NotifItem: React.FC<NotifItemProps> = ({ n, onRead }) => {
-    const [hovered, hoverProps] = useHover();
-    return (
-        <div
-            style={{
-                ...s.notifItem,
-                background: hovered ? '#f5f3ff' : n.read ? 'transparent' : '#eff6ff',
-            }}
-            onClick={onRead}
-            role="button"
-            tabIndex={0}
-            {...hoverProps}
-        >
-            <span style={s.notifIcon}>{n.icon}</span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ ...s.notifText, fontWeight: n.read ? 400 : 600 }}>{n.text}</p>
-                <span style={s.notifTime}>{n.time}</span>
-            </div>
-            {!n.read && <span style={s.notifDot} />}
-        </div>
-    );
-};
-
-/* Search result item */
-interface SearchResultItemProps {
-    item: SearchSuggestion;
-    onClick: () => void;
-}
+interface SearchResultItemProps { item: SearchSuggestion; onClick: () => void; }
 const SearchResultItem: React.FC<SearchResultItemProps> = ({ item, onClick }) => {
     const [hovered, hoverProps] = useHover();
     return (
@@ -381,22 +288,13 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ item, onClick }) =>
     );
 };
 
-/* Profile menu item */
-interface ProfileMenuItemProps {
-    to: string;
-    icon: React.ReactNode;
-    label: string;
-    onClick: () => void;
-}
+interface ProfileMenuItemProps { to: string; icon: React.ReactNode; label: string; onClick: () => void; }
 const ProfileMenuItem: React.FC<ProfileMenuItemProps> = ({ to, icon, label, onClick }) => {
     const [hovered, hoverProps] = useHover();
     return (
         <Link
             to={to}
-            style={{
-                ...s.menuItem,
-                ...(hovered ? s.menuItemHover : {}),
-            }}
+            style={{ ...s.menuItem, ...(hovered ? s.menuItemHover : {}) }}
             onClick={onClick}
             {...hoverProps}
         >
@@ -406,16 +304,12 @@ const ProfileMenuItem: React.FC<ProfileMenuItemProps> = ({ to, icon, label, onCl
     );
 };
 
-/* Logout menu item */
 const LogoutMenuItem: React.FC<{ onClick: () => void }> = ({ onClick }) => {
     const [hovered, hoverProps] = useHover();
     return (
         <button
             id="topbar-logout"
-            style={{
-                ...s.menuItemDanger,
-                ...(hovered ? s.menuItemDangerHover : {}),
-            }}
+            style={{ ...s.menuItemDanger, ...(hovered ? s.menuItemDangerHover : {}) }}
             onClick={onClick}
             {...hoverProps}
         >
@@ -431,20 +325,37 @@ const LogoutMenuItem: React.FC<{ onClick: () => void }> = ({ onClick }) => {
 const s: Record<string, React.CSSProperties> = {
     bar: {
         height: 64,
-        background:'var(--card-bg)',
+        background: 'var(--card-bg)',
         borderBottom: '1px solid var(--border-color)',
         display: 'flex',
         alignItems: 'center',
-        padding: '0 24px',
-        gap: 16,
+        padding: '0 20px',
+        gap: 12,
         position: 'sticky',
         top: 0,
         zIndex: 50,
         boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        flexShrink: 0,
+    },
+
+    /* Hamburger */
+    hamburger: {
+        display: 'none', // shown via CSS .hamburger-btn on mobile
+        width: 38,
+        height: 38,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--page-bg)',
+        border: '1px solid var(--border-color)',
+        cursor: 'pointer',
+        color: 'var(--text-main)',
+        flexShrink: 0,
+        transition: 'all 0.15s',
     },
 
     /* Left */
-    left: { display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: '0 0 auto' },
+    left: { display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flexShrink: 0 },
     homeBtn: {
         width: 34, height: 34, borderRadius: 8,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -461,43 +372,48 @@ const s: Record<string, React.CSSProperties> = {
 
     /* Search */
     searchWrap: {
-        flex: 1, maxWidth: 480, display: 'flex', alignItems: 'center', gap: 8,
-        background: 'var(--page-bg)', borderRadius: 10, padding: '8px 14px',
-        border: '1.5px solid var(--border-color)', transition: 'border-color 0.15s, background 0.15s',
+        flex: 1,
+        maxWidth: 480,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        background: 'var(--page-bg)',
+        borderRadius: 10,
+        padding: '8px 14px',
+        border: '1.5px solid var(--border-color)',
+        transition: 'border-color 0.15s, background 0.15s',
     },
     searchWrapFocused: {
-        background:'var(--card-bg)', borderColor: 'var(--primary)',
+        background: 'var(--card-bg)',
+        borderColor: 'var(--primary)',
         boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.15)',
     },
     searchInput: {
         flex: 1, background: 'none', border: 'none', outline: 'none',
         fontSize: 13.5, fontWeight: 500, color: 'var(--text-main)',
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "'Inter', sans-serif", minWidth: 0,
     },
     clearBtn: {
         background: 'none', border: 'none', cursor: 'pointer',
         color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: 2,
-        borderRadius: 4, transition: 'color 0.1s',
+        borderRadius: 4, transition: 'color 0.1s', flexShrink: 0,
     },
 
     /* Search dropdown */
     searchDropdown: {
         position: 'absolute', top: 'calc(100% + 8px)', left: 0, right: 0,
-        background:'var(--card-bg)', borderRadius: 12, border: '1px solid var(--border-color)',
+        background: 'var(--card-bg)', borderRadius: 12, border: '1px solid var(--border-color)',
         boxShadow: '0 16px 48px rgba(0,0,0,0.12)', zIndex: 300, overflow: 'hidden',
     },
     searchDropdownHeader: {
-        padding: '10px 14px 6px',
-        fontSize: 11, fontWeight: 700, color: 'var(--text-muted)',
+        padding: '10px 14px 6px', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)',
         letterSpacing: '0.06em', textTransform: 'uppercase',
     },
     searchResultItem: {
         display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
         cursor: 'pointer', transition: 'background 0.12s',
     },
-    searchResultItemHover: {
-        background: 'var(--active-menu-bg)',
-    },
+    searchResultItemHover: { background: 'var(--active-menu-bg)' },
     searchResultIcon: { fontSize: 18, flexShrink: 0, width: 28, textAlign: 'center' },
     searchResultLabel: { fontSize: 13.5, fontWeight: 500, color: 'var(--text-main)' },
     searchResultCategory: {
@@ -510,25 +426,7 @@ const s: Record<string, React.CSSProperties> = {
     },
 
     /* Right */
-    right: { display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flex: '0 0 auto' },
-    iconBtn: {
-        width: 38, height: 38, borderRadius: 10,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'var(--page-bg)', border: '1px solid var(--border-color)',
-        cursor: 'pointer', color: 'var(--text-main)',
-        position: 'relative', transition: 'all 0.15s',
-    },
-    iconBtnHover: {
-        background: 'var(--active-menu-bg)', borderColor: 'var(--primary-light)', color: 'var(--primary)',
-    },
-    badge: {
-        position: 'absolute', top: -4, right: -4,
-        background: '#ef4444', color:'var(--card-bg)',
-        fontSize: 9, fontWeight: 800,
-        width: 17, height: 17, borderRadius: '50%',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        border: '2px solid var(--card-bg)',
-    },
+    right: { display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexShrink: 0 },
 
     /* Profile button */
     profileBtn: {
@@ -538,7 +436,7 @@ const s: Record<string, React.CSSProperties> = {
     },
     avatar: {
         width: 30, height: 30, borderRadius: 8,
-        background: 'linear-gradient(135deg, #3b82f6, var(--primary))', color:'var(--card-bg)',
+        background: 'linear-gradient(135deg, #3b82f6, var(--primary))', color: 'var(--card-bg)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontWeight: 800, fontSize: 13, flexShrink: 0,
     },
@@ -546,58 +444,16 @@ const s: Record<string, React.CSSProperties> = {
     userName: { fontWeight: 700, fontSize: 12.5, color: 'var(--text-main)' },
     userRole: { fontWeight: 500, fontSize: 11, color: 'var(--text-muted)' },
 
-    /* Notification dropdown */
-    notifDropdown: {
-        position: 'absolute', top: 'calc(100% + 8px)', right: 0, width: 360,
-        background:'var(--card-bg)', borderRadius: 16, border: '1px solid var(--border-color)',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.12)', zIndex: 200, overflow: 'hidden',
-    },
-    dropdownHeader: {
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '14px 16px', borderBottom: '1px solid var(--border-color)',
-    },
-    dropdownTitle: {
-        fontWeight: 700, fontSize: 14, color: 'var(--text-main)',
-        display: 'flex', alignItems: 'center', gap: 8,
-    },
-    unreadPill: {
-        background: 'var(--active-menu-bg)', color: 'var(--primary)',
-        borderRadius: 99, padding: '1px 8px', fontSize: 11, fontWeight: 700,
-    },
-    markAllBtn: {
-        background: 'none', border: 'none', cursor: 'pointer',
-        fontSize: 12, color: 'var(--primary)', fontWeight: 600, padding: 0,
-    },
-    notifList: { maxHeight: 320, overflowY: 'auto' },
-    notifItem: {
-        display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 16px',
-        borderBottom: '1px solid var(--border-color)', cursor: 'pointer', transition: 'background 0.15s',
-    },
-    notifIcon: { fontSize: 18, flexShrink: 0, marginTop: 1 },
-    notifText: { margin: '0 0 3px', fontSize: 13, color: 'var(--text-main)', lineHeight: 1.45 },
-    notifTime: { fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 },
-    notifDot: {
-        width: 7, height: 7, borderRadius: '50%', background: 'var(--primary)',
-        marginTop: 5, flexShrink: 0,
-    },
-    dropdownFooter: {
-        padding: '10px 16px', borderTop: '1px solid var(--border-color)', background: 'var(--page-bg)',
-    },
-    dropdownFooterText: { fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 },
-
     /* Profile dropdown */
     profileDropdown: {
         position: 'absolute', top: 'calc(100% + 8px)', right: 0, width: 228,
-        background:'var(--card-bg)', borderRadius: 16, border: '1px solid var(--border-color)',
+        background: 'var(--card-bg)', borderRadius: 16, border: '1px solid var(--border-color)',
         boxShadow: '0 20px 60px rgba(0,0,0,0.12)', zIndex: 200, overflow: 'hidden',
     },
-    profileHeader: {
-        display: 'flex', alignItems: 'center', gap: 10,
-        padding: '14px 14px 12px',
-    },
+    profileHeader: { display: 'flex', alignItems: 'center', gap: 10, padding: '14px 14px 12px' },
     profileAvatarLg: {
         width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-        background: 'linear-gradient(135deg, #3b82f6, var(--primary))', color:'var(--card-bg)',
+        background: 'linear-gradient(135deg, #3b82f6, var(--primary))', color: 'var(--card-bg)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontWeight: 800, fontSize: 17,
     },
@@ -616,17 +472,13 @@ const s: Record<string, React.CSSProperties> = {
         fontSize: 13, fontWeight: 600, color: 'var(--text-main)', textDecoration: 'none',
         transition: 'background 0.15s', cursor: 'pointer',
     },
-    menuItemHover: {
-        background: 'var(--active-menu-bg)', color: 'var(--primary)',
-    },
+    menuItemHover: { background: 'var(--active-menu-bg)', color: 'var(--primary)' },
     menuItemDanger: {
         display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', width: '100%',
         fontSize: 13, fontWeight: 600, color: '#ef4444', background: 'none', border: 'none',
         cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s',
     },
-    menuItemDangerHover: {
-        background: 'rgba(239, 68, 68, 0.12)',
-    },
+    menuItemDangerHover: { background: 'rgba(239, 68, 68, 0.12)' },
 };
 
 export default TopBar;

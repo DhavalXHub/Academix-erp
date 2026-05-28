@@ -87,7 +87,8 @@ export const uploadMaterialFile = (
     return client.post(`${API_BASE_URL}/materials/upload`, formData, {
         headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
+            // Content-Type is intentionally omitted — the api.ts interceptor deletes
+            // it for FormData so the browser sets 'multipart/form-data; boundary=...'
         },
         onUploadProgress: (evt) => {
             if (onProgress && evt.total) {

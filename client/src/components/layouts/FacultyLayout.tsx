@@ -1,122 +1,63 @@
-import React from 'react';
-import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
+import React, { useState, useCallback } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { LayoutDashboard, BookOpen, CheckSquare, Edit3, Calendar, MessageSquare, User, LogOut, Home, FileCheck2, Megaphone, HelpCircle, Briefcase, Users } from 'lucide-react';
+import {
+    LayoutDashboard, BookOpen, CheckSquare, Edit3,
+    Calendar, MessageSquare, User, FileCheck2,
+    Megaphone, HelpCircle, Briefcase, Users,
+} from 'lucide-react';
 import TopBar from '@/components/TopBar';
+import Sidebar from './Sidebar';
+
+const navItems = [
+    { icon: LayoutDashboard, label: 'Dashboard',       path: '/faculty/dashboard' },
+    { icon: Megaphone,       label: 'Announcements',   path: '/faculty/announcements' },
+    { icon: BookOpen,        label: 'Courses',          path: '/faculty/courses' },
+    { icon: CheckSquare,     label: 'Attendance',       path: '/faculty/attendance' },
+    { icon: CheckSquare,     label: 'QR Attendance',    path: '/faculty/qr-attendance' },
+    { icon: Edit3,           label: 'Assignments',      path: '/faculty/assignments' },
+    { icon: Calendar,        label: 'Quizzes',          path: '/faculty/quizzes' },
+    { icon: LayoutDashboard, label: 'Gradebook',        path: '/faculty/gradebook' },
+    { icon: FileCheck2,      label: 'Results',          path: '/faculty/results' },
+    { icon: Briefcase,       label: 'Leave Requests',   path: '/faculty/leaves' },
+    { icon: HelpCircle,      label: 'Doubt Solver',     path: '/faculty/doubts' },
+    { icon: Users,           label: 'Mentorship',       path: '/faculty/mentorship' },
+    { icon: Calendar,        label: 'Calendar',         path: '/faculty/calendar' },
+    { icon: MessageSquare,   label: 'Messages',         path: '/faculty/messages' },
+    { icon: User,            label: 'Profile',          path: '/faculty/profile' },
+];
 
 const FacultyLayout: React.FC = () => {
     const { logout } = useAuth();
     const navigate = useNavigate();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const handleLogout = async () => {
+    const handleLogout = useCallback(async () => {
         await logout();
         navigate('/login');
-    };
+    }, [logout, navigate]);
 
-    const navItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/faculty/dashboard' },
-        { icon: Megaphone, label: 'Announcements', path: '/faculty/announcements' },
-        { icon: BookOpen, label: 'Courses', path: '/faculty/courses' },
-        { icon: CheckSquare, label: 'Attendance', path: '/faculty/attendance' },
-        { icon: CheckSquare, label: '🎯 QR Attendance', path: '/faculty/qr-attendance' },
-        { icon: Edit3, label: 'Assignments', path: '/faculty/assignments' },
-        { icon: Calendar, label: 'Quizzes', path: '/faculty/quizzes' },
-        { icon: LayoutDashboard, label: 'Gradebook', path: '/faculty/gradebook' },
-        { icon: FileCheck2, label: 'Results', path: '/faculty/results' },
-        { icon: Briefcase, label: 'Leave Requests', path: '/faculty/leaves' },
-        { icon: HelpCircle, label: 'Doubt Solver', path: '/faculty/doubts' },
-        { icon: Users, label: 'Mentorship', path: '/faculty/mentorship' },
-        { icon: Calendar, label: 'Calendar', path: '/faculty/calendar' },
-        { icon: MessageSquare, label: 'Messages', path: '/faculty/messages' },
-        { icon: User, label: 'Profile', path: '/faculty/profile' },
-    ];
+    const openSidebar  = useCallback(() => setSidebarOpen(true), []);
+    const closeSidebar = useCallback(() => setSidebarOpen(false), []);
 
     return (
-        <div style={styles.layout}>
-            <aside style={styles.sidebar}>
-                <div style={styles.brand}>
-                    <Link to="/" style={styles.logoLink}>
-                        <img src="/favicon.png?v=2" alt="Academix Logo" style={styles.logoIcon} />
-                        <h2 style={styles.logoText}>Academix</h2>
-                    </Link>
-                    <span style={styles.roleTag}>Faculty Portal</span>
-                </div>
-                
-                <nav style={styles.nav}>
-                    {navItems.map((item, idx) => (
-                        <NavLink
-                            key={idx}
-                            to={item.path}
-                            style={({ isActive }) => ({
-                                ...styles.navLink,
-                                ...(isActive ? styles.navLinkActive : {})
-                            })}
-                        >
-                            <item.icon size={18} />
-                            <span>{item.label}</span>
-                        </NavLink>
-                    ))}
-                </nav>
+        <div className="erp-layout">
+            <Sidebar
+                navItems={navItems}
+                roleTag="Faculty Portal"
+                isOpen={sidebarOpen}
+                onClose={closeSidebar}
+                onLogout={handleLogout}
+            />
 
-                <div style={styles.sidebarFooter}>
-                    <Link to="/" style={styles.homeLink}><Home size={16} /> Back to Home</Link>
-                    <button onClick={handleLogout} style={styles.logoutBtn}>
-                        <LogOut size={16} />
-                        <span>Logout</span>
-                    </button>
-                </div>
-            </aside>
-
-            <div style={styles.main}>
-                <TopBar />
-                <main style={styles.content}>
+            <div className="erp-main">
+                <TopBar onMenuClick={openSidebar} />
+                <main className="erp-content">
                     <Outlet />
                 </main>
             </div>
         </div>
     );
-};
-
-const styles: Record<string, React.CSSProperties> = {
-    layout: { display: 'flex', minHeight: '100vh', background: 'var(--page-bg)', fontFamily: "'Inter', sans-serif" },
-    sidebar: {
-        width: 240, background:'var(--card-bg)', color: 'var(--text-main)',
-        display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border-color)',
-    },
-    brand: { padding: '20px 20px 16px', borderBottom: '1px solid var(--border-color)' },
-    logoLink: { display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' },
-    logoIcon: { width: 32, height: 32, objectFit: 'contain' },
-    logoText: { margin: 0, fontSize: 20, fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.5px' },
-    roleTag: {
-        display: 'inline-block', marginTop: 6, fontSize: 10, fontWeight: 700,
-        color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em',
-    },
-    nav: { flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto' },
-    navLink: {
-        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
-        borderRadius: 10, color: 'var(--text-muted)', textDecoration: 'none',
-        fontWeight: 500, fontSize: 13.5, transition: 'all 0.15s',
-    },
-    navLinkActive: {
-        background: 'var(--active-menu-bg)', color: 'var(--primary)', fontWeight: 600,
-    },
-    sidebarFooter: {
-        padding: '16px 12px', borderTop: '1px solid var(--border-color)',
-        display: 'flex', flexDirection: 'column', gap: 4,
-    },
-    homeLink: {
-        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
-        borderRadius: 10, color: 'var(--text-muted)', textDecoration: 'none',
-        fontSize: 13, fontWeight: 500, transition: 'all 0.15s',
-    },
-    logoutBtn: {
-        width: '100%', display: 'flex', alignItems: 'center', gap: 10,
-        padding: '10px 14px', borderRadius: 10, background: 'transparent',
-        border: 'none', color: '#ef4444', fontWeight: 600, fontSize: 13,
-        cursor: 'pointer', transition: 'background 0.15s',
-    },
-    main: { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' },
-    content: { flex: 1, overflowY: 'auto', padding: '28px' },
 };
 
 export default FacultyLayout;

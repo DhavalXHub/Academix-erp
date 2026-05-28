@@ -69,9 +69,9 @@ const StudentDoubtsPage: React.FC = () => {
             loadData();
         };
 
-        socket.on('notification', handleDoubtUpdate);
+        socket.on('newNotification', handleDoubtUpdate);
         return () => {
-            socket.off('notification', handleDoubtUpdate);
+            socket.off('newNotification', handleDoubtUpdate);
         };
     }, [socket, selectedDoubt]);
 

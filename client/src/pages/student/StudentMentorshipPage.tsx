@@ -54,9 +54,9 @@ const StudentMentorshipPage: React.FC = () => {
             loadData();
         };
 
-        socket.on('notification', handleMentorshipChange);
+        socket.on('newNotification', handleMentorshipChange);
         return () => {
-            socket.off('notification', handleMentorshipChange);
+            socket.off('newNotification', handleMentorshipChange);
         };
     }, [socket]);
 

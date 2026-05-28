@@ -592,7 +592,6 @@ const StudentDashboard: React.FC = () => {
 ───────────────────────────────────────────── */
 const s: Record<string, React.CSSProperties> = {
     page: {
-        padding: '28px 32px',
         maxWidth: 1280,
         margin: '0 auto',
         fontFamily: "'Inter', sans-serif",
@@ -652,13 +651,13 @@ const s: Record<string, React.CSSProperties> = {
     /* Row layouts */
     row2: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))',
         gap: 20,
         marginBottom: 24,
     },
     row3: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px, 100%), 1fr))',
         gap: 20,
     },
 

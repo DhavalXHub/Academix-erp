@@ -116,7 +116,7 @@ app.get('/health', (req, res) => {
 // ── Uploaded Files — served publicly with authentication awareness ─────────
 // Protected so only authenticated users can view the files (using query ?token=...)
 const { protect } = require('./middleware/authMiddleware');
-app.use('/uploads', protect, express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', protect, express.static(path.join(__dirname, 'uploads')));
 // If a file in /uploads is not found by static middleware, return 404 instead of falling through to SPA fallback
 app.use('/uploads', (req, res) => {
     res.status(404).json({ success: false, data: null, error: { code: 'NOT_FOUND', message: 'The requested file was not found on the server.' } });

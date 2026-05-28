@@ -756,6 +756,124 @@
   font-weight: 700;
 }
 
+/* ---------- Navbar: scrolled shadow ---------- */
+.lp-nav-scrolled {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+/* Desktop right actions */
+.lp-nav-right {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.lp-nav-login {
+  padding: 0.45rem 1rem !important;
+  font-size: 0.85rem !important;
+}
+
+.lp-nav-cta-btn {
+  padding: 0.5rem 1.1rem !important;
+  font-size: 0.85rem !important;
+}
+
+/* Mobile actions (hamburger + theme) — hidden on desktop */
+.lp-nav-mobile-actions {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Hamburger button */
+.lp-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text-main, #111827);
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.lp-hamburger:hover {
+  background: var(--active-menu-bg, #eff6ff);
+  border-color: var(--primary-light, #60a5fa);
+  color: var(--primary, #2563eb);
+}
+
+/* Mobile menu backdrop */
+.lp-mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 998;
+  top: 68px;
+}
+
+/* Mobile menu panel */
+.lp-mobile-menu {
+  position: fixed;
+  top: 68px;
+  left: 0;
+  right: 0;
+  background: var(--card-bg, #fff);
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  z-index: 999;
+  padding: 1rem 1.5rem 1.5rem;
+  animation: slideDown 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile nav links list */
+.lp-mobile-links {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.lp-mobile-link {
+  display: block;
+  padding: 0.85rem 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main, #111827);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-color, #f3f4f6);
+  transition: color 0.15s;
+}
+
+.lp-mobile-link:hover {
+  color: var(--primary, #2563eb);
+}
+
+.lp-mobile-links li:last-child .lp-mobile-link {
+  border-bottom: none;
+}
+
+/* Mobile CTA buttons */
+.lp-mobile-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1024px) {
   .lp-hero { padding: 8rem 1.5rem 4rem; }
@@ -768,6 +886,15 @@
   .lp-footer-inner { grid-template-columns: 1fr 1fr; }
   .lp-sidebar { display: none; }
 }
+
+/* ── Tablet: Hide nav links + right CTAs, show hamburger ── */
+@media (max-width: 900px) {
+  .lp-nav-links { display: none; }
+  .lp-nav-right { display: none; }
+  .lp-nav-mobile-actions { display: flex; }
+  .lp-nav-inner { gap: 0; }
+}
+
 @media (max-width: 640px) {
   .lp-section-title { font-size: 2rem; }
   .lp-hero h1 { font-size: 2.25rem; letter-spacing: -1px; }
@@ -777,10 +904,10 @@
   .lp-process-steps { grid-template-columns: 1fr; }
   .lp-stats-inner { gap: 2rem; flex-direction: column; }
   .lp-stat-divider { display: none; }
-  .lp-nav-links { display: none; }
   .lp-footer-inner { grid-template-columns: 1fr; gap: 2rem; }
   .lp-footer-bottom { flex-direction: column; gap: 0.75rem; text-align: center; }
   .lp-cta h2 { font-size: 2.25rem; }
+  .lp-nav-inner { padding: 0 1rem; }
 }
 
 /* ============================================================
@@ -811,6 +938,36 @@
 
 .dark .lp-nav-cta:hover {
   background: var(--primary-light);
+}
+
+.dark .lp-hamburger {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+.dark .lp-hamburger:hover {
+  background: var(--active-menu-bg);
+  border-color: var(--primary-light);
+  color: var(--primary-light);
+}
+
+.dark .lp-mobile-menu {
+  background: var(--card-bg);
+  border-bottom-color: var(--border-color);
+}
+
+.dark .lp-mobile-link {
+  color: var(--text-main);
+  border-bottom-color: var(--border-color);
+}
+
+.dark .lp-mobile-link:hover {
+  color: var(--primary-light);
+}
+
+.dark .lp-mobile-backdrop {
+  background: rgba(0, 0, 0, 0.7);
 }
 
 .dark .lp-hero {
