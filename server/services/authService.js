@@ -3,6 +3,16 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
+const logAuthError = (stage, err, meta = {}) => {
+    const details = {
+        stage,
+        code: err?.code || err?.name || 'UNKNOWN',
+        message: err?.message || String(err),
+        ...meta,
+    };
+    console.error('[AUTH]', details);
+};
+
 // ── Token Generators ─────────────────────────────────────────────────────────
 
 /**
@@ -10,6 +20,13 @@ const User = require('../models/User');
  * Payload contains user ID and role for fast RBAC middleware checks.
  */
 const generateAccessToken = (userId, role) => {
+    if (!process.env.JWT_SECRET) {
+        const error = new Error('JWT secret is not configured.');
+        error.code = 'JWT_SECRET_MISSING';
+        logAuthError('generateAccessToken', error, { userId, role });
+        throw error;
+    }
+
     return jwt.sign(
         { id: userId, role },
         process.env.JWT_SECRET,
@@ -32,19 +49,29 @@ const generateRefreshToken = () => {
  * Returns the full user object on success, null on failure.
  */
 const verifyUserCredentials = async (email, password, role) => {
-    // Explicitly select 'password' since it is select:false by default
-    const user = await User.findOne({ email, isActive: true }).select('+password');
+    const normalizedEmail = String(email || '').trim().toLowerCase();
 
-    if (!user) return null;
+    try {
+        // Explicitly select 'password' since it is select:false by default
+        const user = await User.findOne({ email: normalizedEmail, isActive: true }).select('+password');
 
-    // Validate role matches
-    if (user.role !== role) return null;
+        if (!user) return null;
 
-    // Compare entered password against bcrypt hash
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) return null;
+        // Validate role matches
+        if (user.role !== role) return null;
 
-    return user;
+        // Compare entered password against bcrypt hash
+        const isMatch = await user.matchPassword(password);
+        if (!isMatch) return null;
+
+        return user;
+    } catch (err) {
+        logAuthError('verifyUserCredentials', err, { email: normalizedEmail, role });
+        const error = new Error('Database query failed while verifying credentials.');
+        error.code = 'AUTH_QUERY_FAILED';
+        error.cause = err;
+        throw error;
+    }
 };
 
 /**
@@ -52,8 +79,16 @@ const verifyUserCredentials = async (email, password, role) => {
  * Using a hash means a stolen DB dump cannot be used to forge sessions.
  */
 const saveRefreshToken = async (userId, plainToken) => {
-    const hash = await bcrypt.hash(plainToken, 8);
-    await User.findByIdAndUpdate(userId, { refreshTokenHash: hash, lastLogin: new Date() });
+    try {
+        const hash = await bcrypt.hash(plainToken, 8);
+        await User.findByIdAndUpdate(userId, { refreshTokenHash: hash, lastLogin: new Date() });
+    } catch (err) {
+        logAuthError('saveRefreshToken', err, { userId });
+        const error = new Error('Database update failed while saving refresh token.');
+        error.code = 'AUTH_REFRESH_SAVE_FAILED';
+        error.cause = err;
+        throw error;
+    }
 };
 
 /**
@@ -61,18 +96,34 @@ const saveRefreshToken = async (userId, plainToken) => {
  * Returns the user document if valid, null otherwise.
  */
 const validateRefreshToken = async (userId, plainToken) => {
-    const user = await User.findById(userId).select('+refreshTokenHash');
-    if (!user || !user.refreshTokenHash) return null;
+    try {
+        const user = await User.findById(userId).select('+refreshTokenHash');
+        if (!user || !user.refreshTokenHash) return null;
 
-    const isValid = await bcrypt.compare(plainToken, user.refreshTokenHash);
-    return isValid ? user : null;
+        const isValid = await bcrypt.compare(plainToken, user.refreshTokenHash);
+        return isValid ? user : null;
+    } catch (err) {
+        logAuthError('validateRefreshToken', err, { userId });
+        const error = new Error('Database query failed while validating refresh token.');
+        error.code = 'AUTH_REFRESH_VALIDATE_FAILED';
+        error.cause = err;
+        throw error;
+    }
 };
 
 /**
  * Clears the refresh token hash from the DB (logout / token rotation).
  */
 const revokeRefreshToken = async (userId) => {
-    await User.findByIdAndUpdate(userId, { refreshTokenHash: null });
+    try {
+        await User.findByIdAndUpdate(userId, { refreshTokenHash: null });
+    } catch (err) {
+        logAuthError('revokeRefreshToken', err, { userId });
+        const error = new Error('Database update failed while revoking refresh token.');
+        error.code = 'AUTH_REFRESH_REVOKE_FAILED';
+        error.cause = err;
+        throw error;
+    }
 };
 
 module.exports = {

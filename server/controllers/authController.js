@@ -11,6 +11,21 @@ const {
 } = require('../services/authService');
 const jwt = require('jsonwebtoken');
 
+const isProduction = process.env.NODE_ENV === 'production';
+const getAuthCookieOptions = () => ({
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
+const getCsrfCookieOptions = () => ({
+    httpOnly: false,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
@@ -18,22 +33,12 @@ const jwt = require('jsonwebtoken');
  * This prevents JavaScript (XSS) from reading it.
  */
 const setRefreshTokenCookie = (res, token) => {
-    res.cookie('academix_refresh', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
-    });
+    res.cookie('academix_refresh', token, getAuthCookieOptions());
 };
 
 const setCsrfCookie = (res) => {
     const token = require('crypto').randomBytes(32).toString('hex');
-    res.cookie('academix_csrf', token, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('academix_csrf', token, getCsrfCookieOptions());
     return token;
 };
 
@@ -56,14 +61,20 @@ const sendError = (res, statusCode, message, code = 'ERROR') => {
 const loginUser = async (req, res) => {
     try {
         const { email, password, role } = req.body;
+        const normalizedEmail = String(email || '').trim().toLowerCase();
 
         if (!email || !password || !role) {
             return sendError(res, 400, 'Email, password, and role are required.', 'MISSING_FIELDS');
         }
 
-        const user = await verifyUserCredentials(email, password, role);
+        const user = await verifyUserCredentials(normalizedEmail, password, role);
 
         if (!user) {
+            console.warn('[AUTH] login failed: invalid credentials or role', {
+                email: normalizedEmail,
+                role,
+                requestId: req.requestId,
+            });
             return sendError(res, 401, 'Invalid credentials or role.', 'AUTH_FAILED');
         }
 
@@ -71,12 +82,41 @@ const loginUser = async (req, res) => {
             return sendError(res, 403, 'Your account has been deactivated.', 'ACCOUNT_INACTIVE');
         }
 
-        // Issue tokens
-        const accessToken = generateAccessToken(user._id, user.role);
-        const refreshToken = generateRefreshToken();
+        let accessToken;
+        let refreshToken;
 
-        // Persist hashed refresh token + update lastLogin in DB
-        await saveRefreshToken(user._id, refreshToken);
+        try {
+            accessToken = generateAccessToken(user._id, user.role);
+            refreshToken = generateRefreshToken();
+        } catch (tokenErr) {
+            console.error('[AUTH] token generation failed', {
+                requestId: req.requestId,
+                userId: user._id?.toString?.() || String(user._id),
+                role: user.role,
+                code: tokenErr.code || tokenErr.name,
+                message: tokenErr.message,
+            });
+
+            if (tokenErr.code === 'JWT_SECRET_MISSING') {
+                return sendError(res, 503, 'Authentication is temporarily unavailable.', 'JWT_SECRET_MISSING');
+            }
+
+            return sendError(res, 500, 'An internal server error occurred.', 'JWT_SIGNING_FAILED');
+        }
+
+        try {
+            // Persist hashed refresh token + update lastLogin in DB
+            await saveRefreshToken(user._id, refreshToken);
+        } catch (dbErr) {
+            console.error('[AUTH] login persistence failed', {
+                requestId: req.requestId,
+                userId: user._id?.toString?.() || String(user._id),
+                role: user.role,
+                code: dbErr.code || dbErr.name,
+                message: dbErr.message,
+            });
+            return sendError(res, 503, 'Authentication storage failed.', 'AUTH_PERSIST_FAILED');
+        }
 
         // Set the refresh token as a secure cookie on the response
         // Cookie format must match refreshToken() expectations: "<userId>:<token>"
@@ -93,8 +133,13 @@ const loginUser = async (req, res) => {
             },
         }, 'Login successful.');
     } catch (err) {
-        console.error('[AUTH] loginUser error:', err);
-        return sendError(res, 500, 'An internal server error occurred.', 'SERVER_ERROR');
+        console.error('[AUTH] loginUser error:', {
+            requestId: req.requestId,
+            code: err?.code || err?.name || 'UNKNOWN',
+            message: err?.message || String(err),
+            stack: err?.stack,
+        });
+        return sendError(res, 500, err?.message || 'An internal server error occurred.', err?.code || 'SERVER_ERROR');
     }
 };
 
@@ -106,17 +151,18 @@ const loginUser = async (req, res) => {
 const registerUser = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
+        const normalizedEmail = String(email || '').trim().toLowerCase();
 
         if (!name || !email || !password || !role) {
             return sendError(res, 400, 'All fields are required.', 'MISSING_FIELDS');
         }
 
-        const userExists = await User.findOne({ email });
+        const userExists = await User.findOne({ email: normalizedEmail });
         if (userExists) {
             return sendError(res, 409, 'A user with this email already exists.', 'USER_EXISTS');
         }
 
-        const user = await User.create({ name, email, password, role });
+        const user = await User.create({ name, email: normalizedEmail, password, role });
 
         // Create a role-specific profile placeholder
         if (role === 'student') {
@@ -143,8 +189,13 @@ const registerUser = async (req, res) => {
             role: user.role,
         }, 'User registered successfully.');
     } catch (err) {
-        console.error('[AUTH] registerUser error:', err);
-        return sendError(res, 500, 'An internal server error occurred.', 'SERVER_ERROR');
+        console.error('[AUTH] registerUser error:', {
+            requestId: req.requestId,
+            code: err?.code || err?.name || 'UNKNOWN',
+            message: err?.message || String(err),
+            stack: err?.stack,
+        });
+        return sendError(res, 500, err?.message || 'An internal server error occurred.', err?.code || 'SERVER_ERROR');
     }
 };
 
@@ -173,6 +224,10 @@ const refreshToken = async (req, res) => {
 
         const user = await validateRefreshToken(userId, plainToken);
         if (!user) {
+            console.warn('[AUTH] refresh failed: invalid token', {
+                requestId: req.requestId,
+                userId,
+            });
             return sendError(res, 401, 'Refresh token is invalid or has expired.', 'REFRESH_FAILED');
         }
 
@@ -186,8 +241,13 @@ const refreshToken = async (req, res) => {
 
         return sendSuccess(res, 200, { accessToken: newAccessToken }, 'Token refreshed.');
     } catch (err) {
-        console.error('[AUTH] refreshToken error:', err);
-        return sendError(res, 500, 'An internal server error occurred.', 'SERVER_ERROR');
+        console.error('[AUTH] refreshToken error:', {
+            requestId: req.requestId,
+            code: err?.code || err?.name || 'UNKNOWN',
+            message: err?.message || String(err),
+            stack: err?.stack,
+        });
+        return sendError(res, 500, err?.message || 'An internal server error occurred.', err?.code || 'SERVER_ERROR');
     }
 };
 
@@ -205,18 +265,23 @@ const logoutUser = async (req, res) => {
 
         res.clearCookie('academix_refresh', {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax',
         });
         res.clearCookie('academix_csrf', {
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax',
         });
 
         return sendSuccess(res, 200, null, 'Logged out successfully.');
     } catch (err) {
-        console.error('[AUTH] logoutUser error:', err);
-        return sendError(res, 500, 'An internal server error occurred.', 'SERVER_ERROR');
+        console.error('[AUTH] logoutUser error:', {
+            requestId: req.requestId,
+            code: err?.code || err?.name || 'UNKNOWN',
+            message: err?.message || String(err),
+            stack: err?.stack,
+        });
+        return sendError(res, 500, err?.message || 'An internal server error occurred.', err?.code || 'SERVER_ERROR');
     }
 };
 
@@ -239,8 +304,14 @@ const getMe = async (req, res) => {
             lastLogin: user.lastLogin,
         });
     } catch (err) {
-        console.error('[AUTH] getMe error:', err);
-        return sendError(res, 500, 'An internal server error occurred.', 'SERVER_ERROR');
+        console.error('[AUTH] getMe error:', {
+            requestId: req.requestId,
+            userId: req.user?.id,
+            code: err?.code || err?.name || 'UNKNOWN',
+            message: err?.message || String(err),
+            stack: err?.stack,
+        });
+        return sendError(res, 500, err?.message || 'An internal server error occurred.', err?.code || 'SERVER_ERROR');
     }
 };
 

@@ -32,6 +32,11 @@ const protect = async (req, res, next) => {
 
         next();
     } catch (err) {
+        console.error('[AUTH] protect middleware failed', {
+            requestId: req.requestId,
+            code: err?.name || 'UNKNOWN',
+            message: err?.message || String(err),
+        });
         if (err.name === 'TokenExpiredError') {
             return sendError(res, 401, 'Access token has expired.', 'TOKEN_EXPIRED');
         }
