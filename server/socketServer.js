@@ -1,4 +1,3 @@
-const { Server } = require('socket.io');
 const { getAllowedOrigins } = require('./config/env');
 const Course = require('./models/Course');
 const Enrollment = require('./models/Enrollment');
@@ -6,8 +5,19 @@ const Enrollment = require('./models/Enrollment');
 let io;
 
 const jwt = require('jsonwebtoken');
+let Server;
+
+try {
+    ({ Server } = require('socket.io'));
+} catch (err) {
+    console.warn('[Socket.IO] Disabled at startup:', err.message);
+}
 
 const initSocket = (server) => {
+    if (!Server) {
+        return null;
+    }
+
     io = new Server(server, {
         cors: {
             origin: getAllowedOrigins(),
