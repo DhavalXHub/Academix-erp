@@ -7,7 +7,7 @@
     "start": "node server/server.js",
     "dev": "nodemon server/server.js",
     "client": "npm --prefix client run dev",
-    "client:install": "npm --prefix client install",
+    "client:install": "npm --prefix client install --include=dev",
     "client:build": "npm --prefix client run build",
     "build": "npm run client:install && npm run client:build",
     "db:seed": "node server/seedERP.js",

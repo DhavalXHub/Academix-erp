@@ -70,7 +70,13 @@ const AttendanceMarkingForm: React.FC<AttendanceMarkingFormProps> = ({
         return getStudentName(st).toLowerCase().includes(q) || getStudentRoll(st).toLowerCase().includes(q);
     });
 
-    const counts = Object.values(statuses).reduce((acc, s) => { acc[s] = (acc[s] || 0) + 1; return acc; }, {} as Record<string, number>);
+    const counts = (Object.values(statuses) as AttendanceStatus[]).reduce(
+        (acc, status) => {
+            acc[status] = (acc[status] || 0) + 1;
+            return acc;
+        },
+        {} as Record<AttendanceStatus, number>
+    );
 
     return (
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

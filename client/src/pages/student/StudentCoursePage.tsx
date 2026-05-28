@@ -131,7 +131,7 @@ const StudentCoursePage: React.FC = () => {
         return acc;
     }, {});
     // Pinned first
-    Object.values(byModule).forEach(arr => arr.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0)));
+    (Object.values(byModule) as CourseMaterial[][]).forEach(arr => arr.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0)));
 
     return (
         <div style={s.page}>
@@ -215,7 +215,7 @@ const StudentCoursePage: React.FC = () => {
                     <div>
                         {materials.length === 0 ? (
                             <div style={s.empty}>📁 No materials uploaded yet. Check back soon.</div>
-                        ) : Object.entries(byModule).map(([mod, items]) => (
+                        ) : (Object.entries(byModule) as [string, CourseMaterial[]][]).map(([mod, items]) => (
                             <div key={mod} style={{ marginBottom: '2rem' }}>
                                 <div style={s.moduleLabel}>📂 {mod}</div>
                                 <div style={s.materialGrid}>
