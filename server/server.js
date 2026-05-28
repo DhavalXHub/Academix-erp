@@ -38,6 +38,11 @@ app.set('trust proxy', 1);
 const clientDistPath = path.resolve(__dirname, '../client/dist');
 const clientIndexPath = path.join(clientDistPath, 'index.html');
 
+const normalizeOrigin = (value) => {
+    if (!value) return '';
+    return String(value).trim().replace(/\/$/, '');
+};
+
 // ── Core Middleware ────────────────────────────────────────────────────────
 app.use(requestContext);
 app.use(securityHeaders);
@@ -56,8 +61,8 @@ app.use(csrfProtection);
 app.use(auditLogger);
 
 const allowedOrigins = [
-    "http://localhost:5173",
-    process.env.CLIENT_ORIGIN,
+    normalizeOrigin("http://localhost:5173"),
+    normalizeOrigin(process.env.CLIENT_ORIGIN),
 ].filter(Boolean);
 
 app.use(
@@ -66,7 +71,9 @@ app.use(
             // Allow requests with no origin
             if (!origin) return callback(null, true);
 
-            if (allowedOrigins.includes(origin)) {
+            const normalizedOrigin = normalizeOrigin(origin);
+
+            if (allowedOrigins.includes(normalizedOrigin)) {
                 return callback(null, true);
             }
 
