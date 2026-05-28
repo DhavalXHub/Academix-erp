@@ -74,17 +74,6 @@ app.get('/health', (req, res) => {
     });
 });
 
-// ── Static Files (React + Vite build output) ──────────────────────────────
-app.use('/assets', express.static(path.join(clientDistPath, 'assets'), {
-    immutable: true,
-    maxAge: '1y',
-    fallthrough: true,
-}));
-app.use(express.static(clientDistPath, {
-    index: false,
-    fallthrough: true,
-}));
-
 // ── Uploaded Files — served publicly with authentication awareness ─────────
 // Protected so only authenticated users can view the files (using query ?token=...)
 const { protect } = require('./middleware/authMiddleware');
@@ -150,27 +139,6 @@ app.use('/api/audit-logs', require('./routes/auditRoutes'));
 // ── Global Error Handler ───────────────────────────────────────────────────
 app.use('/api', notFound);
 
-// ── SPA Fallback (serves React index for all unmatched non-API routes) ─────
-app.get('*', (req, res, next) => {
-    if (req.method !== 'GET' && req.method !== 'HEAD') {
-        return next();
-    }
-
-    const urlPath = req.path || '';
-    const isApiRoute = urlPath.startsWith('/api');
-    const isProtectedAssetRoute = urlPath.startsWith('/uploads') || urlPath.startsWith('/socket.io');
-    const looksLikeFile = path.extname(urlPath) !== '';
-
-    if (isApiRoute || isProtectedAssetRoute || looksLikeFile) {
-        return next();
-    }
-
-    return res.sendFile(clientIndexPath);
-});
-
-app.use(errorHandler);
-
-
 // ── Socket Server ──────────────────────────────────────────────────────────
 const http = require('http');
 const { initSocket } = require('./socketServer');
@@ -196,3 +164,20 @@ server.listen(PORT, () => {
         }
     }, 5 * 60 * 1000);
 });
+
+/* Serve frontend static files */
+app.use(express.static(clientDistPath));
+
+/* React SPA fallback */
+app.get('*', (req, res) => {
+    if (req.originalUrl.startsWith('/api')) {
+        return res.status(404).json({
+            success: false,
+            message: 'API route not found',
+        });
+    }
+
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+});
+
+app.use(errorHandler);
