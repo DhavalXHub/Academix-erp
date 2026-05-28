@@ -43,6 +43,13 @@ const normalizeOrigin = (value) => {
     return String(value).trim().replace(/\/$/, '');
 };
 
+const parseOrigins = (...values) => {
+    return values
+        .flatMap((value) => String(value || '').split(','))
+        .map((value) => normalizeOrigin(value))
+        .filter(Boolean);
+};
+
 // ── Core Middleware ────────────────────────────────────────────────────────
 app.use(requestContext);
 app.use(securityHeaders);
@@ -60,10 +67,14 @@ app.use(cookieParser());
 app.use(csrfProtection);
 app.use(auditLogger);
 
-const allowedOrigins = [
-    normalizeOrigin("http://localhost:5173"),
-    normalizeOrigin(process.env.CLIENT_ORIGIN),
-].filter(Boolean);
+const allowedOrigins = Array.from(new Set(parseOrigins(
+    'http://localhost:5173',
+    process.env.CLIENT_ORIGIN,
+    process.env.RENDER_EXTERNAL_URL,
+    'https://academix-d6jk.onrender.com'
+)));
+
+console.log('[CORS] Allowed origins:', allowedOrigins);
 
 app.use(
     cors({
