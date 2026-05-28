@@ -75,10 +75,10 @@ const securityHeaders = (req, res, next) => {
         "object-src 'none'",
         "frame-ancestors 'none'",
         "script-src 'self' 'unsafe-inline'",
-        "style-src 'self' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         // Allow QR code image from external service + data URIs + Google Fonts
         "img-src 'self' data: blob: https://api.qrserver.com https:",
-        "font-src 'self' https://fonts.gstatic.com",
+        "font-src 'self' https://fonts.gstatic.com data:",
         `connect-src ${connectSources.join(' ')}`,
         // Allow media (camera stream)
         "media-src 'self' blob:",

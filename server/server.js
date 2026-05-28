@@ -35,6 +35,8 @@ connectDB();
 
 const app = express();
 app.set('trust proxy', 1);
+const clientDistPath = path.resolve(__dirname, '../client/dist');
+const clientIndexPath = path.join(clientDistPath, 'index.html');
 
 // ── Core Middleware ────────────────────────────────────────────────────────
 app.use(requestContext);
@@ -73,7 +75,15 @@ app.get('/health', (req, res) => {
 });
 
 // ── Static Files (React + Vite build output) ──────────────────────────────
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use('/assets', express.static(path.join(clientDistPath, 'assets'), {
+    immutable: true,
+    maxAge: '1y',
+    fallthrough: true,
+}));
+app.use(express.static(clientDistPath, {
+    index: false,
+    fallthrough: true,
+}));
 
 // ── Uploaded Files — served publicly with authentication awareness ─────────
 // Protected so only authenticated users can view the files (using query ?token=...)
@@ -141,8 +151,21 @@ app.use('/api/audit-logs', require('./routes/auditRoutes'));
 app.use('/api', notFound);
 
 // ── SPA Fallback (serves React index for all unmatched non-API routes) ─────
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
+app.get('*', (req, res, next) => {
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+        return next();
+    }
+
+    const urlPath = req.path || '';
+    const isApiRoute = urlPath.startsWith('/api');
+    const isProtectedAssetRoute = urlPath.startsWith('/uploads') || urlPath.startsWith('/socket.io');
+    const looksLikeFile = path.extname(urlPath) !== '';
+
+    if (isApiRoute || isProtectedAssetRoute || looksLikeFile) {
+        return next();
+    }
+
+    return res.sendFile(clientIndexPath);
 });
 
 app.use(errorHandler);
