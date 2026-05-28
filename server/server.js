@@ -15,7 +15,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 const path = require('path');
-const { validateEnv, getAllowedOrigins } = require('./config/env');
+const { validateEnv } = require('./config/env');
 const {
     requestContext,
     csrfProtection,
@@ -55,14 +55,30 @@ app.use(cookieParser());
 app.use(csrfProtection);
 app.use(auditLogger);
 
-const allowedOrigins = getAllowedOrigins();
-app.use(cors({
-    origin(origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-        return callback(new Error(`Origin not allowed by CORS: ${origin}`));
-    },
-    credentials: true,
-}));
+const allowedOrigins = [
+    "http://localhost:5173",
+    process.env.CLIENT_ORIGIN,
+].filter(Boolean);
+
+app.use(
+    cors({
+        origin: function (origin, callback) {
+            // Allow requests with no origin
+            if (!origin) return callback(null, true);
+
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+
+            console.error("Blocked by CORS:", origin);
+
+            return callback(
+                new Error(`Origin not allowed by CORS: ${origin}`)
+            );
+        },
+        credentials: true,
+    })
+);
 
 app.get('/health', (req, res) => {
     res.status(200).json({
