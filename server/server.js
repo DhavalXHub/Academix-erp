@@ -41,6 +41,11 @@ const clientIndexPath = path.join(clientDistPath, 'index.html');
 // ── Core Middleware ────────────────────────────────────────────────────────
 app.use(requestContext);
 app.use(securityHeaders);
+app.use('/assets', express.static(path.join(clientDistPath, 'assets'), {
+    immutable: true,
+    maxAge: '1y',
+    fallthrough: true,
+}));
 app.use(createRateLimiter({ windowMs: 60 * 1000, max: Number(process.env.RATE_LIMIT_PER_MINUTE || 240) }));
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: false }));
