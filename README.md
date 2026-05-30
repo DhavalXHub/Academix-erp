@@ -17,6 +17,29 @@
 Built from scratch utilizing the **MERN Stack** (MongoDB, Express, React, Node.js), this project represents a production-ready architecture. The frontend is elevated with **TypeScript**, **Vite**, and **Tailwind CSS** for maximum performance, type safety, and a premium User Interface with micro-animations and skeleton loading states. The backend features advanced architectural patterns like JWT-gated WebSocket rooms, robust Role-Based Access Control (RBAC), and automated event-driven services.
 
 ---
+## 🌐 Live Links & Demo
+
+### 🚀 Live Application
+
+https://academix-d6jk.onrender.com/
+
+### 🎥 Project Demonstration Video
+
+https://youtu.be/NNCnvQNx45E?si=8kEkJsPTBwAHe0ik
+
+### 💻 GitHub Repository
+
+https://github.com/DhavalXHub/Academix-erp
+
+### 🔑 Demo Student Credentials
+
+Email: `student1@academix.edu`
+
+Password: `password123`
+
+> **Note:** The application is hosted on Render's free tier. The first request may take 20–30 seconds while the server wakes up.
+
+---
 
 ## ✨ Comprehensive Feature Set
 
