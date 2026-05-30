@@ -140,17 +140,17 @@ const StudentAssignmentsPage: React.FC = () => {
     };
 
     return (
-        <div style={s.page}>
+        <div className="responsive-page responsive-assignments-page" style={s.page}>
             {toast && <div style={s.toast}>{toast}</div>}
 
-            <div style={s.header}>
+            <div className="responsive-header" style={s.header}>
                 <h1 style={s.title}>Assignments</h1>
                 <p style={s.sub}>View course assignments, submit your work, and track grades.</p>
             </div>
 
             {/* Stats bar */}
             {allSubmissions.length > 0 && (
-                <div style={s.statsRow}>
+                <div className="responsive-stats-row" style={s.statsRow}>
                     {([
                         { label: 'Total', val: assignments.length, bg: '#f1f5f9' },
                         { label: 'Pending', val: assignments.filter(a => { const st = getStatus(a); return st === 'pending' || st === 'overdue'; }).length, bg: '#fef3c7' },
@@ -166,7 +166,7 @@ const StudentAssignmentsPage: React.FC = () => {
             )}
 
             {/* Course selector + filter */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+            <div className="responsive-toolbar responsive-assignments-toolbar" style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'flex-end' }}>
                 <div>
                     <label style={s.label}>Course</label>
                     <select style={s.select} value={selectedCourse?._id || ''} disabled={isLoading}
@@ -176,7 +176,7 @@ const StudentAssignmentsPage: React.FC = () => {
                     </select>
                 </div>
                 {selectedCourse && (
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <div className="responsive-filter-group" style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                         {(['all', 'pending', 'submitted', 'graded'] as StatusFilter[]).map(f => (
                             <button key={f} style={{ ...s.filterBtn, ...(statusFilter === f ? s.filterBtnActive : {}) }}
                                 onClick={() => setStatusFilter(f)}>
@@ -192,7 +192,7 @@ const StudentAssignmentsPage: React.FC = () => {
             ) : isLoadingAssignments ? (
                 <div style={s.empty}>Loading assignments…</div>
             ) : (
-                <div style={s.grid}>
+                <div className="responsive-split-grid responsive-assignments-grid" style={s.grid}>
                     {/* Assignment list */}
                     <div style={s.card}>
                         <h3 style={s.cardTitle}>Assignments <span style={s.pill}>{filtered.length}</span></h3>
@@ -203,14 +203,14 @@ const StudentAssignmentsPage: React.FC = () => {
                             const sub = submissionMap[a._id];
                             const active = activeAssignment?._id === a._id;
                             return (
-                                <div key={a._id} style={{ ...s.aCard, ...(active ? s.aCardActive : {}) }} onClick={() => openAssignment(a)}>
+                                <div key={a._id} className="responsive-assignment-card" style={{ ...s.aCard, ...(active ? s.aCardActive : {}) }} onClick={() => openAssignment(a)}>
                                     <div style={{ flex: 1, minWidth: 0 }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                                             <span style={{ ...s.badge, ...statusBadge[status] }}>{statusLabel[status]}</span>
                                         </div>
                                         <div style={s.aTitle}>{a.title}</div>
                                         {a.description && <div style={{ ...s.aMeta, marginTop: 2 }}>{a.description.slice(0, 80)}{a.description.length > 80 ? '…' : ''}</div>}
-                                        <div style={s.aMeta}>
+                                        <div className="responsive-meta-row" style={s.aMeta}>
                                             📅 Due: {new Date(a.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} &nbsp;•&nbsp; Max: {a.maxMarks} marks
                                         </div>
                                         {status === 'graded' && sub && (
@@ -320,7 +320,7 @@ const StudentAssignmentsPage: React.FC = () => {
                                         </div>
                                         {s.feedback && <div style={{ marginTop: 6, fontSize: 13, fontStyle: 'italic', color: 'var(--text-muted)' }}>"{s.feedback}"</div>}
                                     </div>
-                                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                    <div className="responsive-stack-sm" style={{ textAlign: 'right', flexShrink: 0 }}>
                                         <div style={{ fontSize: 20, fontWeight: 900, color: '#059669' }}>{s.marksAwarded}</div>
                                         <div style={{ fontSize: 11, color: '#6b7280' }}>/ {a?.maxMarks} marks</div>
                                     </div>

@@ -46,7 +46,7 @@ const PLANS = [
         price: 'Custom',
         period: '',
         description: 'For large universities requiring scale, compliance & SLA.',
-        color: '#0f172a',
+        color: 'var(--text-main)',
         features: [
             'Unlimited students',
             'Unlimited faculty & admins',

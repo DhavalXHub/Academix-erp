@@ -14,6 +14,17 @@ const createSession = asyncHandler(async (req, res) => {
     const { courseId, durationMinutes, sessionLabel, topic, room, lateAfterMinutes } = req.body;
     if (!courseId) throw ApiError.badRequest('courseId is required.', 'MISSING_FIELDS');
 
+    console.info('[QR ATTENDANCE] createSession request', {
+        requestId: req.requestId,
+        userId: req.user?.id,
+        courseId,
+        durationMinutes,
+        sessionLabel,
+        topic,
+        room,
+        lateAfterMinutes,
+    });
+
     const session = await qrService.createQRSession(req.user.id, {
         courseId,
         durationMinutes: Number(durationMinutes) || 15,
@@ -35,6 +46,13 @@ const createSession = asyncHandler(async (req, res) => {
             sessionLabel: session.sessionLabel,
         });
     } catch { /* socket not critical */ }
+
+    console.info('[QR ATTENDANCE] createSession success', {
+        requestId: req.requestId,
+        sessionId: session._id,
+        courseId: session.course?._id || session.course,
+        expiresAt: session.expiresAt,
+    });
 
     return ApiResponse.success(res, 201, { session }, 'QR attendance session created.');
 });
@@ -142,6 +160,14 @@ const scanQR = asyncHandler(async (req, res) => {
     const deviceInfo = req.headers['user-agent'] || '';
     const ipAddress = req.ip || req.connection?.remoteAddress || '';
 
+    console.info('[QR ATTENDANCE] scan request', {
+        requestId: req.requestId,
+        studentId: req.user?.id,
+        tokenPreview: String(token).slice(0, 16),
+        ipAddress,
+        deviceInfo,
+    });
+
     const result = await qrService.scanQRCode(req.user.id, token, deviceInfo, ipAddress);
 
     // Real-time: notify faculty's session room
@@ -155,6 +181,14 @@ const scanQR = asyncHandler(async (req, res) => {
         });
     } catch { /* socket not critical */ }
 
+    console.info('[QR ATTENDANCE] scan success', {
+        requestId: req.requestId,
+        studentId: req.user?.id,
+        sessionId: result.session._id,
+        attendanceStatus: result.attendanceStatus,
+        scannedAt: result.scannedAt,
+    });
+
     return ApiResponse.success(res, 200, { result }, 'Attendance marked successfully via QR.');
 });
 
@@ -163,7 +197,16 @@ const scanQR = asyncHandler(async (req, res) => {
  * Student fetches active sessions for their enrolled courses.
  */
 const getActiveSessions = asyncHandler(async (req, res) => {
+    console.info('[QR ATTENDANCE] active sessions request', {
+        requestId: req.requestId,
+        studentId: req.user?.id,
+    });
     const sessions = await qrService.getActiveSessionForStudent(req.user.id);
+    console.info('[QR ATTENDANCE] active sessions response', {
+        requestId: req.requestId,
+        studentId: req.user?.id,
+        count: sessions.length,
+    });
     return ApiResponse.success(res, 200, { sessions }, 'Active sessions fetched.');
 });
 

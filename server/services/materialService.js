@@ -2,8 +2,8 @@ const CourseMaterial = require('../models/CourseMaterial');
 const Course = require('../models/Course');
 const Enrollment = require('../models/Enrollment');
 const ApiError = require('../utils/ApiError');
-const path = require('path');
 const fs = require('fs');
+const { normalizePublicUploadPath, resolveUploadedFilePath, toPublicUploadPath } = require('../utils/uploadStorage');
 
 /**
  * Verify access to a course's materials.
@@ -47,8 +47,7 @@ const uploadMaterialFile = async (userId, courseId, fileInfo, metadata) => {
         throw ApiError.forbidden('You are not assigned to this course.');
     }
 
-    const relPath = `/uploads/materials/${fileInfo.filename}`;
-    const fileUrl = relPath;
+    const fileUrl = toPublicUploadPath(`materials/${fileInfo.filename}`);
 
     const material = await CourseMaterial.create({
         course: courseId,
@@ -141,8 +140,7 @@ const deleteMaterial = async (userId, userRole, materialId) => {
     // Delete physical file if it exists
     if (!material.isExternalLink && material.fileUrl) {
         try {
-            const filename = path.basename(material.fileUrl);
-            const filePath = path.join(__dirname, '../uploads/materials', filename);
+            const filePath = resolveUploadedFilePath(normalizePublicUploadPath(material.fileUrl));
             if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
         } catch (e) {
             console.warn('[Material Delete] Could not delete physical file:', e.message);

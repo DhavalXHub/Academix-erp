@@ -140,13 +140,13 @@ const ResultsManagementPage: React.FC = () => {
     };
 
     return (
-        <div style={styles.page}>
-            <div style={styles.header}>
+        <div className="responsive-page responsive-results-page" style={styles.page}>
+            <div className="responsive-header" style={styles.header}>
                 <div>
                     <h1 style={styles.title}>Results Management</h1>
                     <p style={styles.subtitle}>Enter, review, and publish course-wise student results.</p>
                 </div>
-                <div style={styles.headerActions}>
+                <div className="responsive-action-row responsive-header-actions" style={styles.headerActions}>
                     <button style={styles.approveBtn} onClick={approve}><CheckCircle2 size={17} /> Approve Set</button>
                     <button style={styles.publishBtn} onClick={publish}><CheckCircle2 size={17} /> Publish Set</button>
                 </div>
@@ -155,7 +155,7 @@ const ResultsManagementPage: React.FC = () => {
             {notice && <div style={styles.notice}>{notice}</div>}
             {error && <div style={{ ...styles.notice, ...styles.error }}>{error}</div>}
 
-            <div style={styles.filters}>
+            <div className="responsive-filters responsive-results-filters" style={styles.filters}>
                 <Select label="Course" value={selectedCourseId} onChange={setSelectedCourseId} options={courses.map(course => ({ value: course._id, label: `${course.code} - ${course.title}` }))} />
                 <Field label="Academic Year" value={academicYear} onChange={setAcademicYear} />
                 <Field label="Semester" type="number" value={String(semester)} onChange={value => setSemester(Number(value))} />
@@ -164,12 +164,12 @@ const ResultsManagementPage: React.FC = () => {
                 <Field label="Max Score" type="number" value={String(maxScore)} onChange={value => setMaxScore(Number(value))} />
             </div>
 
-            <div style={styles.panel}>
+            <div className="responsive-panel responsive-results-panel" style={styles.panel}>
                 <div style={styles.panelTitle}><FileCheck2 size={18} /> Roster Results</div>
                 {roster.length === 0 ? (
                     <div style={styles.empty}>No enrolled students found for this course.</div>
                 ) : (
-                    <div style={styles.tableWrap}>
+                    <div className="responsive-table-wrap" style={styles.tableWrap}>
                         <table style={styles.table}>
                             <thead>
                                 <tr>

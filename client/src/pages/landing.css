@@ -8,7 +8,12 @@
 
 .lp-root {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: #111827;
+  --lp-text-strong: #0f0f1a;
+  --lp-text-muted-strong: #6b7280;
+  --lp-text-soft: #9ca3af;
+  --lp-text-dim: #4b5563;
+  --lp-text-deep: #374151;
+  color: var(--lp-text-strong);
   background: #fafafa;
   scroll-behavior: smooth;
 }
@@ -51,7 +56,7 @@
 .lp-nav-links a {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--lp-text-dim);
   text-decoration: none;
   transition: color 0.2s;
 }
@@ -143,7 +148,7 @@
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: -2px;
-  color: #0f0f1a;
+  color: var(--lp-text-strong);
   margin-bottom: 1.5rem;
 }
 .lp-hero h1 span {
@@ -154,7 +159,7 @@
 }
 .lp-hero-sub {
   font-size: 1.125rem;
-  color: #6b7280;
+  color: var(--lp-text-muted-strong);
   line-height: 1.7;
   margin-bottom: 2.5rem;
   font-weight: 500;
@@ -187,7 +192,7 @@
   padding: 0.875rem 2rem;
   border-radius: 12px;
   background: var(--card-bg);
-  color: #374151;
+  color: var(--lp-text-deep);
   font-weight: 700;
   font-size: 0.95rem;
   text-decoration: none;
@@ -234,7 +239,7 @@
 .lp-chrome-url {
   margin: 0 auto;
   font-size: 11px;
-  color: #9ca3af;
+  color: var(--lp-text-soft);
   background: #f3f4f6;
   padding: 3px 12px;
   border-radius: 999px;
@@ -359,14 +364,14 @@
 .lp-stat-number {
   font-size: 2.5rem;
   font-weight: 900;
-  color: #111827;
+  color: var(--lp-text-strong);
   letter-spacing: -1.5px;
   line-height: 1;
 }
 .lp-stat-label-text {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #9ca3af;
+  color: var(--lp-text-soft);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-top: 0.5rem;
@@ -396,13 +401,13 @@
   font-size: 2.75rem;
   font-weight: 900;
   letter-spacing: -1.5px;
-  color: #0f0f1a;
+  color: var(--lp-text-strong);
   margin-bottom: 1.25rem;
   line-height: 1.1;
 }
 .lp-section-sub {
   font-size: 1.1rem;
-  color: #6b7280;
+  color: var(--lp-text-muted-strong);
   font-weight: 500;
   max-width: 600px;
   line-height: 1.7;
@@ -448,13 +453,13 @@
 .lp-feature-title {
   font-size: 1.1rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--lp-text-strong);
   margin-bottom: 0.75rem;
   letter-spacing: -0.3px;
 }
 .lp-feature-desc {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--lp-text-muted-strong);
   line-height: 1.65;
   font-weight: 500;
 }
@@ -516,13 +521,13 @@
 .lp-step-title {
   font-size: 1rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--lp-text-strong);
   margin-bottom: 0.6rem;
   letter-spacing: -0.2px;
 }
 .lp-step-desc {
   font-size: 0.85rem;
-  color: #9ca3af;
+  color: var(--lp-text-soft);
   font-weight: 500;
   line-height: 1.6;
 }
@@ -717,7 +722,7 @@
 }
 .lp-footer-tagline {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--lp-text-dim);
   line-height: 1.7;
   font-weight: 500;
   max-width: 300px;
@@ -733,12 +738,12 @@
 .lp-footer-col li { margin-bottom: 0.75rem; }
 .lp-footer-col a {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--lp-text-dim);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
 }
-.lp-footer-col a:hover { color: #9ca3af; }
+.lp-footer-col a:hover { color: var(--lp-text-soft); }
 .lp-footer-bottom {
   max-width: 1200px;
   margin: 0 auto;
@@ -748,7 +753,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.8rem;
-  color: #374151;
+  color: var(--lp-text-deep);
   font-weight: 600;
 }
 .lp-footer-bottom-badge {
@@ -914,6 +919,11 @@
    Academix ERP — Premium Dark Mode Theme Overrides
    ============================================================ */
 .dark .lp-root {
+  --lp-text-strong: var(--text-main);
+  --lp-text-muted-strong: var(--text-muted);
+  --lp-text-soft: var(--text-muted);
+  --lp-text-dim: var(--text-muted);
+  --lp-text-deep: var(--text-muted);
   color: var(--text-main);
   background: var(--page-bg);
 }

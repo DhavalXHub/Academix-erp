@@ -104,7 +104,7 @@ const StudentMentorshipPage: React.FC = () => {
     const currentBacklogs = latestNote ? latestNote.backlogsCount : 0;
 
     return (
-        <div style={styles.page}>
+        <div className="responsive-page responsive-mentorship-page" style={styles.page}>
             {toast && (
                 <div style={{
                     ...styles.toast,
@@ -116,7 +116,7 @@ const StudentMentorshipPage: React.FC = () => {
                 </div>
             )}
 
-            <div style={styles.header}>
+            <div className="responsive-header" style={styles.header}>
                 <div>
                     <h1 style={styles.title}>My Mentorship & Advising</h1>
                     <p style={styles.subtitle}>View your advising timeline, track formal feedback, and request mentorship counseling sessions.</p>
@@ -141,13 +141,13 @@ const StudentMentorshipPage: React.FC = () => {
                     <p>The academic office is currently allocating batch mentors for your semester. Please check back later.</p>
                 </div>
             ) : (
-                <div style={styles.grid}>
+                <div className="responsive-split-grid responsive-mentorship-grid" style={styles.grid}>
                     {/* Left Advising Timeline & Info */}
                     <div style={styles.leftCol}>
                         {/* Advisor Card */}
                         <div style={styles.card}>
                             <h3 style={styles.cardHeading}>Academic Advisor</h3>
-                            <div style={styles.advisorRow}>
+                            <div className="responsive-advisor-row" style={styles.advisorRow}>
                                 <div style={styles.avatar}>
                                     {advisor.name.charAt(0)}
                                 </div>
@@ -162,7 +162,7 @@ const StudentMentorshipPage: React.FC = () => {
                         {/* Performance Metrics snapshot */}
                         <div style={styles.card}>
                             <h3 style={styles.cardHeading}>Advisor File Snapshot</h3>
-                            <div style={styles.statsRoster}>
+                            <div className="responsive-stats-grid" style={styles.statsRoster}>
                                 <div style={styles.statBox}>
                                     <span style={styles.statLabel}>Recorded CGPA</span>
                                     <span style={{ ...styles.statVal, color: currentGPA >= 8.5 ? '#10b981' : currentGPA < 7.0 ? '#ef4444' : 'var(--text-main)' }}>{currentGPA}</span>
@@ -195,7 +195,7 @@ const StudentMentorshipPage: React.FC = () => {
                                         const isProposedByStudent = m.requestedBy === 'student';
                                         return (
                                             <div key={m._id} style={styles.meetingItem}>
-                                                <div style={styles.meetingHeader}>
+                                                <div className="responsive-meeting-header" style={styles.meetingHeader}>
                                                     <h4 style={styles.meetingTitle}>{m.title}</h4>
                                                     <span style={{
                                                         ...styles.statusTag,
@@ -208,7 +208,7 @@ const StudentMentorshipPage: React.FC = () => {
                                                 
                                                 {/* Action Buttons for incoming requests */}
                                                 {!isProposedByStudent && m.status === 'pending' && (
-                                                    <div style={styles.actions}>
+                                                    <div className="responsive-action-row" style={styles.actions}>
                                                         <button 
                                                             style={styles.approveBtn}
                                                             onClick={() => handleUpdateMeetingStatus(m._id, 'approved')}
@@ -270,7 +270,7 @@ const StudentMentorshipPage: React.FC = () => {
             {/* Request Meeting Modal */}
             {showRequestForm && (
                 <div style={styles.modalOverlay}>
-                    <div style={styles.modal}>
+                    <div className="responsive-modal" style={styles.modal}>
                         <div style={styles.modalHeader}>
                             <h3 style={styles.modalTitle}>Request Advising Session</h3>
                             <button style={styles.closeBtn} onClick={() => setShowRequestForm(false)}>

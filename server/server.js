@@ -15,7 +15,9 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 const path = require('path');
+const fs = require('fs');
 const { validateEnv } = require('./config/env');
+const { getUploadRoots, resolveUploadedFilePath } = require('./utils/uploadStorage');
 const {
     requestContext,
     csrfProtection,
@@ -37,6 +39,17 @@ const app = express();
 app.set('trust proxy', 1);
 const clientDistPath = path.resolve(__dirname, '../client/dist');
 const clientIndexPath = path.join(clientDistPath, 'index.html');
+const uploadRoots = getUploadRoots();
+
+try {
+    uploadRoots.forEach((root) => fs.mkdirSync(root, { recursive: true }));
+    console.log('[UPLOADS] Storage roots:', uploadRoots);
+    if (process.env.RENDER === 'true' && !process.env.UPLOAD_STORAGE_DIR && !process.env.RENDER_DISK_MOUNT_PATH) {
+        console.warn('[UPLOADS] Running on Render with the default storage root. Mount a persistent disk or set UPLOAD_STORAGE_DIR to keep uploaded files across deploys.');
+    }
+} catch (err) {
+    console.error('[UPLOADS] Failed to initialize storage roots:', uploadRoots, err.message);
+}
 
 const normalizeOrigin = (value) => {
     if (!value) return '';
@@ -116,9 +129,46 @@ app.get('/health', (req, res) => {
 // ── Uploaded Files — served publicly with authentication awareness ─────────
 // Protected so only authenticated users can view the files (using query ?token=...)
 const { protect } = require('./middleware/authMiddleware');
-app.use('/uploads', protect, express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', protect, (req, res, next) => {
+    try {
+        const absolutePath = resolveUploadedFilePath(req.path || '');
+        console.info('[UPLOADS] lookup', {
+            requestId: req.requestId,
+            method: req.method,
+            url: req.originalUrl,
+            userId: req.user?.id,
+            absolutePath,
+            exists: fs.existsSync(absolutePath),
+        });
+    } catch (err) {
+        console.warn('[UPLOADS] lookup failed', {
+            requestId: req.requestId,
+            method: req.method,
+            url: req.originalUrl,
+            userId: req.user?.id,
+            error: err.message,
+        });
+    }
+    next();
+});
+
+uploadRoots.forEach((root) => {
+    app.use('/uploads', protect, express.static(root, {
+        fallthrough: true,
+        setHeaders: (res, filePath) => {
+            console.info('[UPLOADS] served', { root, filePath });
+            res.setHeader('Cache-Control', 'no-store');
+        },
+    }));
+});
 // If a file in /uploads is not found by static middleware, return 404 instead of falling through to SPA fallback
 app.use('/uploads', (req, res) => {
+    console.warn('[UPLOADS] not found', {
+        requestId: req.requestId,
+        method: req.method,
+        url: req.originalUrl,
+        userId: req.user?.id,
+    });
     res.status(404).json({ success: false, data: null, error: { code: 'NOT_FOUND', message: 'The requested file was not found on the server.' } });
 });
 

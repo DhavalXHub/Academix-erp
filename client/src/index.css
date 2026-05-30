@@ -50,6 +50,8 @@ html, body {
   transition: background-color 0.3s ease, color 0.3s ease;
   margin: 0;
   padding: 0;
+  overflow-x: clip;
+  width: 100%;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -64,6 +66,7 @@ html, body {
   background: var(--page-bg);
   font-family: 'Inter', sans-serif;
   position: relative;
+  overflow-x: clip;
 }
 
 .erp-main {
@@ -78,6 +81,22 @@ html, body {
   flex: 1;
   overflow-y: auto;
   padding: 28px;
+  min-width: 0;
+}
+
+.responsive-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.responsive-split-grid,
+.responsive-calendar-list,
+.responsive-stats-row,
+.responsive-stats-grid,
+.responsive-toolbar,
+.responsive-tab-strip,
+.responsive-action-row {
+  min-width: 0;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -144,6 +163,369 @@ html, body {
   /* Content padding reduced on smaller screens */
   .erp-content {
     padding: 16px;
+  }
+
+  .responsive-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .responsive-header > div:first-child {
+    width: 100%;
+  }
+
+  .responsive-tab-strip {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .responsive-tab-strip > button {
+    flex: 1 1 160px;
+  }
+
+  .responsive-toolbar {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .responsive-toolbar > * {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .responsive-split-grid {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .responsive-stats-row,
+  .responsive-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .responsive-stats-row {
+    display: grid !important;
+  }
+
+  .responsive-stats-grid {
+    display: grid !important;
+  }
+
+  .responsive-calendar-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .responsive-calendar-card > :last-child {
+    width: 100%;
+  }
+
+  .responsive-action-row {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .responsive-action-row > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .responsive-messages-layout {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .responsive-messages-switcher {
+    display: flex !important;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .responsive-messages-switcher-button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .responsive-messages-page {
+    height: auto !important;
+    min-height: calc(100vh - 64px) !important;
+    overflow-y: visible !important;
+  }
+
+  .responsive-messages-sidebar,
+  .responsive-messages-main {
+    display: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+  }
+
+  .responsive-messages-layout[data-mobile-view='contacts'] .responsive-messages-sidebar {
+    display: flex !important;
+  }
+
+  .responsive-messages-layout[data-mobile-view='chat'] .responsive-messages-main {
+    display: flex !important;
+  }
+
+  .responsive-messages-layout[data-mobile-view='chat'] .responsive-mobile-chat-header {
+    display: flex !important;
+  }
+
+  .responsive-messages-sidebar {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    max-width: 100% !important;
+  }
+
+  .responsive-messages-list {
+    overflow: visible !important;
+    max-height: none !important;
+  }
+
+  .responsive-messages-main {
+    min-height: 60vh !important;
+  }
+
+  .responsive-messages-layout[data-mobile-view='chat'] .responsive-chat-window {
+    min-height: calc(100vh - 220px);
+  }
+
+  .responsive-results-filters {
+    grid-template-columns: 1fr !important;
+  }
+
+  .responsive-results-panel {
+    padding: 12px !important;
+  }
+
+  .responsive-results-panel .responsive-table-wrap {
+    margin-left: -12px;
+    margin-right: -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .responsive-reply-form {
+    flex-direction: column;
+  }
+
+  .responsive-reply-form > * {
+    width: 100%;
+  }
+
+  .responsive-thread-header,
+  .responsive-meeting-header,
+  .responsive-stack-sm,
+  .responsive-advisor-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .responsive-thread-header > *,
+  .responsive-meeting-header > *,
+  .responsive-stack-sm > *,
+  .responsive-advisor-row > * {
+    max-width: 100%;
+  }
+
+  .responsive-original-post,
+  .responsive-calendar-event-card {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .responsive-calendar-event-card,
+  .responsive-calendar-card,
+  .responsive-assignment-card {
+    align-items: flex-start !important;
+  }
+
+  .responsive-assignment-card {
+    flex-direction: column;
+  }
+
+  .responsive-assignment-card > span:last-child {
+    align-self: flex-end;
+  }
+
+  .responsive-modal,
+  .responsive-preview-modal-shell {
+    width: calc(100vw - 32px) !important;
+    max-width: none !important;
+  }
+
+  .responsive-preview-modal-shell {
+    height: min(92vh, 720px) !important;
+  }
+
+  .responsive-preview-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .responsive-preview-frame {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .erp-content {
+    padding: 12px;
+  }
+
+  .responsive-page {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .responsive-toolbar > *,
+  .responsive-action-row > *,
+  .responsive-tab-strip > button,
+  .responsive-modal button,
+  .responsive-modal a {
+    width: 100%;
+  }
+
+  .responsive-calendar-card,
+  .responsive-assignment-card,
+  .responsive-card,
+  .responsive-thread-container,
+  .responsive-stats-grid {
+    gap: 12px;
+  }
+
+  .responsive-calendar-event-card,
+  .responsive-assignment-card,
+  .responsive-calendar-card,
+  .responsive-thread-container,
+  .responsive-modal {
+    max-width: 100%;
+  }
+
+  .responsive-replies-list,
+  .responsive-calendar-list {
+    padding-right: 0;
+  }
+
+  .responsive-stats-row,
+  .responsive-stats-grid {
+    gap: 10px;
+  }
+
+  .responsive-messages-sidebar {
+    min-height: 320px;
+  }
+
+  .responsive-chat-window {
+    min-height: 60vh;
+  }
+
+  .responsive-chat-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start !important;
+  }
+
+  .responsive-chat-header > div:first-child {
+    min-width: 0;
+  }
+
+  .responsive-chat-meta {
+    margin-left: 0 !important;
+    width: 100%;
+    text-align: left;
+    font-size: 12px !important;
+  }
+
+  .responsive-chat-area {
+    padding: 14px 14px 8px !important;
+  }
+
+  .responsive-chat-composer {
+    padding: 12px !important;
+    gap: 8px !important;
+  }
+
+  .responsive-chat-composer input {
+    min-width: 0;
+  }
+
+  .responsive-message-row {
+    align-items: flex-start !important;
+  }
+
+  .responsive-message-bubble {
+    max-width: calc(100vw - 120px) !important;
+  }
+
+  .responsive-messages-page .toast-container,
+  .responsive-messages-page [data-toast-container] {
+    width: calc(100vw - 24px);
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-messages-sidebar {
+    min-height: 280px;
+  }
+
+  .responsive-messages-main {
+    min-height: 58vh !important;
+  }
+
+  .responsive-messages-layout[data-mobile-view='contacts'] .responsive-messages-sidebar,
+  .responsive-messages-layout[data-mobile-view='chat'] .responsive-messages-main {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .responsive-mobile-chat-header {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 0 0 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .responsive-message-bubble {
+    max-width: calc(100vw - 76px) !important;
+  }
+
+  .responsive-chat-window {
+    min-height: 64vh;
+  }
+
+  .responsive-chat-header {
+    padding: 12px 14px !important;
+  }
+
+  .responsive-chat-header .responsive-chat-meta {
+    order: 3;
+  }
+
+  .responsive-chat-composer {
+    flex-wrap: wrap;
+  }
+
+  .responsive-chat-composer input {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .responsive-chat-composer button {
+    width: 48px;
+    margin-left: auto;
+  }
+
+  .responsive-message-bubble {
+    max-width: calc(100vw - 92px) !important;
   }
 }
 

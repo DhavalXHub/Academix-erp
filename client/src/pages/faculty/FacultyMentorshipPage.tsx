@@ -200,7 +200,7 @@ const FacultyMentorshipPage: React.FC = () => {
     const criticalCount = mentees.filter(m => m.attendanceRate < 75 || m.backlogsCount > 0).length;
 
     return (
-        <div style={styles.page}>
+        <div className="responsive-page responsive-mentorship-page responsive-faculty-mentorship-page" style={styles.page}>
             {toast && (
                 <div style={{
                     ...styles.toast,
@@ -212,7 +212,7 @@ const FacultyMentorshipPage: React.FC = () => {
                 </div>
             )}
 
-            <div style={styles.header}>
+            <div className="responsive-header" style={styles.header}>
                 <div>
                     <h1 style={styles.title}>Mentorship & Advising Panel</h1>
                     <p style={styles.subtitle}>Monitor CGPAs, attendance percentages, backlog logs, and register direct advising notes.</p>
@@ -222,7 +222,7 @@ const FacultyMentorshipPage: React.FC = () => {
             {isLoading && mentees.length === 0 ? (
                 <div style={styles.empty}>Assembling mentee database...</div>
             ) : (
-                <div style={styles.grid}>
+                <div className="responsive-split-grid responsive-mentorship-grid" style={styles.grid}>
                     {/* LEFT COLUMN: Roster of Mentees */}
                     <div style={styles.listCard}>
                         <div style={styles.cardHeader}>
@@ -278,7 +278,7 @@ const FacultyMentorshipPage: React.FC = () => {
                         ) : (
                             <div style={styles.menteeFile}>
                                 <div style={styles.fileHeader}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <div className="responsive-stack-sm" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                         <div>
                                             <h3 style={styles.fileTitle}>{selectedMentee.user.name}</h3>
                                             <p style={styles.fileSub}>Dept: {selectedMentee.department} • Semester: {selectedMentee.semester} • {selectedMentee.user.email}</p>
@@ -323,7 +323,7 @@ const FacultyMentorshipPage: React.FC = () => {
                                                 const isStudentReq = m.requestedBy === 'student';
                                                 return (
                                                     <div key={m._id} style={styles.meetingItem}>
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                        <div className="responsive-meeting-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                                             <div>
                                                                 <h5 style={styles.meetingTitle}>{m.title}</h5>
                                                                 {m.description && <p style={styles.meetingDesc}>{m.description}</p>}
@@ -332,7 +332,7 @@ const FacultyMentorshipPage: React.FC = () => {
                                                                     ({isStudentReq ? 'Requested by Student' : 'Scheduled by You'})
                                                                 </span>
                                                             </div>
-                                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                                                            <div className="responsive-stack-sm" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
                                                                 <span style={{
                                                                     ...styles.statusTag,
                                                                     background: m.status === 'approved' ? '#dcfce7' : m.status === 'declined' ? '#fee2e2' : m.status === 'completed' ? '#f3f4f6' : '#fef3c7',
@@ -341,14 +341,14 @@ const FacultyMentorshipPage: React.FC = () => {
 
                                                                 {m.status === 'pending' && (
                                                                     <div style={{ display: 'flex', gap: 4 }}>
-                                                                        <button 
+                                                                        <button
                                                                             style={styles.approveBtn}
                                                                             onClick={() => handleUpdateMeetingStatus(m._id, 'approved')}
                                                                             title="Approve"
                                                                         >
                                                                             <Check size={12} /> Accept
                                                                         </button>
-                                                                        <button 
+                                                                        <button
                                                                             style={styles.declineBtn}
                                                                             onClick={() => handleUpdateMeetingStatus(m._id, 'declined')}
                                                                             title="Decline"
@@ -357,6 +357,7 @@ const FacultyMentorshipPage: React.FC = () => {
                                                                         </button>
                                                                     </div>
                                                                 )}
+
                                                                 {m.status === 'approved' && (
                                                                     <button
                                                                         style={styles.completeBtn}
@@ -377,7 +378,8 @@ const FacultyMentorshipPage: React.FC = () => {
                                 {/* Advising Logs Form */}
                                 <div style={styles.logsSection}>
                                     <h4 style={styles.sectionHeading}>📝 Register Advising Note</h4>
-                                    <form onSubmit={handleAddNote} style={styles.noteForm}>
+                                    <form onSubmit={handleAddNote} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                                                                    <div className="responsive-advisor-row" style={styles.advisorRow}>
                                         <textarea 
                                             required
                                             placeholder="Document key takeaways, performance reviews, or personal challenges..." 
@@ -393,6 +395,7 @@ const FacultyMentorshipPage: React.FC = () => {
                                         >
                                             {isSavingNote ? 'Recording...' : 'Add Log Entry'}
                                         </button>
+                                    </div>
                                     </form>
 
                                     {/* Advisor Timeline Logs */}
@@ -422,7 +425,7 @@ const FacultyMentorshipPage: React.FC = () => {
             {/* Schedule Meeting Modal */}
             {showMeetingModal && selectedMentee && (
                 <div style={styles.modalOverlay}>
-                    <div style={styles.modal}>
+                    <div className="responsive-modal" style={styles.modal}>
                         <div style={styles.modalHeader}>
                             <h3 style={styles.modalTitle}>Schedule Advising Session with {selectedMentee.user.name}</h3>
                             <button style={styles.closeBtn} onClick={() => setShowMeetingModal(false)}>
@@ -533,7 +536,7 @@ const styles: Record<string, React.CSSProperties> = {
     timelineItem: { display: 'flex', gap: 12 },
     timelineBadge: { color: '#6366f1', fontSize: 12, marginTop: 2 },
     timelineContent: { background: '#fafbfc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12, flex: 1 },
-    timelineDate: { fontSize: 10, fontWeight: 700, color: '#6366f1', textTransform: 'uppercase', marginBottom: 4 },
+    timelineDate: { fontSize: 10, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', marginBottom: 4 },
     timelineMsg: { margin: 0, fontSize: 13, color: 'var(--text-main)', lineHeight: 1.4 },
     noNotes: { fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 },
     

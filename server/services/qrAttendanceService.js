@@ -21,7 +21,11 @@ const generateSessionToken = (sessionId, courseId, facultyId, expiresAt) => {
         exp: Math.floor(expiresAt.getTime() / 1000),
     };
     // Sign with the app's JWT_SECRET so token is verifiable without a DB hit
-    return jwt.sign(payload, process.env.JWT_SECRET, { algorithm: 'HS256' });
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        throw new Error('JWT_SECRET is not configured. QR attendance tokens cannot be signed.');
+    }
+    return jwt.sign(payload, secret, { algorithm: 'HS256' });
 };
 
 /**
@@ -29,7 +33,9 @@ const generateSessionToken = (sessionId, courseId, facultyId, expiresAt) => {
  */
 const verifySessionToken = (token) => {
     try {
-        return jwt.verify(token, process.env.JWT_SECRET);
+        const secret = process.env.JWT_SECRET;
+        if (!secret) return null;
+        return jwt.verify(token, secret);
     } catch {
         return null;
     }
@@ -43,6 +49,15 @@ const verifySessionToken = (token) => {
  * @param {object} params
  */
 const createQRSession = async (facultyUserId, { courseId, durationMinutes = 15, sessionLabel, topic, room, lateAfterMinutes = 10 }) => {
+    console.info('[QR ATTENDANCE] createQRSession service', {
+        facultyUserId: String(facultyUserId),
+        courseId: String(courseId),
+        durationMinutes,
+        sessionLabel,
+        topic,
+        room,
+        lateAfterMinutes,
+    });
     // 1. Verify the faculty teaches this course
     const course = await Course.findById(courseId).select('code title primaryFaculty department');
     if (!course) throw ApiError.notFound('Course not found.');
@@ -78,6 +93,13 @@ const createQRSession = async (facultyUserId, { courseId, durationMinutes = 15, 
         lateAfterMs,
         status: 'active',
         scans: [],
+    });
+
+    console.info('[QR ATTENDANCE] session created', {
+        sessionId: session._id,
+        courseId: session.course,
+        facultyUserId: session.faculty,
+        expiresAt: session.expiresAt,
     });
 
     return session.populate([
@@ -189,29 +211,73 @@ const removeScan = async (sessionId, facultyUserId, studentUserId) => {
  * Validates everything, records the scan, returns result.
  */
 const scanQRCode = async (studentUserId, token, deviceInfo, ipAddress) => {
+    console.info('[QR ATTENDANCE] scanQRCode start', {
+        studentUserId: String(studentUserId),
+        tokenPreview: String(token).slice(0, 16),
+        ipAddress,
+    });
     // 1. Verify token signature (fast, no DB)
     const decoded = verifySessionToken(token);
-    if (!decoded) throw ApiError.badRequest('Invalid or expired QR code.', 'QR_INVALID');
+    if (!decoded) {
+        console.warn('[QR ATTENDANCE] token verification failed', {
+            studentUserId: String(studentUserId),
+            tokenPreview: String(token).slice(0, 16),
+        });
+        throw ApiError.badRequest('Invalid or expired QR code.', 'QR_INVALID');
+    }
+
+    console.info('[QR ATTENDANCE] token verified', {
+        studentUserId: String(studentUserId),
+        sessionId: decoded.sid,
+        courseId: decoded.cid,
+        facultyId: decoded.fid,
+    });
 
     // 2. Load session from DB
     const session = await QRSession.findById(decoded.sid)
         .populate('course', 'code title')
         .populate('faculty', 'name email');
 
-    if (!session) throw ApiError.notFound('Attendance session not found.', 'SESSION_NOT_FOUND');
+    if (!session) {
+        console.warn('[QR ATTENDANCE] session not found', {
+            studentUserId: String(studentUserId),
+            sessionId: decoded.sid,
+        });
+        throw ApiError.notFound('Attendance session not found.', 'SESSION_NOT_FOUND');
+    }
+
+    console.info('[QR ATTENDANCE] session loaded', {
+        sessionId: session._id,
+        courseId: session.course?._id || session.course,
+        status: session.status,
+        expiresAt: session.expiresAt,
+    });
 
     // 3. Status checks
-    if (session.status === 'ended') throw ApiError.badRequest('This attendance session has ended.', 'SESSION_ENDED');
-    if (session.status === 'paused') throw ApiError.badRequest('Attendance is currently paused. Please wait.', 'SESSION_PAUSED');
+    if (session.status === 'ended') {
+        console.warn('[QR ATTENDANCE] session ended', { sessionId: session._id, studentUserId: String(studentUserId) });
+        throw ApiError.badRequest('This attendance session has ended.', 'SESSION_ENDED');
+    }
+    if (session.status === 'paused') {
+        console.warn('[QR ATTENDANCE] session paused', { sessionId: session._id, studentUserId: String(studentUserId) });
+        throw ApiError.badRequest('Attendance is currently paused. Please wait.', 'SESSION_PAUSED');
+    }
     if (new Date() > session.expiresAt) {
         session.status = 'ended';
         await session.save();
+        console.warn('[QR ATTENDANCE] qr expired', { sessionId: session._id, studentUserId: String(studentUserId) });
         throw ApiError.badRequest('This QR code has expired.', 'QR_EXPIRED');
     }
 
     // 4. Duplicate scan check
     const alreadyScanned = session.scans.some(s => s.student.toString() === studentUserId);
-    if (alreadyScanned) throw ApiError.conflict('You have already marked attendance for this session.', 'DUPLICATE_SCAN');
+    if (alreadyScanned) {
+        console.warn('[QR ATTENDANCE] duplicate scan rejected', {
+            sessionId: session._id,
+            studentUserId: String(studentUserId),
+        });
+        throw ApiError.conflict('You have already marked attendance for this session.', 'DUPLICATE_SCAN');
+    }
 
     // 5. Enrollment check — student must be enrolled in this course
     const enrollment = await Enrollment.findOne({
@@ -219,11 +285,25 @@ const scanQRCode = async (studentUserId, token, deviceInfo, ipAddress) => {
         course: session.course._id,
         status: 'enrolled',
     });
-    if (!enrollment) throw ApiError.forbidden('You are not enrolled in this course.', 'NOT_ENROLLED');
+    if (!enrollment) {
+        console.warn('[QR ATTENDANCE] enrollment check failed', {
+            sessionId: session._id,
+            studentUserId: String(studentUserId),
+            courseId: String(session.course._id),
+        });
+        throw ApiError.forbidden('You are not enrolled in this course.', 'NOT_ENROLLED');
+    }
 
     // 6. Determine on-time vs late
     const elapsed = Date.now() - session.startedAt.getTime();
     const attendanceStatus = elapsed > session.lateAfterMs ? 'late' : 'present';
+
+    console.info('[QR ATTENDANCE] attendance status resolved', {
+        sessionId: session._id,
+        studentUserId: String(studentUserId),
+        attendanceStatus,
+        elapsedMs: elapsed,
+    });
 
     // 7. Record scan
     session.scans.push({
@@ -234,6 +314,13 @@ const scanQRCode = async (studentUserId, token, deviceInfo, ipAddress) => {
         ipAddress: ipAddress || '',
     });
     await session.save();
+
+    console.info('[QR ATTENDANCE] scan persisted', {
+        sessionId: session._id,
+        studentUserId: String(studentUserId),
+        attendanceStatus,
+        scanCount: session.scans.length,
+    });
 
     return {
         session: {
@@ -254,6 +341,9 @@ const scanQRCode = async (studentUserId, token, deviceInfo, ipAddress) => {
  * Get all active sessions a student can see (for their enrolled courses).
  */
 const getActiveSessionForStudent = async (studentUserId) => {
+    console.info('[QR ATTENDANCE] getActiveSessionForStudent', {
+        studentUserId: String(studentUserId),
+    });
     // Find enrolled courses
     const enrollments = await Enrollment.find({ student: studentUserId, status: 'enrolled' }).select('course');
     const courseIds = enrollments.map(e => e.course);
@@ -266,6 +356,11 @@ const getActiveSessionForStudent = async (studentUserId) => {
         .populate('course', 'code title')
         .populate('faculty', 'name email')
         .sort({ startedAt: -1 });
+
+    console.info('[QR ATTENDANCE] active session query result', {
+        studentUserId: String(studentUserId),
+        count: sessions.length,
+    });
 
     return sessions;
 };

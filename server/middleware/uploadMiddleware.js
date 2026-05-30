@@ -5,17 +5,12 @@
  *           JPG, PNG, JPEG, GIF, MP4, WEBM, MOV
  */
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const { ensureUploadDir } = require('../utils/uploadStorage');
 
 // ── Storage Config ─────────────────────────────────────────────────────────────
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadPath = path.join(__dirname, '../uploads/materials');
-        // Ensure directory exists
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
-        }
+        const uploadPath = ensureUploadDir('materials');
         cb(null, uploadPath);
     },
     filename: (req, file, cb) => {

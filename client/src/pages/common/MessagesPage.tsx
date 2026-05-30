@@ -250,6 +250,7 @@ const MessagesPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedUser, setSelectedUser] = useState<ConversationEntry | null>(null);
     const [showNewChat, setShowNewChat] = useState(false);
+    const [mobileView, setMobileView] = useState<'contacts' | 'chat'>('contacts');
     const [isLoading, setIsLoading] = useState(true);
     const openedUserRef = useRef<string | null>(null);
 
@@ -313,6 +314,7 @@ const MessagesPage: React.FC = () => {
         if (conv) {
             setSelectedUser(conv);
             setShowNewChat(false);
+            setMobileView('chat');
         }
     }, [conversations]);
 
@@ -320,6 +322,7 @@ const MessagesPage: React.FC = () => {
     const handleSelectConversation = (conv: ConversationEntry) => {
         setSelectedUser(conv);
         setShowNewChat(false);
+        setMobileView('chat');
         openedUserRef.current = conv.userId;
         // Clear unread count locally immediately
         setConversations(prev =>
@@ -348,6 +351,7 @@ const MessagesPage: React.FC = () => {
         }
         setShowNewChat(false);
         setSearchQuery('');
+        setMobileView('chat');
     };
 
     const filteredConversations = conversations.filter(c =>
@@ -363,7 +367,7 @@ const MessagesPage: React.FC = () => {
     const totalUnread = conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0);
 
     return (
-        <div style={s.page}>
+        <div className="responsive-page responsive-messages-page" style={s.page}>
             {/* Toast notifications */}
             <ToastContainer
                 toasts={messageToasts}
@@ -371,9 +375,29 @@ const MessagesPage: React.FC = () => {
                 onOpen={handleToastOpen}
             />
 
-            <div style={s.layout}>
+            <div className="responsive-messages-layout" data-mobile-view={mobileView} style={s.layout}>
+                <div className="responsive-messages-switcher" style={s.mobileSwitcher}>
+                    <button
+                        type="button"
+                        className="responsive-messages-switcher-button"
+                        style={{ ...s.mobileSwitcherButton, ...(mobileView === 'contacts' ? s.mobileSwitcherButtonActive : {}) }}
+                        onClick={() => setMobileView('contacts')}
+                    >
+                        Contacts
+                    </button>
+                    <button
+                        type="button"
+                        className="responsive-messages-switcher-button"
+                        style={{ ...s.mobileSwitcherButton, ...(mobileView === 'chat' ? s.mobileSwitcherButtonActive : {}) }}
+                        onClick={() => setMobileView('chat')}
+                        disabled={!selectedUser}
+                    >
+                        Chat
+                    </button>
+                </div>
+
                 {/* ── Sidebar ── */}
-                <div style={s.sidebar}>
+                <div className="responsive-messages-sidebar" style={s.sidebar}>
                     {/* Header */}
                     <div style={s.sidebarHeader}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
@@ -424,7 +448,7 @@ const MessagesPage: React.FC = () => {
                     </div>
 
                     {/* Contact List */}
-                    <div style={s.contactsList}>
+                    <div className="responsive-messages-list" style={s.contactsList}>
                         {showNewChat ? (
                             <>
                                 <div style={s.sectionLabel}>Start New Conversation</div>
@@ -464,7 +488,24 @@ const MessagesPage: React.FC = () => {
                 </div>
 
                 {/* ── Main Chat Area ── */}
-                <div style={s.mainArea}>
+                <div className="responsive-messages-main" style={s.mainArea}>
+                    {selectedUser && (
+                        <div className="responsive-mobile-chat-header" style={s.mobileChatHeader}>
+                            <button
+                                type="button"
+                                className="responsive-mobile-chat-back"
+                                style={s.mobileChatBack}
+                                onClick={() => setMobileView('contacts')}
+                            >
+                                ← Contacts
+                            </button>
+                            <div style={s.mobileChatInfo}>
+                                <div style={s.mobileChatName}>{selectedUser.name}</div>
+                                <div style={s.mobileChatMeta}>{selectedUser.role === 'faculty' ? 'Faculty' : selectedUser.role === 'admin' ? 'Admin' : 'Student'}</div>
+                            </div>
+                        </div>
+                    )}
+
                     {selectedUser ? (
                         <ChatWindow
                             recipientId={selectedUser.userId}
@@ -512,6 +553,57 @@ const s: Record<string, React.CSSProperties> = {
         background: 'var(--card-bg)', borderRadius: 20,
         border: '1px solid rgba(0,0,0,0.07)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.08)', overflow: 'hidden',
+    },
+    mobileSwitcher: {
+        display: 'none',
+    },
+    mobileSwitcherButton: {
+        border: '1px solid var(--border-color)',
+        background: 'var(--card-bg)',
+        color: 'var(--text-muted)',
+        borderRadius: 12,
+        padding: '10px 14px',
+        fontSize: 14,
+        fontWeight: 700,
+        cursor: 'pointer',
+    },
+    mobileSwitcherButtonActive: {
+        background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+        color: '#fff',
+        borderColor: 'transparent',
+        boxShadow: '0 4px 14px rgba(99,102,241,0.25)',
+    },
+    mobileChatHeader: {
+        display: 'none',
+    },
+    mobileChatBack: {
+        border: '1px solid var(--border-color)',
+        background: 'var(--card-bg)',
+        color: 'var(--text-main)',
+        borderRadius: 12,
+        padding: '10px 12px',
+        fontSize: 13,
+        fontWeight: 700,
+        cursor: 'pointer',
+        flexShrink: 0,
+    },
+    mobileChatInfo: {
+        minWidth: 0,
+        flex: 1,
+    },
+    mobileChatName: {
+        fontSize: 16,
+        fontWeight: 800,
+        color: 'var(--text-main)',
+        lineHeight: 1.2,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+    },
+    mobileChatMeta: {
+        marginTop: 3,
+        fontSize: 12,
+        color: 'var(--text-muted)',
     },
     sidebar: {
         width: 340, borderRight: '1px solid rgba(0,0,0,0.07)',

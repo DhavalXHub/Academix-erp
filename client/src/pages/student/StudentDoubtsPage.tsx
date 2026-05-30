@@ -141,7 +141,7 @@ const StudentDoubtsPage: React.FC = () => {
     });
 
     return (
-        <div style={styles.page}>
+        <div className="responsive-page responsive-doubts-page" style={styles.page}>
             {toast && (
                 <div style={{
                     ...styles.toast,
@@ -153,7 +153,7 @@ const StudentDoubtsPage: React.FC = () => {
                 </div>
             )}
 
-            <div style={styles.header}>
+            <div className="responsive-header" style={styles.header}>
                 <div>
                     <h1 style={styles.title}>Academic Doubt Solver</h1>
                     <p style={styles.subtitle}>Clarify concepts, communicate directly with course professors, and keep track of your doubt resolution timeline.</p>
@@ -165,7 +165,7 @@ const StudentDoubtsPage: React.FC = () => {
             </div>
 
             {/* Toolbar */}
-            <div style={styles.toolbar}>
+            <div className="responsive-toolbar responsive-doubts-toolbar" style={styles.toolbar}>
                 <div style={styles.searchBox}>
                     <Search size={16} style={{ color: 'var(--text-muted)' }} />
                     <input 
@@ -203,7 +203,7 @@ const StudentDoubtsPage: React.FC = () => {
                     <button style={{ ...styles.primaryBtn, marginTop: 12 }} onClick={() => setShowNewModal(true)}>Raise Your First Doubt</button>
                 </div>
             ) : (
-                <div style={styles.grid}>
+                <div className="responsive-split-grid responsive-doubts-grid" style={styles.grid}>
                     {/* Left List Pane */}
                     <div style={styles.listCard}>
                         <div style={styles.listHeader}>
@@ -256,8 +256,8 @@ const StudentDoubtsPage: React.FC = () => {
                                 <p>Select an active academic doubt ticket from the left column to view the resolution thread.</p>
                             </div>
                         ) : (
-                            <div style={styles.threadContainer}>
-                                <div style={styles.threadHeader}>
+                            <div className="responsive-thread-container" style={styles.threadContainer}>
+                                <div className="responsive-thread-header" style={styles.threadHeader}>
                                     <div>
                                         <span style={styles.threadCourseCode}>{selectedDoubt.course.code} - {selectedDoubt.course.title}</span>
                                         <h3 style={styles.threadTitle}>{selectedDoubt.title}</h3>
@@ -276,7 +276,7 @@ const StudentDoubtsPage: React.FC = () => {
                                 </div>
 
                                 {/* Original Doubt Post */}
-                                <div style={styles.originalPost}>
+                                <div className="responsive-original-post" style={styles.originalPost}>
                                     <div style={styles.userInitials}>
                                         {selectedDoubt.student?.name?.charAt(0) || 'S'}
                                     </div>
@@ -289,12 +289,12 @@ const StudentDoubtsPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div style={styles.repliesHeading}>
+                                <div className="responsive-replies-heading" style={styles.repliesHeading}>
                                     <span>Discussion Thread ({selectedDoubt.replies.length})</span>
                                 </div>
 
                                 {/* Timeline Replies */}
-                                <div style={styles.repliesList}>
+                                <div className="responsive-replies-list" style={styles.repliesList}>
                                     {selectedDoubt.replies.length === 0 ? (
                                         <div style={styles.noRepliesBox}>
                                             <AlertCircle size={18} style={{ color: '#9ca3af' }} />
@@ -337,7 +337,7 @@ const StudentDoubtsPage: React.FC = () => {
                                         <span>This ticket is marked as resolved. Click "Reopen Doubt" above to post further queries.</span>
                                     </div>
                                 ) : (
-                                    <form onSubmit={handleSendReply} style={styles.replyForm}>
+                                    <form onSubmit={handleSendReply} className="responsive-reply-form" style={styles.replyForm}>
                                         <input 
                                             type="text" 
                                             placeholder="Write your academic clarification reply here..." 
@@ -364,7 +364,7 @@ const StudentDoubtsPage: React.FC = () => {
             {/* Raise New Doubt Modal */}
             {showNewModal && (
                 <div style={styles.modalOverlay}>
-                    <div style={styles.modal}>
+                    <div className="responsive-modal" style={styles.modal}>
                         <div style={styles.modalHeader}>
                             <h3 style={styles.modalTitle}>Raise New Academic Doubt</h3>
                             <button style={styles.closeBtn} onClick={() => setShowNewModal(false)}>
@@ -446,7 +446,7 @@ const styles: Record<string, React.CSSProperties> = {
     statusPill: { fontSize: 9, fontWeight: 800, padding: '3px 6px', borderRadius: 4 },
     ticketTitle: { margin: '0 0 6px', fontSize: 13, fontWeight: 700, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
     ticketDesc: { margin: '0 0 8px', fontSize: 12, color: 'var(--text-muted)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4 },
-    ticketMeta: { display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#9ca3af', fontWeight: 500 },
+    ticketMeta: { display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', fontWeight: 500 },
     
     // Right threads
     threadCard: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: 16, padding: 24, display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' },
@@ -470,7 +470,7 @@ const styles: Record<string, React.CSSProperties> = {
     replyForm: { display: 'flex', gap: 10, borderTop: '1px solid #f1f5f9', paddingTop: 14 },
     replyInput: { flex: 1, padding: '11px 14px', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: 13, outline: 'none', background: '#fff', color: 'var(--text-main)' },
     sendBtn: { background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: 8, padding: '0 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-    resolvedBanner: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#f3f4f6', color: '#4b5563', borderRadius: 8, padding: 12, fontSize: 12, fontWeight: 600 },
+    resolvedBanner: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#f3f4f6', color: 'var(--text-muted)', borderRadius: 8, padding: 12, fontSize: 12, fontWeight: 600 },
     
     // Modal
     modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(2px)' },

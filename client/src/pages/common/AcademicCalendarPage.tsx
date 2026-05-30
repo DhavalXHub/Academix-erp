@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, Clock, MapPin, Plus, Trash2, FileText, Download, Eye, Maximize2, ZoomIn, ZoomOut, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchCourses, type Course } from '@/services/courseService';
-import api, { client } from '@/services/api';
+import api, { client, API_BASE_URL } from '@/services/api';
 import {
     createExamEvent,
     deleteExamEvent,
@@ -191,26 +191,28 @@ const AcademicCalendarPage: React.FC = () => {
         }
     };
 
-    const getPDFServerUrl = (url: string) => {
-        const separator = url.includes('?') ? '&' : '?';
-        const baseURL = url.startsWith('http') ? '' : ((import.meta as any).env?.VITE_API_BASE_URL?.replace('/api/v1', '') || '');
-        return `${baseURL}${url}${separator}token=${accessToken}`;
+    const getPDFServerUrl = (calendarId: string) => {
+        const token = encodeURIComponent(accessToken || '');
+        const apiRoot = String(API_BASE_URL || '').replace(/\/$/, '');
+        const route = `${apiRoot}/academic-calendars/${calendarId}/file`;
+        const separator = route.includes('?') ? '&' : '?';
+        return `${route}${separator}token=${token}`;
     };
 
     return (
-        <div style={styles.page}>
+        <div className="responsive-page responsive-academic-calendar" style={styles.page}>
             {notice && (
                 <div style={{ ...styles.notice, ...(notice.type === 'error' ? styles.noticeError : styles.noticeSuccess) }}>
                     {notice.text}
                 </div>
             )}
 
-            <div style={styles.header}>
+            <div className="responsive-header" style={styles.header}>
                 <div>
                     <h1 style={styles.title}>Academic Calendar Ecosystem</h1>
                     <p style={styles.subtitle}>Exam timetables, holiday schedules, and institution-wide year calendars in one unified place.</p>
                 </div>
-                <div style={styles.tabStrip}>
+                <div className="responsive-tab-strip" style={styles.tabStrip}>
                     <button 
                         style={{ ...styles.tabBtn, ...(activeTab === 'events' ? styles.activeTab : {}) }}
                         onClick={() => setActiveTab('events')}
@@ -260,7 +262,7 @@ const AcademicCalendarPage: React.FC = () => {
                         </form>
                     )}
 
-                    <div style={styles.toolbar}>
+                    <div className="responsive-toolbar responsive-calendar-toolbar" style={styles.toolbar}>
                         <label style={styles.filterLabel}>Status</label>
                         <select style={styles.filter} value={status} onChange={(e) => setStatus(e.target.value)}>
                             <option value="all">All</option>
@@ -273,21 +275,21 @@ const AcademicCalendarPage: React.FC = () => {
                     ) : events.length === 0 ? (
                         <div style={styles.empty}>No academic events have been published yet.</div>
                     ) : (
-                        <div style={styles.list}>
+                        <div className="responsive-calendar-list" style={styles.list}>
                             {[...grouped.upcoming, ...grouped.past].map((event) => (
-                                <article key={event._id} style={{ ...styles.card, opacity: new Date(event.endsAt) < new Date() ? 0.72 : 1 }}>
+                                <article key={event._id} className="responsive-calendar-event-card" style={{ ...styles.card, opacity: new Date(event.endsAt) < new Date() ? 0.72 : 1 }}>
                                     <div style={styles.dateBadge}>
                                         <span>{new Date(event.startsAt).toLocaleString(undefined, { month: 'short' })}</span>
                                         <strong>{new Date(event.startsAt).getDate()}</strong>
                                     </div>
                                     <div style={styles.cardBody}>
-                                        <div style={styles.cardTop}>
+                                        <div className="responsive-card-top" style={styles.cardTop}>
                                             <span style={styles.typePill}>{label(event.type)}</span>
                                             <span style={{ ...styles.statusPill, ...statusStyle(event.status) }}>{label(event.status)}</span>
                                         </div>
                                         <h2 style={styles.eventTitle}>{event.title}</h2>
                                         <p style={styles.courseLine}>{event.course ? `${event.course.code} - ${event.course.title}` : 'Institution wide'}</p>
-                                        <div style={styles.meta}>
+                                        <div className="responsive-meta-row" style={styles.meta}>
                                             <span><Clock size={15} /> {formatRange(event.startsAt, event.endsAt)}</span>
                                             <span><MapPin size={15} /> {event.venue || 'Venue pending'}</span>
                                         </div>
@@ -364,7 +366,7 @@ const AcademicCalendarPage: React.FC = () => {
                     ) : (
                         <div style={styles.pdfList}>
                             {pdfCalendars.map(cal => (
-                                <div key={cal._id} style={styles.pdfCard}>
+                                <div key={cal._id} className="responsive-calendar-card" style={styles.pdfCard}>
                                     <div style={styles.pdfIconWrap}>
                                         <FileText size={26} color="#6366f1" />
                                     </div>
@@ -380,7 +382,7 @@ const AcademicCalendarPage: React.FC = () => {
                                         <h3 style={styles.pdfTitle}>{cal.title}</h3>
                                         <p style={styles.pdfSubtext}>File: {cal.fileName} • Uploaded by Admin</p>
                                     </div>
-                                    <div style={styles.pdfActions}>
+                                    <div className="responsive-action-row responsive-calendar-actions" style={styles.pdfActions}>
                                         <button 
                                             style={styles.previewBtn} 
                                             onClick={() => {
@@ -393,7 +395,7 @@ const AcademicCalendarPage: React.FC = () => {
                                             <Eye size={15} /> Preview
                                         </button>
                                         <a 
-                                            href={getPDFServerUrl(cal.fileUrl)} 
+                                            href={getPDFServerUrl(cal._id)} 
                                             download={cal.fileName}
                                             style={styles.downloadLink}
                                             title="Direct Download"
@@ -423,11 +425,11 @@ const AcademicCalendarPage: React.FC = () => {
                     ...styles.previewOverlay,
                     ...(isFullscreen ? styles.fullscreenOverlay : {})
                 }}>
-                    <div style={{
+                    <div className="responsive-preview-modal-shell" style={{
                         ...styles.previewModal,
                         ...(isFullscreen ? styles.fullscreenModal : {})
                     }}>
-                        <div style={styles.previewHeader}>
+                        <div className="responsive-preview-header" style={styles.previewHeader}>
                             <div>
                                 <h3 style={styles.previewTitle}>{previewCal.title}</h3>
                                 <p style={styles.previewSub}>Year: {previewCal.academicYear} • Scale: {zoom}%</p>
@@ -439,9 +441,9 @@ const AcademicCalendarPage: React.FC = () => {
                                 <button style={styles.closeBtn} onClick={() => setPreviewCal(null)} title="Close Preview"><X size={20} /></button>
                             </div>
                         </div>
-                        <div style={styles.iframeContainer}>
+                        <div className="responsive-preview-frame" style={styles.iframeContainer}>
                             <iframe 
-                                src={getPDFServerUrl(previewCal.fileUrl)} 
+                                src={getPDFServerUrl(previewCal._id)} 
                                 style={{
                                     ...styles.iframe,
                                     transform: `scale(${zoom / 100})`,

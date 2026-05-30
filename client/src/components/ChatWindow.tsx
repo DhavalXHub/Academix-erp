@@ -137,9 +137,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName, onM
     });
 
     return (
-        <div style={styles.container}>
+        <div className="responsive-chat-window" style={styles.container}>
             {/* Header */}
-            <div style={styles.header}>
+            <div className="responsive-chat-header" style={styles.header}>
                 <div style={styles.avatar}>{recipientName.charAt(0).toUpperCase()}</div>
                 <div>
                     <h3 style={styles.name}>{recipientName}</h3>
@@ -150,13 +150,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName, onM
                         }
                     </p>
                 </div>
-                <div style={{ marginLeft: 'auto', color: 'var(--text-muted)', fontSize: 13 }}>
+                <div className="responsive-chat-meta" style={{ marginLeft: 'auto', color: 'var(--text-muted)', fontSize: 13 }}>
                     {messages.length} message{messages.length !== 1 ? 's' : ''}
                 </div>
             </div>
 
             {/* Chat Area */}
-            <div style={styles.chatArea}>
+            <div className="responsive-chat-area" style={styles.chatArea}>
                 {isLoading ? (
                     <div style={styles.infoText}>Loading messages...</div>
                 ) : messages.length === 0 ? (
@@ -183,7 +183,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipientId, recipientName, onM
             </div>
 
             {/* Input Area */}
-            <form onSubmit={handleSend} style={styles.inputArea}>
+            <form onSubmit={handleSend} className="responsive-chat-composer" style={styles.inputArea}>
                 <input
                     ref={inputRef}
                     type="text"

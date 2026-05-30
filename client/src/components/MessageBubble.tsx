@@ -15,14 +15,14 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
     const time = new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     return (
-        <div style={{ ...styles.container, justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
+        <div className="responsive-message-row" style={{ ...styles.container, justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
             {!isMe && (
                 <div style={styles.avatar}>
                     {message.sender.name?.charAt(0) || 'U'}
                 </div>
             )}
             
-            <div style={isMe ? styles.bubbleMe : styles.bubbleThem}>
+            <div className="responsive-message-bubble" style={isMe ? styles.bubbleMe : styles.bubbleThem}>
                 {!isMe && <div style={styles.senderName}>{message.sender.name}</div>}
                 <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{message.content}</div>
                 <div style={isMe ? styles.timeMe : styles.timeThem}>
