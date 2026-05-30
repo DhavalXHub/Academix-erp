@@ -1,9 +1,53 @@
+/**
+ * academicCalendarController.js
+ * Manages academic calendar PDFs stored on Cloudinary.
+ * All file I/O is via Cloudinary — no local filesystem involvement.
+ */
 const AcademicCalendar = require('../models/AcademicCalendar');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
-const fs = require('fs');
-const { normalizePublicUploadPath, resolveUploadedFilePath, toPublicUploadPath } = require('../utils/uploadStorage');
+const https = require('https');
+const { uploadToCloudinary, deleteFromCloudinary, mimeToResourceType } = require('../utils/cloudinaryUpload');
+
+/**
+ * Fetches a Cloudinary URL server-side and pipes it to the Express response.
+ * Avoids all browser CORS and cross-origin download-attribute restrictions.
+ *
+ * @param {string}  cloudinaryUrl     - The secure_url from Cloudinary
+ * @param {string}  fileName          - Original filename for Content-Disposition
+ * @param {'inline'|'attachment'} disposition - inline = preview, attachment = download
+ * @param {object}  res               - Express response object
+ */
+const pipeCloudinaryFile = (cloudinaryUrl, fileName, disposition, res) => {
+    return new Promise((resolve, reject) => {
+        https.get(cloudinaryUrl, (cloudRes) => {
+            if (cloudRes.statusCode !== 200) {
+                reject(new Error(`Cloudinary returned HTTP ${cloudRes.statusCode}`));
+                return;
+            }
+
+            let contentType = cloudRes.headers['content-type'] || 'application/octet-stream';
+            if (fileName && fileName.toLowerCase().endsWith('.pdf')) {
+                contentType = 'application/pdf';
+            }
+            const safeName = encodeURIComponent(fileName || 'calendar.pdf').replace(/'/g, "'");
+
+            res.setHeader('Content-Type', contentType);
+            res.setHeader('Content-Disposition', `${disposition}; filename="${safeName}"`);
+            res.setHeader('Cache-Control', 'no-store');
+
+            if (cloudRes.headers['content-length']) {
+                res.setHeader('Content-Length', cloudRes.headers['content-length']);
+            }
+
+            cloudRes.pipe(res);
+            cloudRes.on('end', resolve);
+            cloudRes.on('error', reject);
+        }).on('error', reject);
+    });
+};
+
 
 // @desc    Get all academic calendars
 // @route   GET /api/v1/academic-calendars
@@ -17,52 +61,69 @@ const getCalendars = asyncHandler(async (req, res) => {
         .populate('uploadedBy', 'name email role')
         .sort({ createdAt: -1 });
 
-    const calendarData = calendars.map((calendar) => {
-        const plain = calendar.toObject();
-        plain.fileUrl = normalizePublicUploadPath(plain.fileUrl || '');
-        return plain;
-    });
-
-    return ApiResponse.success(res, 200, { calendars: calendarData });
+    return ApiResponse.success(res, 200, { calendars });
 });
 
-// @desc    Create/Upload academic calendar
+// @desc    Upload academic calendar PDF/image to Cloudinary
 // @route   POST /api/v1/academic-calendars
 const uploadCalendar = asyncHandler(async (req, res) => {
     const { title, academicYear, calendarType } = req.body;
+
     if (!title || !academicYear || !calendarType) {
         throw ApiError.badRequest('title, academicYear, and calendarType are required.');
     }
 
     if (!req.file) {
-        throw ApiError.badRequest('PDF or image file is required.');
+        throw ApiError.badRequest('A PDF or image file is required.');
     }
 
-    const fileUrl = toPublicUploadPath(`materials/${req.file.filename}`);
-    const fileName = req.file.originalname;
-    const absolutePath = resolveUploadedFilePath(fileUrl);
+    // Validate MIME type (extra server-side guard beyond multer filter)
+    const allowedMimes = new Set([
+        'application/pdf',
+        'image/jpeg', 'image/png', 'image/webp', 'image/gif',
+    ]);
+    if (!allowedMimes.has(req.file.mimetype)) {
+        throw ApiError.badRequest('Only PDF and image files are accepted for Academic Calendars.');
+    }
 
-    console.info('[ACADEMIC_CALENDAR] Upload received', {
+    // Upload to Cloudinary
+    const resourceType = mimeToResourceType(req.file.mimetype); // 'image' or 'raw'
+    let cloudResult;
+    try {
+        cloudResult = await uploadToCloudinary(req.file.buffer, {
+            folder: 'academix/academic-calendars',
+            resource_type: resourceType,
+            use_filename: true,
+            unique_filename: true,
+        });
+    } catch (uploadErr) {
+        console.error('[ACADEMIC_CALENDAR] Cloudinary upload error:', uploadErr.message);
+        throw ApiError.internal('File upload to cloud storage failed. Please try again.');
+    }
+
+    console.info('[ACADEMIC_CALENDAR] Upload succeeded', {
         requestId: req.requestId,
         userId: req.user?.id,
         title,
         academicYear,
         calendarType,
-        fileUrl,
-        absolutePath,
-        exists: fs.existsSync(absolutePath),
+        secureUrl: cloudResult.secure_url,
+        publicId: cloudResult.public_id,
+        bytes: cloudResult.bytes,
     });
 
     const calendar = await AcademicCalendar.create({
         title,
         academicYear,
         calendarType,
-        fileUrl,
-        fileName,
+        fileUrl: cloudResult.secure_url,       // permanent Cloudinary HTTPS URL
+        cloudinaryPublicId: cloudResult.public_id,
+        cloudinaryResourceType: cloudResult.resource_type,
+        fileName: req.file.originalname,
         uploadedBy: req.user.id,
     });
 
-    // Broadcast notification to all students and faculty
+    // Broadcast notification
     try {
         const notificationService = require('../services/notificationService');
         const typeLabel = calendarType === 'holiday' ? 'Holiday Schedule'
@@ -78,52 +139,62 @@ const uploadCalendar = asyncHandler(async (req, res) => {
         console.error('[Calendar Notification] Failed:', notifErr.message);
     }
 
-    console.info('[ACADEMIC_CALENDAR] Calendar saved', {
-        requestId: req.requestId,
-        calendarId: calendar._id,
-        fileUrl: calendar.fileUrl,
-        absolutePath,
-        exists: fs.existsSync(absolutePath),
-    });
-
     return ApiResponse.success(res, 201, { calendar }, 'Calendar uploaded successfully.');
 });
 
-// @desc    Stream academic calendar file
+// @desc    Proxy-serve calendar file inline (for iframe / preview)
 // @route   GET /api/v1/academic-calendars/:id/file
-const getCalendarFile = asyncHandler(async (req, res) => {
-    const calendar = await AcademicCalendar.findById(req.params.id).select('title academicYear calendarType fileUrl fileName');
+const proxyCalendarFile = asyncHandler(async (req, res) => {
+    const calendar = await AcademicCalendar.findById(req.params.id)
+        .select('title fileUrl fileName');
 
-    if (!calendar) {
-        throw ApiError.notFound('Calendar not found.');
+    if (!calendar || !calendar.fileUrl) {
+        throw ApiError.notFound('Calendar file not found.');
     }
 
-    const publicFileUrl = normalizePublicUploadPath(calendar.fileUrl || '');
-    const absolutePath = resolveUploadedFilePath(publicFileUrl);
-    const exists = fs.existsSync(absolutePath);
-
-    console.info('[ACADEMIC_CALENDAR] File lookup', {
-        requestId: req.requestId,
-        calendarId: calendar._id,
-        title: calendar.title,
-        fileUrl: calendar.fileUrl,
-        publicFileUrl,
-        absolutePath,
-        exists,
-    });
-
-    if (!exists) {
-        throw ApiError.notFound('The requested file was not found on the server.');
+    try {
+        await pipeCloudinaryFile(calendar.fileUrl, calendar.fileName, 'inline', res);
+    } catch (err) {
+        console.error('[CALENDAR] Proxy stream error:', err.message);
+        if (!res.headersSent) {
+            throw ApiError.internal('Could not retrieve file from cloud storage.');
+        }
     }
-
-    return res.sendFile(absolutePath);
 });
 
-// @desc    Delete academic calendar
+// @desc    Force-download calendar file with correct filename
+// @route   GET /api/v1/academic-calendars/:id/download
+const downloadCalendarFile = asyncHandler(async (req, res) => {
+    const calendar = await AcademicCalendar.findById(req.params.id)
+        .select('title fileUrl fileName');
+
+    if (!calendar || !calendar.fileUrl) {
+        throw ApiError.notFound('Calendar file not found.');
+    }
+
+    try {
+        await pipeCloudinaryFile(calendar.fileUrl, calendar.fileName, 'attachment', res);
+    } catch (err) {
+        console.error('[CALENDAR] Download stream error:', err.message);
+        if (!res.headersSent) {
+            throw ApiError.internal('Could not retrieve file from cloud storage.');
+        }
+    }
+});
+
+// @desc    Delete academic calendar (and its Cloudinary asset)
 // @route   DELETE /api/v1/academic-calendars/:id
 const deleteCalendar = asyncHandler(async (req, res) => {
     const calendar = await AcademicCalendar.findById(req.params.id);
     if (!calendar) throw ApiError.notFound('Calendar not found.');
+
+    // Remove asset from Cloudinary if we have a public_id
+    if (calendar.cloudinaryPublicId) {
+        await deleteFromCloudinary(
+            calendar.cloudinaryPublicId,
+            calendar.cloudinaryResourceType || 'raw'
+        );
+    }
 
     await calendar.deleteOne();
     return ApiResponse.success(res, 200, null, 'Calendar deleted successfully.');
@@ -132,6 +203,7 @@ const deleteCalendar = asyncHandler(async (req, res) => {
 module.exports = {
     getCalendars,
     uploadCalendar,
-    getCalendarFile,
+    proxyCalendarFile,
+    downloadCalendarFile,
     deleteCalendar,
 };

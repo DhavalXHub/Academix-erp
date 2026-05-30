@@ -23,10 +23,11 @@ const csrfProtection = (req, res, next) => {
     const token = existingToken || crypto.randomBytes(32).toString('hex');
 
     if (!existingToken) {
+        const isProduction = process.env.NODE_ENV === 'production';
         res.cookie(cookieName, token, {
             httpOnly: false,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax',
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
     }

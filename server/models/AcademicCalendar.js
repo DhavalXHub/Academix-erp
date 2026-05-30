@@ -17,9 +17,20 @@ const academicCalendarSchema = new mongoose.Schema(
             enum: ['academic', 'holiday', 'exam'],
             default: 'academic'
         },
+        // Cloudinary HTTPS URL — permanent, CDN-served
         fileUrl: {
             type: String,
             required: true
+        },
+        // Cloudinary public_id — needed to delete the asset
+        cloudinaryPublicId: {
+            type: String,
+            default: null
+        },
+        // Cloudinary resource type: 'image' | 'raw' | 'video'
+        cloudinaryResourceType: {
+            type: String,
+            default: 'raw'
         },
         fileName: {
             type: String,

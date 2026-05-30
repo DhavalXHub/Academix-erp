@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, Clock, MapPin, Plus, Trash2, FileText, Download, Eye, Maximize2, ZoomIn, ZoomOut, X } from 'lucide-react';
+import { CalendarDays, Clock, MapPin, Plus, Trash2, FileText, Download, Eye, Maximize2, ZoomIn, ZoomOut, X, ExternalLink, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchCourses, type Course } from '@/services/courseService';
 import api, { client, API_BASE_URL } from '@/services/api';
@@ -40,6 +40,11 @@ export interface InstitutionalCalendar {
     createdAt: string;
 }
 
+// ── URL Utilities ─────────────────────────────────────────────────
+// Preview and Download are handled securely via the server-side proxy endpoints
+// which stream files directly from Cloudinary under the authorized session.
+
+
 const AcademicCalendarPage: React.FC = () => {
     const { accessToken, user } = useAuth();
     const [activeTab, setActiveTab] = useState<'events' | 'pdfs'>('events');
@@ -65,6 +70,8 @@ const AcademicCalendarPage: React.FC = () => {
     const [previewCal, setPreviewCal] = useState<InstitutionalCalendar | null>(null);
     const [zoom, setZoom] = useState(100);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [iframeLoading, setIframeLoading] = useState(false);
+    const [iframeKey, setIframeKey] = useState(0);
 
     const isAdmin = user?.role === 'admin';
 
@@ -195,6 +202,14 @@ const AcademicCalendarPage: React.FC = () => {
         const token = encodeURIComponent(accessToken || '');
         const apiRoot = String(API_BASE_URL || '').replace(/\/$/, '');
         const route = `${apiRoot}/academic-calendars/${calendarId}/file`;
+        const separator = route.includes('?') ? '&' : '?';
+        return `${route}${separator}token=${token}`;
+    };
+
+    const getPDFDownloadUrl = (calendarId: string) => {
+        const token = encodeURIComponent(accessToken || '');
+        const apiRoot = String(API_BASE_URL || '').replace(/\/$/, '');
+        const route = `${apiRoot}/academic-calendars/${calendarId}/download`;
         const separator = route.includes('?') ? '&' : '?';
         return `${route}${separator}token=${token}`;
     };
@@ -389,13 +404,15 @@ const AcademicCalendarPage: React.FC = () => {
                                                 setPreviewCal(cal);
                                                 setZoom(100);
                                                 setIsFullscreen(false);
+                                                setIframeLoading(true);
+                                                setIframeKey(k => k + 1);
                                             }}
                                             title="Interactive Preview"
                                         >
                                             <Eye size={15} /> Preview
                                         </button>
-                                        <a 
-                                            href={getPDFServerUrl(cal._id)} 
+                                        <a
+                                            href={getPDFDownloadUrl(cal._id)}
                                             download={cal.fileName}
                                             style={styles.downloadLink}
                                             title="Direct Download"
@@ -421,41 +438,71 @@ const AcademicCalendarPage: React.FC = () => {
 
             {/* Premium Glassmorphic PDF Preview Modal */}
             {previewCal && (
-                <div style={{
+            <div style={{
                     ...styles.previewOverlay,
                     ...(isFullscreen ? styles.fullscreenOverlay : {})
+                }}
+                onClick={(e) => { if (e.target === e.currentTarget) setPreviewCal(null); }}
+            >
+                <div className="responsive-preview-modal-shell" style={{
+                    ...styles.previewModal,
+                    ...(isFullscreen ? styles.fullscreenModal : {})
                 }}>
-                    <div className="responsive-preview-modal-shell" style={{
-                        ...styles.previewModal,
-                        ...(isFullscreen ? styles.fullscreenModal : {})
-                    }}>
-                        <div className="responsive-preview-header" style={styles.previewHeader}>
-                            <div>
-                                <h3 style={styles.previewTitle}>{previewCal.title}</h3>
-                                <p style={styles.previewSub}>Year: {previewCal.academicYear} • Scale: {zoom}%</p>
-                            </div>
-                            <div style={styles.previewControls}>
-                                <button style={styles.controlBtn} onClick={() => setZoom(prev => Math.max(50, prev - 10))} title="Zoom Out"><ZoomOut size={16} /></button>
-                                <button style={styles.controlBtn} onClick={() => setZoom(prev => Math.min(200, prev + 10))} title="Zoom In"><ZoomIn size={16} /></button>
-                                <button style={styles.controlBtn} onClick={() => setIsFullscreen(prev => !prev)} title="Toggle Fullscreen"><Maximize2 size={16} /></button>
-                                <button style={styles.closeBtn} onClick={() => setPreviewCal(null)} title="Close Preview"><X size={20} /></button>
-                            </div>
+                    <div className="responsive-preview-header" style={styles.previewHeader}>
+                        <div>
+                            <h3 style={styles.previewTitle}>{previewCal.title}</h3>
+                            <p style={styles.previewSub}>Year: {previewCal.academicYear} &bull; Scale: {zoom}%</p>
                         </div>
-                        <div className="responsive-preview-frame" style={styles.iframeContainer}>
-                            <iframe 
-                                src={getPDFServerUrl(previewCal._id)} 
-                                style={{
-                                    ...styles.iframe,
-                                    transform: `scale(${zoom / 100})`,
-                                    transformOrigin: 'top center',
-                                    height: `${100 * (100 / zoom)}%`,
-                                    width: `${100 * (100 / zoom)}%`
-                                }}
-                                title="Academic PDF Viewport"
-                            />
+                        <div style={styles.previewControls}>
+                            <button style={styles.controlBtn} onClick={() => setZoom(prev => Math.max(50, prev - 10))} title="Zoom Out"><ZoomOut size={16} /></button>
+                            <button style={styles.controlBtn} onClick={() => setZoom(prev => Math.min(200, prev + 10))} title="Zoom In"><ZoomIn size={16} /></button>
+                            <button style={styles.controlBtn} onClick={() => setIsFullscreen(prev => !prev)} title="Toggle Fullscreen"><Maximize2 size={16} /></button>
+                            <a
+                                href={getPDFDownloadUrl(previewCal._id)}
+                                download={previewCal.fileName}
+                                style={{ ...styles.controlBtn, textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                title="Download PDF"
+                            >
+                                <Download size={16} />
+                            </a>
+                            <a
+                                href={previewCal.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ ...styles.controlBtn, textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                title="Open in new tab"
+                            >
+                                <ExternalLink size={16} />
+                            </a>
+                            <button style={styles.closeBtn} onClick={() => setPreviewCal(null)} title="Close Preview"><X size={20} /></button>
                         </div>
                     </div>
+                    <div className="responsive-preview-frame" style={styles.iframeContainer}>
+                        {iframeLoading && (
+                            <div style={styles.iframeLoader}>
+                                <Loader2 size={32} style={{ animation: 'spin 1s linear infinite', color: '#6366f1' }} />
+                                <p style={{ marginTop: 12, color: '#64748b', fontSize: 13 }}>Loading PDF preview…</p>
+                            </div>
+                        )}
+                        <iframe 
+                            key={iframeKey}
+                            src={getPDFServerUrl(previewCal._id)}
+                            style={{
+                                ...styles.iframe,
+                                transform: `scale(${zoom / 100})`,
+                                transformOrigin: 'top center',
+                                height: `${100 * (100 / zoom)}%`,
+                                width: `${100 * (100 / zoom)}%`,
+                                display: iframeLoading ? 'none' : 'block',
+                            }}
+                            title="Academic PDF Viewport"
+                            onLoad={() => setIframeLoading(false)}
+                            onError={() => setIframeLoading(false)}
+                            allow="fullscreen"
+                        />
+                    </div>
                 </div>
+            </div>
             )}
         </div>
     );
@@ -542,8 +589,9 @@ const styles: Record<string, React.CSSProperties> = {
     previewControls: { display: 'flex', gap: 6, alignItems: 'center' },
     controlBtn: { width: 34, height: 34, borderRadius: 6, border: '1px solid #e2e8f0', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4b5563' },
     closeBtn: { width: 34, height: 34, borderRadius: 6, border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' },
-    iframeContainer: { flex: 1, background: '#f8fafc', overflow: 'auto', display: 'flex', justifyContent: 'center' },
-    iframe: { border: 'none', transition: 'transform 0.2s ease' },
+    iframeContainer: { flex: 1, background: '#f8fafc', overflow: 'auto', display: 'flex', justifyContent: 'center', position: 'relative' },
+    iframeLoader: { position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', zIndex: 10 },
+    iframe: { border: 'none', transition: 'transform 0.2s ease', width: '100%', height: '100%' },
 
     empty: { padding: '4rem', textAlign: 'center', color: 'var(--text-muted)', border: '1px dashed var(--border-color, #e5e7eb)', borderRadius: 12, background: '#fafbfc' },
     notice: { position: 'fixed', top: 18, right: 18, zIndex: 999999, border: '1px solid', borderRadius: 8, padding: '12px 14px', fontWeight: 800, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' },

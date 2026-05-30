@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSocket } from '@/contexts/SocketContext';
 import { fetchTeachingCourses } from '@/services/courseService';
@@ -11,7 +11,6 @@ import type { Course } from '@/services/courseService';
 
 /* ─── tiny QR renderer using a canvas + qrcode-svg URL ─────────────────────── */
 const QRDisplay: React.FC<{ token: string; size?: number }> = ({ token, size = 240 }) => {
-    const iframeRef = useRef<HTMLIFrameElement>(null);
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(token)}&format=svg&ecc=M`;
     return (
         <img src={qrUrl} width={size} height={size} alt="QR Code"

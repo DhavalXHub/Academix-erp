@@ -28,3 +28,19 @@ Thumbs.db
 # Temp files
 *.tmp
 *.swp
+
+# Development/debug scripts (should not deploy)
+test.js
+test_*.js
+check_syntax.js
+fix-syntax.js
+ping_test.js
+ping_ready.txt
+theme-refactor.js
+clean_db.js
+server/test_db.js
+server/temp_run.js
+server/spawn_server.js
+server/verify_login.js
+server_output_new.log
+server_error.log

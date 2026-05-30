@@ -30,7 +30,17 @@ const courseMaterialSchema = new mongoose.Schema(
         // ── File Storage ──────────────────────────────────────────────
         fileUrl: {
             type: String,
-            required: true, // Either a local /uploads/... path or an external URL
+            required: true, // Cloudinary HTTPS URL (uploaded files) or external URL (links)
+        },
+        // Cloudinary public_id — needed to delete the cloud asset on material removal
+        cloudinaryPublicId: {
+            type: String,
+            default: null,
+        },
+        // Cloudinary resource type: 'image' | 'raw' | 'video'
+        cloudinaryResourceType: {
+            type: String,
+            default: 'raw',
         },
         fileName: {
             type: String,

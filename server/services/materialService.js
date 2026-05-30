@@ -1,9 +1,13 @@
+/**
+ * materialService.js
+ * Business logic for course materials.
+ * All file uploads go to Cloudinary; no local filesystem writes.
+ */
 const CourseMaterial = require('../models/CourseMaterial');
 const Course = require('../models/Course');
 const Enrollment = require('../models/Enrollment');
 const ApiError = require('../utils/ApiError');
-const fs = require('fs');
-const { normalizePublicUploadPath, resolveUploadedFilePath, toPublicUploadPath } = require('../utils/uploadStorage');
+const { uploadToCloudinary, deleteFromCloudinary, mimeToResourceType } = require('../utils/cloudinaryUpload');
 
 /**
  * Verify access to a course's materials.
@@ -39,7 +43,7 @@ const getMaterialsByCourse = async (userId, userRole, courseId) => {
         .sort({ isPinned: -1, uploadedAt: -1 });
 };
 
-// POST /api/v1/materials/upload — multipart/form-data (real file)
+// POST /api/v1/materials/upload — multipart/form-data (real file → Cloudinary)
 const uploadMaterialFile = async (userId, courseId, fileInfo, metadata) => {
     const course = await Course.findById(courseId);
     if (!course) throw ApiError.notFound('Course not found.');
@@ -47,14 +51,29 @@ const uploadMaterialFile = async (userId, courseId, fileInfo, metadata) => {
         throw ApiError.forbidden('You are not assigned to this course.');
     }
 
-    const fileUrl = toPublicUploadPath(`materials/${fileInfo.filename}`);
+    // Upload buffer to Cloudinary
+    const resourceType = mimeToResourceType(fileInfo.mimetype);
+    let cloudResult;
+    try {
+        cloudResult = await uploadToCloudinary(fileInfo.buffer, {
+            folder: 'academix/materials',
+            resource_type: resourceType,
+            use_filename: true,
+            unique_filename: true,
+        });
+    } catch (uploadErr) {
+        console.error('[Material] Cloudinary upload error:', uploadErr.message);
+        throw ApiError.internal('File upload to cloud storage failed. Please try again.');
+    }
 
     const material = await CourseMaterial.create({
         course: courseId,
         faculty: userId,
         title: metadata.title || fileInfo.originalname,
         description: metadata.description || '',
-        fileUrl,
+        fileUrl: cloudResult.secure_url,              // Cloudinary HTTPS URL
+        cloudinaryPublicId: cloudResult.public_id,
+        cloudinaryResourceType: cloudResult.resource_type,
         fileName: fileInfo.originalname,
         fileSize: fileInfo.size,
         mimeType: fileInfo.mimetype,
@@ -81,7 +100,7 @@ const uploadMaterialFile = async (userId, courseId, fileInfo, metadata) => {
     return material;
 };
 
-// POST /api/v1/materials — external link (JSON body)
+// POST /api/v1/materials/link — external URL (JSON body, no file upload)
 const uploadMaterialLink = async (userId, courseId, data) => {
     const course = await Course.findById(courseId);
     if (!course) throw ApiError.notFound('Course not found.');
@@ -117,7 +136,7 @@ const uploadMaterialLink = async (userId, courseId, data) => {
     return material;
 };
 
-// PATCH /api/v1/materials/:id — update metadata
+// PATCH /api/v1/materials/:id — update metadata only
 const updateMaterial = async (userId, materialId, updates) => {
     const material = await CourseMaterial.findById(materialId);
     if (!material) throw ApiError.notFound('Material not found.');
@@ -137,15 +156,15 @@ const deleteMaterial = async (userId, userRole, materialId) => {
     if (userRole !== 'admin' && material.faculty.toString() !== userId.toString()) {
         throw ApiError.forbidden('You can only delete your own materials.');
     }
-    // Delete physical file if it exists
-    if (!material.isExternalLink && material.fileUrl) {
-        try {
-            const filePath = resolveUploadedFilePath(normalizePublicUploadPath(material.fileUrl));
-            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        } catch (e) {
-            console.warn('[Material Delete] Could not delete physical file:', e.message);
-        }
+
+    // Delete from Cloudinary if this was an uploaded (not external) file
+    if (!material.isExternalLink && material.cloudinaryPublicId) {
+        await deleteFromCloudinary(
+            material.cloudinaryPublicId,
+            material.cloudinaryResourceType || 'raw'
+        );
     }
+
     await CourseMaterial.findByIdAndDelete(materialId);
 };
 

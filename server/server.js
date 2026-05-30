@@ -17,7 +17,7 @@ const connectDB = require('./config/db');
 const path = require('path');
 const fs = require('fs');
 const { validateEnv } = require('./config/env');
-const { getUploadRoots, resolveUploadedFilePath } = require('./utils/uploadStorage');
+const { initCloudinary } = require('./config/cloudinary');
 const {
     requestContext,
     csrfProtection,
@@ -35,21 +35,18 @@ validateEnv();
 // Connect to Database
 connectDB();
 
+// Initialize Cloudinary (validates credentials at startup)
+try {
+    initCloudinary();
+} catch (err) {
+    console.error('[Cloudinary] Initialization failed:', err.message);
+    if (process.env.NODE_ENV === 'production') process.exit(1);
+}
+
 const app = express();
 app.set('trust proxy', 1);
 const clientDistPath = path.resolve(__dirname, '../client/dist');
 const clientIndexPath = path.join(clientDistPath, 'index.html');
-const uploadRoots = getUploadRoots();
-
-try {
-    uploadRoots.forEach((root) => fs.mkdirSync(root, { recursive: true }));
-    console.log('[UPLOADS] Storage roots:', uploadRoots);
-    if (process.env.RENDER === 'true' && !process.env.UPLOAD_STORAGE_DIR && !process.env.RENDER_DISK_MOUNT_PATH) {
-        console.warn('[UPLOADS] Running on Render with the default storage root. Mount a persistent disk or set UPLOAD_STORAGE_DIR to keep uploaded files across deploys.');
-    }
-} catch (err) {
-    console.error('[UPLOADS] Failed to initialize storage roots:', uploadRoots, err.message);
-}
 
 const normalizeOrigin = (value) => {
     if (!value) return '';
@@ -126,51 +123,8 @@ app.get('/health', (req, res) => {
     });
 });
 
-// ── Uploaded Files — served publicly with authentication awareness ─────────
-// Protected so only authenticated users can view the files (using query ?token=...)
-const { protect } = require('./middleware/authMiddleware');
-app.use('/uploads', protect, (req, res, next) => {
-    try {
-        const absolutePath = resolveUploadedFilePath(req.path || '');
-        console.info('[UPLOADS] lookup', {
-            requestId: req.requestId,
-            method: req.method,
-            url: req.originalUrl,
-            userId: req.user?.id,
-            absolutePath,
-            exists: fs.existsSync(absolutePath),
-        });
-    } catch (err) {
-        console.warn('[UPLOADS] lookup failed', {
-            requestId: req.requestId,
-            method: req.method,
-            url: req.originalUrl,
-            userId: req.user?.id,
-            error: err.message,
-        });
-    }
-    next();
-});
-
-uploadRoots.forEach((root) => {
-    app.use('/uploads', protect, express.static(root, {
-        fallthrough: true,
-        setHeaders: (res, filePath) => {
-            console.info('[UPLOADS] served', { root, filePath });
-            res.setHeader('Cache-Control', 'no-store');
-        },
-    }));
-});
-// If a file in /uploads is not found by static middleware, return 404 instead of falling through to SPA fallback
-app.use('/uploads', (req, res) => {
-    console.warn('[UPLOADS] not found', {
-        requestId: req.requestId,
-        method: req.method,
-        url: req.originalUrl,
-        userId: req.user?.id,
-    });
-    res.status(404).json({ success: false, data: null, error: { code: 'NOT_FOUND', message: 'The requested file was not found on the server.' } });
-});
+// Note: /uploads route removed — all files are served directly from Cloudinary CDN.
+// Each route file imports `protect` middleware independently.
 
 // ── API Routes (v1) ────────────────────────────────────────────────────────
 app.use('/api/v1/auth', require('./routes/authRoutes'));
@@ -225,8 +179,25 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/exams', require('./routes/examRoutes'));
 app.use('/api/audit-logs', require('./routes/auditRoutes'));
 
-// ── Global Error Handler ───────────────────────────────────────────────────
+// ── API 404 handler ────────────────────────────────────────────────────────
 app.use('/api', notFound);
+
+// ── Serve frontend static files ───────────────────────────────────────────
+app.use(express.static(clientDistPath));
+
+// ── React SPA fallback (must be after static + API routes) ────────────────
+app.get('*', (req, res) => {
+    if (req.originalUrl.startsWith('/api')) {
+        return res.status(404).json({
+            success: false,
+            message: 'API route not found',
+        });
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+});
+
+// ── Global Error Handler (must be LAST middleware) ────────────────────────
+app.use(errorHandler);
 
 // ── Socket Server ──────────────────────────────────────────────────────────
 const http = require('http');
@@ -244,29 +215,10 @@ server.listen(PORT, () => {
     setInterval(async () => {
         try {
             const { sendDeadlineReminders } = require('./services/notificationService');
-            // Check for 1-day (24 hours) deadlines
             await sendDeadlineReminders(24);
-            // Check for 1-hour deadlines
             await sendDeadlineReminders(1);
         } catch (err) {
             console.error('[DeadlineReminder Scheduler] Error:', err.message);
         }
     }, 5 * 60 * 1000);
 });
-
-/* Serve frontend static files */
-app.use(express.static(clientDistPath));
-
-/* React SPA fallback */
-app.get('*', (req, res) => {
-    if (req.originalUrl.startsWith('/api')) {
-        return res.status(404).json({
-            success: false,
-            message: 'API route not found',
-        });
-    }
-
-    res.sendFile(path.join(clientDistPath, 'index.html'));
-});
-
-app.use(errorHandler);
